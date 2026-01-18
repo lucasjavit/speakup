@@ -1,0 +1,69 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary, #667eea);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--color-text-secondary, #64748b);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.googleBtn,
+.githubBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.googleBtn:hover {
+  border-color: #4285F4;
+  background: rgba(66, 133, 244, 0.05);
+}
+
+.githubBtn:hover {
+  border-color: #333;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.terms {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #94a3b8);
+  text-align: center;
+}
+
+.terms a {
+  color: var(--color-primary, #667eea);
+  text-decoration: none;
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}
