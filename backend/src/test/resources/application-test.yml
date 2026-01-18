@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-client-id
+            client-secret: test-client-secret
+          github:
+            client-id: test-client-id
+            client-secret: test-client-secret
+
+jwt:
+  secret: test-jwt-secret-key-for-testing-purposes-only
+  expiration: 86400000
+  refresh-expiration: 604800000
+
+logging:
+  level:
+    root: WARN
+    com.speakup: DEBUG
