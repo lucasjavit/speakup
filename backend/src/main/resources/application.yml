@@ -8,10 +8,12 @@ spring:
     username: ${DB_USERNAME:speakup}
     password: ${DB_PASSWORD:speakup123}
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
+      maximum-pool-size: ${HIKARI_MAX_POOL_SIZE:10}
+      minimum-idle: ${HIKARI_MIN_IDLE:5}
       idle-timeout: 300000
       connection-timeout: 20000
+      max-lifetime: 1800000
+      pool-name: SpeakUpHikariPool
 
   # JPA Configuration
   jpa:
@@ -24,12 +26,17 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
 
   # Flyway Migration
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    validate-on-migrate: true
 
   # Redis Configuration
   data:
@@ -37,6 +44,18 @@ spring:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+
+  # Cache Configuration
+  cache:
+    type: redis
+    redis:
+      time-to-live: 1800000 # 30 minutes default
 
 # Server Configuration
 server:
@@ -44,6 +63,9 @@ server:
   error:
     include-message: always
     include-binding-errors: always
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/plain
 
 # JWT Configuration
 jwt:
@@ -66,17 +88,24 @@ logging:
     com.speakup: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
 
 # Actuator
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,caches
   endpoint:
     health:
       show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
 
 ---
 # Development Profile
@@ -89,10 +118,20 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+    properties:
+      hibernate:
+        generate_statistics: true
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
 
 logging:
   level:
     com.speakup: DEBUG
+    org.springframework.cache: TRACE
 
 ---
 # Production Profile
@@ -101,12 +140,67 @@ spring:
     activate:
       on-profile: prod
 
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
 
 logging:
   level:
     root: WARN
     com.speakup: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+
+springdoc:
+  swagger-ui:
+    enabled: false
+
+---
+# Test Profile
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:speakup_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: simple
+
+logging:
+  level:
+    root: WARN
+    com.speakup: DEBUG
