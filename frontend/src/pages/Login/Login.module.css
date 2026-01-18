@@ -28,28 +28,21 @@
   color: var(--color-text-secondary, #64748b);
 }
 
+.error {
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: #fef2f2;
+  color: #dc2626;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 .buttons {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-}
-
-.googleBtn,
-.githubBtn {
-  display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.75rem;
-}
-
-.googleBtn:hover {
-  border-color: #4285F4;
-  background: rgba(66, 133, 244, 0.05);
-}
-
-.githubBtn:hover {
-  border-color: #333;
-  background: rgba(0, 0, 0, 0.05);
 }
 
 .terms {

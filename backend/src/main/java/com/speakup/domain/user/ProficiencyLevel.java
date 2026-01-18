@@ -9,9 +9,12 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ProficiencyLevel {
-    BEGINNER("A1-A2", "Beginner", 1),
-    INTERMEDIATE("B1-B2", "Intermediate", 2),
-    ADVANCED("C1-C2", "Advanced", 3);
+    BEGINNER("A1", "Beginner", 1),
+    ELEMENTARY("A2", "Elementary", 2),
+    INTERMEDIATE("B1", "Intermediate", 3),
+    UPPER_INTERMEDIATE("B2", "Upper Intermediate", 4),
+    ADVANCED("C1", "Advanced", 5),
+    FLUENT("C2", "Fluent", 6);
 
     private final String cefrLevel;
     private final String displayName;
