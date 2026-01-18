@@ -1,0 +1,126 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--color-bg-secondary, #f8fafc);
+  border-right: 1px solid var(--color-border, #e2e8f0);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary, #667eea);
+  text-decoration: none;
+}
+
+.nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.navLink {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: var(--color-text-secondary, #64748b);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background: var(--color-bg-tertiary, #f1f5f9);
+  color: var(--color-text-primary, #1e293b);
+}
+
+.navLink.active {
+  background: var(--color-primary-light, #e0e7ff);
+  color: var(--color-primary, #667eea);
+  font-weight: 500;
+  border-right: 3px solid var(--color-primary, #667eea);
+}
+
+.sidebarFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.backLink {
+  color: var(--color-text-muted, #94a3b8);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+
+.backLink:hover {
+  color: var(--color-text-secondary, #64748b);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: var(--color-bg-primary, #ffffff);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  padding: 1rem 2rem;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.userRole {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #94a3b8);
+  text-transform: capitalize;
+}
+
+.main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--color-bg-tertiary, #f1f5f9);
+  overflow-y: auto;
+}

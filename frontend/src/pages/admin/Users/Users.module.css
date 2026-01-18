@@ -1,0 +1,131 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.error {
+  color: var(--color-error, #ef4444);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.searchForm {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.searchInput {
+  width: 300px;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.tableCard {
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.table th {
+  background: var(--color-bg-secondary, #f8fafc);
+  font-weight: 500;
+  color: var(--color-text-secondary, #64748b);
+  font-size: 0.875rem;
+}
+
+.table td {
+  color: var(--color-text-primary, #1e293b);
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.roleSelect {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: var(--color-bg-primary, #ffffff);
+  cursor: pointer;
+}
+
+.role {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #64748b);
+  text-transform: capitalize;
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status.active {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #22c55e);
+}
+
+.status.inactive {
+  background: var(--color-bg-tertiary, #f1f5f9);
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pageInfo {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #64748b);
+}

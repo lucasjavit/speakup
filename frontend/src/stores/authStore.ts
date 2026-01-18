@@ -44,3 +44,12 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Re-export permission functions from hooks for backward compatibility
+export {
+  isAdmin,
+  isSuperAdmin,
+  canManageSessions,
+  canManageUsers,
+  canManagePayments,
+} from '@/hooks/usePermissions';

@@ -1,0 +1,118 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.error {
+  color: var(--color-error, #ef4444);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.sessionCard {
+  padding: 1.5rem;
+}
+
+.sessionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.sessionName {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.status.active {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #22c55e);
+}
+
+.status.inactive {
+  background: var(--color-bg-tertiary, #f1f5f9);
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.sessionTime {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+  margin-bottom: 0.25rem;
+}
+
+.sessionTimezone {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #64748b);
+  margin-bottom: 0.75rem;
+}
+
+.sessionDays {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.day {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--color-bg-tertiary, #f1f5f9);
+  border-radius: 4px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.running {
+  font-size: 0.875rem;
+  color: var(--color-primary, #667eea);
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+  padding-top: 1rem;
+}

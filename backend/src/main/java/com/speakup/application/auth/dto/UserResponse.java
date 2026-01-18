@@ -3,6 +3,7 @@ package com.speakup.application.auth.dto;
 import com.speakup.domain.user.AuthProvider;
 import com.speakup.domain.user.Language;
 import com.speakup.domain.user.ProficiencyLevel;
+import com.speakup.domain.user.Role;
 import com.speakup.domain.user.User;
 
 import java.util.UUID;
@@ -21,7 +22,8 @@ public record UserResponse(
         ProficiencyLevel proficiencyLevel,
         String timezone,
         boolean profileCompleted,
-        boolean active
+        boolean active,
+        Role role
 ) {
     public static UserResponse from(User user) {
         return new UserResponse(
@@ -35,7 +37,8 @@ public record UserResponse(
                 user.getProficiencyLevel(),
                 user.getTimezone(),
                 user.isProfileCompleted(),
-                user.isActive()
+                user.isActive(),
+                user.getRole()
         );
     }
 }

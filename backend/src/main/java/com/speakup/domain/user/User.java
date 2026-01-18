@@ -63,6 +63,11 @@ public class User extends BaseEntity {
     @Builder.Default
     private boolean active = true;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
+
     /**
      * Mark profile as completed when all required fields are filled.
      */

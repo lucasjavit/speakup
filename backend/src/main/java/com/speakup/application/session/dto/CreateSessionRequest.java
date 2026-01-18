@@ -1,0 +1,30 @@
+package com.speakup.application.session.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Set;
+
+/**
+ * Request to create a new session.
+ */
+public record CreateSessionRequest(
+        @NotBlank(message = "Name is required")
+        String name,
+
+        @NotNull(message = "Start time is required")
+        LocalTime startTime,
+
+        @NotNull(message = "End time is required")
+        LocalTime endTime,
+
+        @NotBlank(message = "Timezone is required")
+        String timezone,
+
+        @NotEmpty(message = "At least one day of week is required")
+        Set<DayOfWeek> daysOfWeek
+) {
+}

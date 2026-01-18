@@ -1,5 +1,6 @@
 package com.speakup.presentation.exception;
 
+import com.speakup.application.session.SessionNotFoundException;
 import com.speakup.domain.shared.DomainException;
 import com.speakup.domain.user.exception.DuplicateEmailException;
 import com.speakup.domain.user.exception.UserNotFoundException;
@@ -29,6 +30,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(ApiResponse.error("USER_NOT_FOUND", ex.getMessage()));
+    }
+
+    @ExceptionHandler(SessionNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleSessionNotFound(SessionNotFoundException ex) {
+        log.warn("Session not found: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse.error("SESSION_NOT_FOUND", ex.getMessage()));
     }
 
     @ExceptionHandler(DuplicateEmailException.class)

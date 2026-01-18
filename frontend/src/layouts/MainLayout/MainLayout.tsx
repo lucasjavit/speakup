@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthStore, isAdmin } from '@/stores/authStore';
 import { Button } from '@/components/ui';
 import styles from './MainLayout.module.css';
 
@@ -28,6 +28,11 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <Link to="/session" className={styles.navLink}>
                   Sessions
                 </Link>
+                {isAdmin(user?.role) && (
+                  <Link to="/admin" className={styles.navLink}>
+                    Admin
+                  </Link>
+                )}
                 <div className={styles.userMenu}>
                   <img
                     src={user?.avatarUrl || '/default-avatar.png'}

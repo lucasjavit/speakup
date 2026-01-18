@@ -1,0 +1,88 @@
+import api, { apiCall } from '@/lib/axios';
+import type {
+  ApiResult,
+  Session,
+  CreateSessionRequest,
+  UpdateSessionRequest,
+  SessionStatus,
+  AdminUser,
+  Role,
+  DashboardStats,
+} from '@/types';
+
+interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+export const adminService = {
+  // Dashboard
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    return apiCall<DashboardStats>(api.get<ApiResult<DashboardStats>>('/admin/dashboard/stats'));
+  },
+
+  // Sessions
+  getSessions: async (page = 0, size = 10): Promise<PaginatedResponse<Session>> => {
+    return apiCall<PaginatedResponse<Session>>(
+      api.get<ApiResult<PaginatedResponse<Session>>>(`/admin/sessions?page=${page}&size=${size}`)
+    );
+  },
+
+  getAllSessions: async (): Promise<Session[]> => {
+    return apiCall<Session[]>(api.get<ApiResult<Session[]>>('/admin/sessions/all'));
+  },
+
+  getActiveSessions: async (): Promise<Session[]> => {
+    return apiCall<Session[]>(api.get<ApiResult<Session[]>>('/admin/sessions/active'));
+  },
+
+  getRunningSessions: async (): Promise<Session[]> => {
+    return apiCall<Session[]>(api.get<ApiResult<Session[]>>('/admin/sessions/running'));
+  },
+
+  getSession: async (id: string): Promise<Session> => {
+    return apiCall<Session>(api.get<ApiResult<Session>>(`/admin/sessions/${id}`));
+  },
+
+  createSession: async (data: CreateSessionRequest): Promise<Session> => {
+    return apiCall<Session>(api.post<ApiResult<Session>>('/admin/sessions', data));
+  },
+
+  updateSession: async (id: string, data: UpdateSessionRequest): Promise<Session> => {
+    return apiCall<Session>(api.put<ApiResult<Session>>(`/admin/sessions/${id}`, data));
+  },
+
+  updateSessionStatus: async (id: string, status: SessionStatus): Promise<Session> => {
+    return apiCall<Session>(api.patch<ApiResult<Session>>(`/admin/sessions/${id}/status`, { status }));
+  },
+
+  deleteSession: async (id: string): Promise<void> => {
+    await api.delete(`/admin/sessions/${id}`);
+  },
+
+  // Users
+  getUsers: async (page = 0, size = 10, search?: string): Promise<PaginatedResponse<AdminUser>> => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (search) {
+      params.append('search', search);
+    }
+    return apiCall<PaginatedResponse<AdminUser>>(
+      api.get<ApiResult<PaginatedResponse<AdminUser>>>(`/admin/users?${params}`)
+    );
+  },
+
+  getUser: async (id: string): Promise<AdminUser> => {
+    return apiCall<AdminUser>(api.get<ApiResult<AdminUser>>(`/admin/users/${id}`));
+  },
+
+  updateUserRole: async (id: string, role: Role): Promise<AdminUser> => {
+    return apiCall<AdminUser>(api.patch<ApiResult<AdminUser>>(`/admin/users/${id}/role`, { role }));
+  },
+
+  updateUserStatus: async (id: string, active: boolean): Promise<AdminUser> => {
+    return apiCall<AdminUser>(api.patch<ApiResult<AdminUser>>(`/admin/users/${id}/status`, { active }));
+  },
+};

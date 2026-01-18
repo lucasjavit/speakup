@@ -6,6 +6,7 @@ import com.speakup.application.auth.dto.GoogleAuthRequest;
 import com.speakup.application.auth.dto.RefreshTokenRequest;
 import com.speakup.application.auth.dto.UserResponse;
 import com.speakup.domain.user.AuthProvider;
+import com.speakup.domain.user.Role;
 import com.speakup.domain.user.User;
 import com.speakup.domain.user.UserRepository;
 import com.speakup.infrastructure.security.GoogleTokenVerifier;
@@ -63,7 +64,9 @@ public class AuthController {
                     return userRepository.save(existingUser);
                 })
                 .orElseGet(() -> {
-                    // Create new user
+                    // Check if there's no SUPER_ADMIN yet - make first user SUPER_ADMIN
+                    boolean noSuperAdminExists = !userRepository.existsByRole(Role.SUPER_ADMIN);
+
                     User newUser = User.builder()
                             .email(email)
                             .name(name)
@@ -72,12 +75,18 @@ public class AuthController {
                             .providerId(providerId)
                             .active(true)
                             .profileCompleted(false)
+                            .role(noSuperAdminExists ? Role.SUPER_ADMIN : Role.USER)
                             .build();
+
+                    if (noSuperAdminExists) {
+                        log.info("No SUPER_ADMIN exists, assigning SUPER_ADMIN role to {}", email);
+                    }
+
                     return userRepository.save(newUser);
                 });
 
         // Generate JWT tokens
-        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail());
+        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
         String refreshToken = tokenProvider.generateRefreshToken(user.getId());
 
         log.info("User {} authenticated via Google", email);
@@ -114,7 +123,7 @@ public class AuthController {
 
         return userRepository.findById(userId)
                 .map(user -> {
-                    String newAccessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail());
+                    String newAccessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
                     String newRefreshToken = tokenProvider.generateRefreshToken(user.getId());
                     return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken, UserResponse.from(user)));
                 })

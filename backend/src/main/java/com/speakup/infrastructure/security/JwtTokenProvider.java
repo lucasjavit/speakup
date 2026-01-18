@@ -1,5 +1,6 @@
 package com.speakup.infrastructure.security;
 
+import com.speakup.domain.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -40,13 +41,14 @@ public class JwtTokenProvider {
     /**
      * Generate access token for a user.
      */
-    public String generateAccessToken(UUID userId, String email) {
+    public String generateAccessToken(UUID userId, String email, Role role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("role", role.name())
                 .claim("type", "access")
                 .issuedAt(now)
                 .expiration(expiryDate)
@@ -84,6 +86,15 @@ public class JwtTokenProvider {
     public String getEmailFromToken(String token) {
         Claims claims = parseClaims(token);
         return claims.get("email", String.class);
+    }
+
+    /**
+     * Extract role from token.
+     */
+    public Role getRoleFromToken(String token) {
+        Claims claims = parseClaims(token);
+        String roleName = claims.get("role", String.class);
+        return roleName != null ? Role.valueOf(roleName) : Role.USER;
     }
 
     /**
