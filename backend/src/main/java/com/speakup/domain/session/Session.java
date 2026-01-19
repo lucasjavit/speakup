@@ -59,6 +59,14 @@ public class Session extends BaseEntity {
     private SessionStatus status = SessionStatus.ACTIVE;
 
     /**
+     * Duration of each 1:1 call in seconds.
+     * Default is 600 seconds (10 minutes).
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer callDurationSeconds = 600;
+
+    /**
      * Check if the session is currently active (within time range).
      */
     public boolean isCurrentlyRunning() {

@@ -1,0 +1,269 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.reconnectBtn {
+  padding: 0.5rem 1rem;
+  background: var(--color-warning);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--text-secondary);
+}
+
+.error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.error button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Stats Section */
+.statsSection {
+  margin-bottom: 2rem;
+}
+
+.statsSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.statCard {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Session Section */
+.sessionSection {
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.sessionSection h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.activeSession {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  border: 2px solid var(--color-success);
+}
+
+.sessionInfo h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.sessionInfo p {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.sessionBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--color-success);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.joinButton {
+  padding: 1rem 2rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.joinButton:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.joinButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.noSession {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
+}
+
+.upcomingSessions {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.upcomingSessions h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+}
+
+.upcomingSessions ul {
+  list-style: none;
+  padding: 0;
+}
+
+.upcomingSessions li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.upcomingSessions li strong {
+  flex: 1;
+  min-width: 150px;
+}
+
+.sessionDays {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  width: 100%;
+}
+
+/* Connection Status */
+.connectionStatus {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.connected,
+.disconnected {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.connected::before,
+.disconnected::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.connected {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.connected::before {
+  background: var(--color-success);
+}
+
+.disconnected {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.disconnected::before {
+  background: var(--color-error);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .activeSession {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .joinButton {
+    width: 100%;
+  }
+}

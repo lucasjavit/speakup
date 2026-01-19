@@ -35,7 +35,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/actuator/health",
-            "/actuator/info"
+            "/actuator/info",
+            "/ws/**"  // WebSocket endpoints (auth handled by interceptor)
     };
 
     @Bean

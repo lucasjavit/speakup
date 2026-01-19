@@ -5,6 +5,9 @@ import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Login';
 import { CompleteProfile } from '@/pages/CompleteProfile';
 import { NotFound } from '@/pages/NotFound';
+import { Lobby } from '@/pages/Lobby';
+import { Queue } from '@/pages/Queue';
+import { Call } from '@/pages/Call';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
@@ -23,6 +26,14 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: 'lobby',
+        element: <Lobby />,
+      },
+      {
+        path: 'queue',
+        element: <Queue />,
+      },
+      {
         path: '*',
         element: <NotFound />,
       },
@@ -31,6 +42,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/call',
+    element: <Call />,
   },
   {
     path: '/complete-profile',

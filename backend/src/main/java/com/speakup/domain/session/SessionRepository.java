@@ -29,4 +29,9 @@ public interface SessionRepository {
     long count();
 
     long countByStatus(SessionStatus status);
+
+    /**
+     * Find all sessions that are currently running (active and within time window).
+     */
+    List<Session> findByCurrentlyRunning();
 }

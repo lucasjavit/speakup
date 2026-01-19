@@ -53,6 +53,7 @@ export interface Session {
   daysOfWeek: DayOfWeek[];
   status: SessionStatus;
   currentlyRunning: boolean;
+  callDurationSeconds: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,6 +64,7 @@ export interface CreateSessionRequest {
   endTime: string;
   timezone: string;
   daysOfWeek: DayOfWeek[];
+  callDurationSeconds?: number;
 }
 
 export interface UpdateSessionRequest {
@@ -71,6 +73,7 @@ export interface UpdateSessionRequest {
   endTime: string;
   timezone: string;
   daysOfWeek: DayOfWeek[];
+  callDurationSeconds?: number;
 }
 
 /**

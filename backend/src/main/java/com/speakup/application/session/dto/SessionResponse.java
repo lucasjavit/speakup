@@ -21,6 +21,7 @@ public record SessionResponse(
         Set<DayOfWeek> daysOfWeek,
         SessionStatus status,
         boolean currentlyRunning,
+        Integer callDurationSeconds,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -34,6 +35,7 @@ public record SessionResponse(
                 session.getDaysOfWeekSet(),
                 session.getStatus(),
                 session.isCurrentlyRunning(),
+                session.getCallDurationSeconds(),
                 session.getCreatedAt(),
                 session.getUpdatedAt()
         );

@@ -81,6 +81,11 @@
   color: white;
 }
 
+.hint {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

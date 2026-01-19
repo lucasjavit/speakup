@@ -4,6 +4,7 @@ import com.speakup.domain.session.Session;
 import com.speakup.domain.session.SessionRepository;
 import com.speakup.domain.session.SessionStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,4 +22,8 @@ public interface JpaSessionRepository extends JpaRepository<Session, UUID>, Sess
 
     @Override
     long countByStatus(SessionStatus status);
+
+    @Override
+    @Query("SELECT s FROM Session s WHERE s.status = 'ACTIVE'")
+    List<Session> findByCurrentlyRunning();
 }

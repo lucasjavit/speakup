@@ -41,13 +41,14 @@ public class JwtTokenProvider {
     /**
      * Generate access token for a user.
      */
-    public String generateAccessToken(UUID userId, String email, Role role) {
+    public String generateAccessToken(UUID userId, String email, String name, Role role) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
 
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("name", name)
                 .claim("role", role.name())
                 .claim("type", "access")
                 .issuedAt(now)
@@ -86,6 +87,14 @@ public class JwtTokenProvider {
     public String getEmailFromToken(String token) {
         Claims claims = parseClaims(token);
         return claims.get("email", String.class);
+    }
+
+    /**
+     * Extract user name from token.
+     */
+    public String getUserNameFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims.get("name", String.class);
     }
 
     /**

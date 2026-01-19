@@ -25,6 +25,7 @@ export function SessionForm() {
   const [endTime, setEndTime] = useState('08:00');
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([]);
+  const [callDurationMinutes, setCallDurationMinutes] = useState(10);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEditing);
@@ -44,6 +45,7 @@ export function SessionForm() {
       setEndTime(session.endTime);
       setTimezone(session.timezone);
       setDaysOfWeek(session.daysOfWeek);
+      setCallDurationMinutes(Math.round(session.callDurationSeconds / 60));
     } catch (err) {
       setError('Failed to load session');
       console.error(err);
@@ -76,6 +78,7 @@ export function SessionForm() {
         endTime,
         timezone,
         daysOfWeek,
+        callDurationSeconds: callDurationMinutes * 60,
       };
 
       if (isEditing) {
@@ -166,6 +169,23 @@ export function SessionForm() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="callDuration" className={styles.label}>
+              Call Duration (minutes)
+            </label>
+            <Input
+              id="callDuration"
+              type="number"
+              min={1}
+              max={60}
+              value={callDurationMinutes}
+              onChange={(e) => setCallDurationMinutes(Math.max(1, Math.min(60, parseInt(e.target.value) || 1)))}
+            />
+            <span className={styles.hint}>
+              Duration of each 1:1 call between users (1-60 minutes)
+            </span>
           </div>
 
           <div className={styles.actions}>

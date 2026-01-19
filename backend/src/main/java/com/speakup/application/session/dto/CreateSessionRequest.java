@@ -1,5 +1,7 @@
 package com.speakup.application.session.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +27,16 @@ public record CreateSessionRequest(
         String timezone,
 
         @NotEmpty(message = "At least one day of week is required")
-        Set<DayOfWeek> daysOfWeek
+        Set<DayOfWeek> daysOfWeek,
+
+        @Min(value = 60, message = "Call duration must be at least 60 seconds")
+        @Max(value = 3600, message = "Call duration must be at most 3600 seconds (1 hour)")
+        Integer callDurationSeconds
 ) {
+    /**
+     * Returns the call duration, defaulting to 600 seconds (10 minutes) if not specified.
+     */
+    public Integer callDurationSecondsOrDefault() {
+        return callDurationSeconds != null ? callDurationSeconds : 600;
+    }
 }

@@ -31,13 +31,18 @@ public class SessionService {
      */
     @Transactional
     public SessionResponse create(CreateSessionRequest request) {
-        Session session = Session.builder()
+        Session.SessionBuilder builder = Session.builder()
                 .name(request.name())
                 .startTime(request.startTime())
                 .endTime(request.endTime())
                 .timezone(request.timezone())
-                .status(SessionStatus.ACTIVE)
-                .build();
+                .status(SessionStatus.ACTIVE);
+
+        if (request.callDurationSeconds() != null) {
+            builder.callDurationSeconds(request.callDurationSeconds());
+        }
+
+        Session session = builder.build();
         session.setDaysOfWeekSet(request.daysOfWeek());
 
         Session saved = sessionRepository.save(session);
@@ -88,6 +93,9 @@ public class SessionService {
         session.setEndTime(request.endTime());
         session.setTimezone(request.timezone());
         session.setDaysOfWeekSet(request.daysOfWeek());
+        if (request.callDurationSeconds() != null) {
+            session.setCallDurationSeconds(request.callDurationSeconds());
+        }
 
         Session saved = sessionRepository.save(session);
         log.info("Updated session: {} ({})", saved.getName(), saved.getId());

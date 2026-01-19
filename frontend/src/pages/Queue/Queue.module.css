@@ -1,0 +1,100 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: var(--bg-primary);
+}
+
+.content {
+  text-align: center;
+  max-width: 400px;
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 2rem;
+  position: relative;
+}
+
+.spinnerRing {
+  width: 100%;
+  height: 100%;
+  border: 4px solid var(--bg-tertiary);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.info {
+  margin-bottom: 2rem;
+}
+
+.position {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.position strong {
+  color: var(--color-primary);
+  font-size: 1.5rem;
+}
+
+.hint {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.reconnect {
+  padding: 1rem;
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.reconnect p {
+  margin-bottom: 0.5rem;
+}
+
+.reconnect button {
+  padding: 0.5rem 1rem;
+  background: var(--color-warning);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.leaveButton {
+  padding: 0.75rem 2rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.leaveButton:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}

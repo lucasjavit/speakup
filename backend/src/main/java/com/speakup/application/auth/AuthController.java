@@ -86,7 +86,7 @@ public class AuthController {
                 });
 
         // Generate JWT tokens
-        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String accessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getName(), user.getRole());
         String refreshToken = tokenProvider.generateRefreshToken(user.getId());
 
         log.info("User {} authenticated via Google", email);
@@ -123,7 +123,7 @@ public class AuthController {
 
         return userRepository.findById(userId)
                 .map(user -> {
-                    String newAccessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getRole());
+                    String newAccessToken = tokenProvider.generateAccessToken(user.getId(), user.getEmail(), user.getName(), user.getRole());
                     String newRefreshToken = tokenProvider.generateRefreshToken(user.getId());
                     return ResponseEntity.ok(new AuthResponse(newAccessToken, newRefreshToken, UserResponse.from(user)));
                 })
