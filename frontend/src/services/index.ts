@@ -4,3 +4,5 @@ export { matchingService } from './matchingService';
 export { conversationService } from './conversationService';
 export { peerService } from './peerService';
 export { recordingService, isRecordingSupported } from './recordingService';
+export { ratingService } from './ratingService';
+export { relationshipService } from './relationshipService';

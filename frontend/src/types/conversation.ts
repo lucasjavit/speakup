@@ -30,6 +30,8 @@ export interface UserStats {
   totalDurationSeconds: number;
   totalDurationMinutes: number;
   averageDurationSeconds: number;
+  conversationsThisWeek: number;
+  conversationsThisMonth: number;
 }
 
 export interface EndConversationRequest {

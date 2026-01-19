@@ -6,7 +6,6 @@ import { Login } from '@/pages/Login';
 import { CompleteProfile } from '@/pages/CompleteProfile';
 import { NotFound } from '@/pages/NotFound';
 import { Lobby } from '@/pages/Lobby';
-import { Queue } from '@/pages/Queue';
 import { Call } from '@/pages/Call';
 import { Break } from '@/pages/Break';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
@@ -29,10 +28,6 @@ export const router = createBrowserRouter([
       {
         path: 'lobby',
         element: <Lobby />,
-      },
-      {
-        path: 'queue',
-        element: <Queue />,
       },
       {
         path: '*',

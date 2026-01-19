@@ -19,9 +19,9 @@ class PeerService {
       // Clean up existing peer
       this.destroy();
 
-      // Generate a shorter, unique peer ID to avoid issues with long UUIDs
-      // PeerJS sometimes has issues with certain ID formats
-      const peerId = `sp_${userId.replace(/-/g, '').substring(0, 16)}`;
+      // Use full UUID without hyphens to avoid collision risk
+      // PeerJS handles long IDs fine, truncating was unnecessary
+      const peerId = `sp_${userId.replace(/-/g, '')}`;
       console.log('Creating peer with ID:', peerId);
 
       // Check if we have a custom PeerJS server configured
@@ -47,6 +47,13 @@ class PeerService {
             { urls: 'stun:stun2.l.google.com:19302' },
             { urls: 'stun:stun3.l.google.com:19302' },
             { urls: 'stun:stun4.l.google.com:19302' },
+            // TURN server for NAT traversal (required for ~20% of users behind symmetric NAT)
+            // Configure via environment variables for production
+            ...(import.meta.env.VITE_TURN_URL ? [{
+              urls: import.meta.env.VITE_TURN_URL,
+              username: import.meta.env.VITE_TURN_USERNAME || '',
+              credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+            }] : []),
           ],
         },
         debug: import.meta.env.DEV ? 2 : 0,
@@ -66,11 +73,12 @@ class PeerService {
 
       this.peer = new Peer(peerId, peerOptions);
 
-      // Set a connection timeout
+      // Set a connection timeout (configurable via env)
+      const timeoutMs = parseInt(import.meta.env.VITE_PEER_CONNECTION_TIMEOUT || '15000', 10);
       const connectionTimeout = setTimeout(() => {
         console.error('PeerJS connection timeout');
         reject(new Error('Connection timeout'));
-      }, 15000);
+      }, timeoutMs);
 
       this.peer.on('open', (id) => {
         clearTimeout(connectionTimeout);
@@ -261,6 +269,107 @@ class PeerService {
         track.enabled = enabled;
       });
     }
+  }
+
+  // Change audio device during call
+  async changeAudioDevice(deviceId: string): Promise<MediaStream> {
+    if (!this.localStream) {
+      throw new Error('No local stream available');
+    }
+
+    try {
+      // Get new audio stream
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          deviceId: { exact: deviceId },
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+
+      const newAudioTrack = newStream.getAudioTracks()[0];
+      const oldAudioTrack = this.localStream.getAudioTracks()[0];
+
+      // Replace track in peer connection if in call
+      if (this.currentCall && this.currentCall.peerConnection) {
+        const senders = this.currentCall.peerConnection.getSenders();
+        const audioSender = senders.find(s => s.track?.kind === 'audio');
+        if (audioSender) {
+          await audioSender.replaceTrack(newAudioTrack);
+        }
+      }
+
+      // Replace track in local stream
+      if (oldAudioTrack) {
+        this.localStream.removeTrack(oldAudioTrack);
+        oldAudioTrack.stop();
+      }
+      this.localStream.addTrack(newAudioTrack);
+
+      // Update selected device
+      this.selectedAudioDeviceId = deviceId;
+
+      console.log('Audio device changed to:', deviceId);
+      return this.localStream;
+    } catch (error) {
+      console.error('Failed to change audio device:', error);
+      throw error;
+    }
+  }
+
+  // Change video device during call
+  async changeVideoDevice(deviceId: string): Promise<MediaStream> {
+    if (!this.localStream) {
+      throw new Error('No local stream available');
+    }
+
+    try {
+      // Get new video stream
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          deviceId: { exact: deviceId },
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        },
+      });
+
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      const oldVideoTrack = this.localStream.getVideoTracks()[0];
+
+      // Replace track in peer connection if in call
+      if (this.currentCall && this.currentCall.peerConnection) {
+        const senders = this.currentCall.peerConnection.getSenders();
+        const videoSender = senders.find(s => s.track?.kind === 'video');
+        if (videoSender) {
+          await videoSender.replaceTrack(newVideoTrack);
+        }
+      }
+
+      // Replace track in local stream
+      if (oldVideoTrack) {
+        this.localStream.removeTrack(oldVideoTrack);
+        oldVideoTrack.stop();
+      }
+      this.localStream.addTrack(newVideoTrack);
+
+      // Update selected device
+      this.selectedVideoDeviceId = deviceId;
+
+      console.log('Video device changed to:', deviceId);
+      return this.localStream;
+    } catch (error) {
+      console.error('Failed to change video device:', error);
+      throw error;
+    }
+  }
+
+  // Get current selected devices
+  getSelectedDevices(): { audioDeviceId: string | null; videoDeviceId: string | null } {
+    return {
+      audioDeviceId: this.selectedAudioDeviceId,
+      videoDeviceId: this.selectedVideoDeviceId,
+    };
   }
 
   // Check if audio is enabled

@@ -11,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,6 +53,15 @@ public class ConversationService {
         long totalConversations = conversationRepository.countCompletedByUserId(userId);
         long totalDurationSeconds = conversationRepository.getTotalDurationByUserId(userId);
 
+        // Calculate date boundaries
+        Instant oneWeekAgo = Instant.now().minus(java.time.Duration.ofDays(7));
+        Instant startOfMonth = ZonedDateTime.now(ZoneId.systemDefault())
+                .withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0)
+                .toInstant();
+
+        long conversationsThisWeek = conversationRepository.countCompletedByUserIdSince(userId, oneWeekAgo);
+        long conversationsThisMonth = conversationRepository.countCompletedByUserIdSince(userId, startOfMonth);
+
         return UserStats.builder()
                 .totalConversations(totalConversations)
                 .totalDurationSeconds(totalDurationSeconds)
@@ -57,6 +69,8 @@ public class ConversationService {
                 .averageDurationSeconds(totalConversations > 0
                         ? totalDurationSeconds / totalConversations
                         : 0)
+                .conversationsThisWeek(conversationsThisWeek)
+                .conversationsThisMonth(conversationsThisMonth)
                 .build();
     }
 

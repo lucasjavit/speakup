@@ -1,0 +1,192 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+  padding: 1rem;
+}
+
+.modal {
+  background: var(--color-bg-primary, #ffffff);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 400px;
+  width: 100%;
+  padding: 1.5rem;
+  animation: slideIn 0.2s ease;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0 0 1.5rem;
+  text-align: center;
+}
+
+.fluencyOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.fluencyOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--bg-secondary, #f8fafc);
+  border: 2px solid var(--border-color, #e2e8f0);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fluencyOption:hover {
+  border-color: var(--color-primary, #667eea);
+}
+
+.fluencyOption:has(.fluencyRadio:checked) {
+  background: var(--color-primary-bg, #eff6ff);
+  border-color: var(--color-primary, #667eea);
+}
+
+.fluencyRadio {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-primary, #667eea);
+  cursor: pointer;
+}
+
+.fluencyRadio:disabled {
+  cursor: not-allowed;
+}
+
+.fluencyText {
+  font-size: 1rem;
+  color: var(--text-primary, #1e293b);
+  font-weight: 500;
+}
+
+.statusMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--text-secondary, #64748b);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem;
+}
+
+.successMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-success, #10b981);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  background: var(--color-success-bg, #ecfdf5);
+  border-radius: 8px;
+}
+
+.checkIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-error, #dc2626);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  background: var(--color-error-bg, #fee2e2);
+  border-radius: 8px;
+}
+
+.blockSection {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+  text-align: center;
+}
+
+.blockButton {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--text-tertiary, #94a3b8);
+  border: 1px solid var(--border-color, #e2e8f0);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.blockButton:hover:not(:disabled) {
+  color: var(--color-error, #dc2626);
+  border-color: var(--color-error, #dc2626);
+  background: var(--color-error-bg, #fee2e2);
+}
+
+.blockButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.blockButton.blocked {
+  color: var(--color-error, #dc2626);
+  border-color: var(--color-error, #dc2626);
+  background: var(--color-error-bg, #fee2e2);
+}
+
+.blockButton.blocked:hover:not(:disabled) {
+  color: var(--color-success, #10b981);
+  border-color: var(--color-success, #10b981);
+  background: var(--color-success-bg, #ecfdf5);
+}
+
+.blockHint {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #94a3b8);
+  margin: 0.5rem 0 0;
+}
+
+.footer {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.footer button {
+  min-width: 140px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

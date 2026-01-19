@@ -10,6 +10,8 @@ public record UserStats(
         long totalConversations,
         long totalDurationSeconds,
         long totalDurationMinutes,
-        long averageDurationSeconds
+        long averageDurationSeconds,
+        long conversationsThisWeek,
+        long conversationsThisMonth
 ) {
 }

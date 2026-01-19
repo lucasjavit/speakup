@@ -25,9 +25,6 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <Link to="/" className={styles.navLink}>
                   Home
                 </Link>
-                <Link to="/session" className={styles.navLink}>
-                  Sessions
-                </Link>
                 {isAdmin(user?.role) && (
                   <Link to="/admin" className={styles.navLink}>
                     Admin

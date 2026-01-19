@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, Input, TimePicker, TimezoneSelect } from '@/components/ui';
+import { BackButton, Button, Card, Input, TimePicker, TimezoneSelect } from '@/components/ui';
 import { adminService } from '@/services';
 import type { DayOfWeek, CreateSessionRequest } from '@/types';
 import styles from './SessionForm.module.css';
@@ -26,6 +26,7 @@ export function SessionForm() {
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([]);
   const [callDurationMinutes, setCallDurationMinutes] = useState(10);
+  const [callDurationSeconds, setCallDurationSeconds] = useState(0);
   const [breakDurationSeconds, setBreakDurationSeconds] = useState(30);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -46,7 +47,8 @@ export function SessionForm() {
       setEndTime(session.endTime);
       setTimezone(session.timezone);
       setDaysOfWeek(session.daysOfWeek);
-      setCallDurationMinutes(Math.round(session.callDurationSeconds / 60));
+      setCallDurationMinutes(Math.floor(session.callDurationSeconds / 60));
+      setCallDurationSeconds(session.callDurationSeconds % 60);
       setBreakDurationSeconds(session.breakDurationSeconds || 30);
     } catch (err) {
       setError('Failed to load session');
@@ -70,6 +72,16 @@ export function SessionForm() {
       return;
     }
 
+    const totalCallDuration = callDurationMinutes * 60 + callDurationSeconds;
+    if (totalCallDuration < 10) {
+      setError('Call duration must be at least 10 seconds');
+      return;
+    }
+    if (totalCallDuration > 1800) {
+      setError('Call duration must be at most 30 minutes');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
@@ -80,7 +92,7 @@ export function SessionForm() {
         endTime,
         timezone,
         daysOfWeek,
-        callDurationSeconds: callDurationMinutes * 60,
+        callDurationSeconds: totalCallDuration,
         breakDurationSeconds,
       };
 
@@ -105,6 +117,7 @@ export function SessionForm() {
 
   return (
     <div className={styles.container}>
+      <BackButton to="/admin/sessions" label="Sessions" className={styles.backButton} />
       <Card className={styles.card}>
         <h2 className={styles.title}>{isEditing ? 'Edit Session' : 'Create Session'}</h2>
 
@@ -175,19 +188,33 @@ export function SessionForm() {
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="callDuration" className={styles.label}>
-              Call Duration (minutes)
-            </label>
-            <Input
-              id="callDuration"
-              type="number"
-              min={1}
-              max={60}
-              value={callDurationMinutes}
-              onChange={(e) => setCallDurationMinutes(Math.max(1, Math.min(60, parseInt(e.target.value) || 1)))}
-            />
+            <label className={styles.label}>Call Duration</label>
+            <div className={styles.durationRow}>
+              <div className={styles.durationInput}>
+                <Input
+                  id="callDurationMinutes"
+                  type="number"
+                  min={0}
+                  max={30}
+                  value={callDurationMinutes}
+                  onChange={(e) => setCallDurationMinutes(Math.max(0, Math.min(30, parseInt(e.target.value) || 0)))}
+                />
+                <span className={styles.durationLabel}>min</span>
+              </div>
+              <div className={styles.durationInput}>
+                <Input
+                  id="callDurationSeconds"
+                  type="number"
+                  min={0}
+                  max={59}
+                  value={callDurationSeconds}
+                  onChange={(e) => setCallDurationSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                />
+                <span className={styles.durationLabel}>sec</span>
+              </div>
+            </div>
             <span className={styles.hint}>
-              Duration of each 1:1 call between users (1-60 minutes)
+              Duration of each 1:1 call (10 sec - 30 min)
             </span>
           </div>
 

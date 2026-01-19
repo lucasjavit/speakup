@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,6 +77,15 @@ public interface JpaConversationRepository extends JpaRepository<Conversation, U
         AND c.status = 'COMPLETED'
         """)
     long getTotalDurationByUserId(@Param("userId") UUID userId);
+
+    @Override
+    @Query("""
+        SELECT COUNT(c) FROM Conversation c
+        WHERE (c.userA.id = :userId OR c.userB.id = :userId)
+        AND c.status = 'COMPLETED'
+        AND c.endedAt >= :since
+        """)
+    long countCompletedByUserIdSince(@Param("userId") UUID userId, @Param("since") Instant since);
 
     @Override
     List<Conversation> findByStatus(ConversationStatus status);

@@ -53,14 +53,10 @@
   border-top: 1px solid var(--color-border, #e2e8f0);
 }
 
-.backLink {
-  color: var(--color-text-muted, #94a3b8);
-  text-decoration: none;
-  font-size: 0.875rem;
-}
-
-.backLink:hover {
-  color: var(--color-text-secondary, #64748b);
+.backButton {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.75rem 0;
 }
 
 .content {

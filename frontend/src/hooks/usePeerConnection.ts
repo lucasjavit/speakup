@@ -14,6 +14,8 @@ interface UsePeerConnectionReturn {
   hangUp: () => void;
   toggleAudio: () => void;
   toggleVideo: () => void;
+  changeAudioDevice: (deviceId: string) => Promise<void>;
+  changeVideoDevice: (deviceId: string) => Promise<void>;
   destroy: () => void;
 }
 
@@ -124,6 +126,26 @@ export function usePeerConnection(options: UsePeerConnectionOptions = {}): UsePe
     setIsVideoEnabled(newState);
   }, [isVideoEnabled]);
 
+  // Change audio device
+  const changeAudioDevice = useCallback(async (deviceId: string) => {
+    try {
+      const stream = await peerService.changeAudioDevice(deviceId);
+      setLocalStream(stream);
+    } catch (err) {
+      console.error('Failed to change audio device:', err);
+    }
+  }, []);
+
+  // Change video device
+  const changeVideoDevice = useCallback(async (deviceId: string) => {
+    try {
+      const stream = await peerService.changeVideoDevice(deviceId);
+      setLocalStream(stream);
+    } catch (err) {
+      console.error('Failed to change video device:', err);
+    }
+  }, []);
+
   // Destroy connection
   const destroy = useCallback(() => {
     peerService.destroy();
@@ -146,6 +168,8 @@ export function usePeerConnection(options: UsePeerConnectionOptions = {}): UsePe
     hangUp,
     toggleAudio,
     toggleVideo,
+    changeAudioDevice,
+    changeVideoDevice,
     destroy,
   };
 }

@@ -3,6 +3,7 @@ package com.speakup.domain.conversation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,6 +51,11 @@ public interface ConversationRepository {
      * Get total duration of all conversations for a user (in seconds).
      */
     long getTotalDurationByUserId(UUID userId);
+
+    /**
+     * Count completed conversations for a user since a given date.
+     */
+    long countCompletedByUserIdSince(UUID userId, Instant since);
 
     /**
      * Find conversations by status.

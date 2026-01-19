@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useCallStore } from '@/stores/callStore';
 import { useWebSocket } from '@/hooks';
+import { BackButton } from '@/components/ui';
 import type { MatchFoundPayload } from '@/types';
 import styles from './Queue.module.css';
 
@@ -65,6 +66,7 @@ export function Queue() {
 
   return (
     <div className={styles.container}>
+      <BackButton to="/" label="Home" className={styles.backButton} />
       <div className={styles.content}>
         <div className={styles.spinner}>
           <div className={styles.spinnerRing}></div>

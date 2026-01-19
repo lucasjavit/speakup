@@ -29,8 +29,8 @@ public record CreateSessionRequest(
         @NotEmpty(message = "At least one day of week is required")
         Set<DayOfWeek> daysOfWeek,
 
-        @Min(value = 60, message = "Call duration must be at least 60 seconds")
-        @Max(value = 3600, message = "Call duration must be at most 3600 seconds (1 hour)")
+        @Min(value = 10, message = "Call duration must be at least 10 seconds")
+        @Max(value = 1800, message = "Call duration must be at most 1800 seconds (30 minutes)")
         Integer callDurationSeconds,
 
         @Min(value = 0, message = "Break duration must be at least 0 seconds")

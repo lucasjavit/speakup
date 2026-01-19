@@ -33,24 +33,75 @@
 }
 
 .dashboard {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-top: 2rem;
 }
 
-.stats {
+.statsCard {
+  width: 100%;
+}
+
+.practiceRow {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.practiceCard {
+  min-width: 0;
+}
+
+.scheduleCard {
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .practiceRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
-.stat {
-  text-align: center;
+.statCard {
+  background: var(--bg-tertiary, #f1f5f9);
   padding: 1rem;
-  background: var(--color-bg-secondary, #f8fafc);
-  border-radius: var(--radius-md, 8px);
+  border-radius: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary-bg, #eff6ff) 0%, #dbeafe 100%);
+  border-radius: 10px;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.statIcon svg {
+  width: 20px;
+  height: 20px;
 }
 
 .statValue {
@@ -58,11 +109,31 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-primary, #667eea);
+  line-height: 1.1;
 }
 
 .statLabel {
-  font-size: 0.8125rem;
+  font-size: 0.6875rem;
   color: var(--color-text-secondary, #64748b);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* Responsive for stats grid */
+@media (max-width: 900px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statCard:last-child {
+    grid-column: span 2;
+  }
 }
 
 .alert {
@@ -193,4 +264,140 @@
   font-size: 0.875rem;
   color: var(--color-text-secondary, #64748b);
   margin: 0;
+}
+
+/* Accordion Styles */
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+  border-radius: 8px;
+}
+
+.accordionHeader:hover {
+  background: var(--bg-tertiary, #f1f5f9);
+}
+
+.accordionTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.scheduleIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary, #667eea);
+}
+
+.sessionCount {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-tertiary, #94a3b8);
+  background: var(--bg-tertiary, #f1f5f9);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-tertiary, #94a3b8);
+  transition: transform 0.2s;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.accordionContent {
+  padding: 0 1rem 1rem;
+}
+
+.noSessions {
+  text-align: center;
+  color: var(--color-text-secondary, #64748b);
+  font-size: 0.875rem;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.sessionList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sessionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--bg-tertiary, #f1f5f9);
+  border-radius: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sessionItem:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sessionInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statusIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.sessionLive .statusIcon {
+  color: #10b981;
+}
+
+.sessionScheduled .statusIcon {
+  color: var(--color-text-tertiary, #94a3b8);
+}
+
+.sessionText {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.sessionName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.sessionTime {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.liveBadge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
 }

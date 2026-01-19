@@ -4,6 +4,7 @@ import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationRepository;
 import com.speakup.domain.conversation.ConversationStatus;
 import com.speakup.domain.matching.QueueEntry;
+import com.speakup.domain.relationship.UserRelationshipRepository;
 import com.speakup.domain.session.Session;
 import com.speakup.domain.session.SessionRepository;
 import com.speakup.domain.user.User;
@@ -33,6 +34,7 @@ public class MatchingService {
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
+    private final UserRelationshipRepository relationshipRepository;
     private final WebSocketSessionManager webSocketSessionManager;
     private final TopicGenerator topicGenerator;
 
@@ -189,6 +191,12 @@ public class MatchingService {
     private boolean canMatch(QueueEntry a, QueueEntry b, boolean requireCompatibleLevel, boolean allowRepeated) {
         log.debug("Checking canMatch: {} vs {} (requireCompatibleLevel={}, allowRepeated={})",
                 a.getUserId(), b.getUserId(), requireCompatibleLevel, allowRepeated);
+
+        // Check if either user has blocked the other
+        if (relationshipRepository.isBlockedEitherDirection(a.getUserId(), b.getUserId())) {
+            log.debug("Users are blocked (either direction), skipping match");
+            return false;
+        }
 
         // Check if they already had a conversation in this session
         if (!allowRepeated) {

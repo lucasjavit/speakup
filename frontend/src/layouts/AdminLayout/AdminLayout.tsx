@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import { useAuthStore, isAdmin, canManageSessions, canManageUsers, canManagePayments } from '@/stores/authStore';
-import { Button } from '@/components/ui';
+import { BackButton, Button } from '@/components/ui';
 import styles from './AdminLayout.module.css';
 
 interface AdminLayoutProps {
@@ -46,9 +46,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <Link to="/" className={styles.backLink}>
-            Back to App
-          </Link>
+          <BackButton to="/" label="Back to Home" className={styles.backButton} />
         </div>
       </aside>
 

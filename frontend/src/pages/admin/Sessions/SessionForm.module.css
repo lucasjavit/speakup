@@ -3,6 +3,10 @@
   margin: 0 auto;
 }
 
+.backButton {
+  margin-bottom: 1rem;
+}
+
 .loading {
   text-align: center;
   padding: 2rem;
@@ -83,6 +87,27 @@
 
 .hint {
   font-size: 0.75rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.durationRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.durationInput {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.durationInput input {
+  width: 80px;
+}
+
+.durationLabel {
+  font-size: 0.875rem;
   color: var(--color-text-secondary, #64748b);
 }
 
