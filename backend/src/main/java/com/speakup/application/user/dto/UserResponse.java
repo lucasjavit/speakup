@@ -9,12 +9,17 @@ import java.util.UUID;
 
 /**
  * DTO for user response.
+ * ID Number is masked for privacy (GDPR/LGPD compliance).
  */
 public record UserResponse(
         UUID id,
         String email,
         String name,
         String avatarUrl,
+        String maskedIdNumber,
+        String country,
+        String city,
+        String address,
         Language nativeLanguage,
         Language targetLanguage,
         ProficiencyLevel proficiencyLevel,
@@ -29,6 +34,10 @@ public record UserResponse(
                 user.getEmail(),
                 user.getName(),
                 user.getAvatarUrl(),
+                maskIdNumber(user.getIdNumber()),
+                user.getCountry(),
+                user.getCity(),
+                user.getAddress(),
                 user.getNativeLanguage(),
                 user.getTargetLanguage(),
                 user.getProficiencyLevel(),
@@ -37,5 +46,19 @@ public record UserResponse(
                 user.isActive(),
                 user.getCreatedAt()
         );
+    }
+
+    /**
+     * Mask ID number for privacy. Shows only last 4 characters.
+     * Example: "123456789" becomes "****6789"
+     */
+    public static String maskIdNumber(String idNumber) {
+        if (idNumber == null || idNumber.isEmpty()) {
+            return null;
+        }
+        if (idNumber.length() <= 4) {
+            return "****";
+        }
+        return "****" + idNumber.substring(idNumber.length() - 4);
     }
 }

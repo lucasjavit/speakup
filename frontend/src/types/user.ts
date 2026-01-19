@@ -21,6 +21,10 @@ export interface User {
   name: string;
   avatarUrl?: string;
   provider?: AuthProvider;
+  maskedIdNumber?: string;  // ID number is now masked for privacy (GDPR)
+  country?: string;
+  city?: string;
+  address?: string;
   nativeLanguage?: Language;
   targetLanguage?: Language;
   proficiencyLevel?: ProficiencyLevel;
@@ -32,7 +36,71 @@ export interface User {
   updatedAt?: string;
 }
 
+// ==================== GDPR/LGPD Types ====================
+
+export type ConsentType = 'DATA_PROCESSING' | 'RECORDING' | 'MARKETING';
+
+export interface UserConsent {
+  consentType: ConsentType;
+  consented: boolean;
+  consentedAt?: string;
+  withdrawnAt?: string;
+}
+
+export interface ConsentRequest {
+  consentType: ConsentType;
+}
+
+export interface UserProfileExport {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  idNumber?: string;  // Unmasked in export (user's own data)
+  country?: string;
+  city?: string;
+  address?: string;
+  nativeLanguage?: string;
+  targetLanguage?: string;
+  proficiencyLevel?: string;
+  timezone?: string;
+  profileCompleted: boolean;
+  active: boolean;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ConversationExport {
+  id: string;
+  partnerName: string;
+  topic?: string;
+  durationSeconds?: number;
+  recordingUrl?: string;
+  startedAt?: string;
+  endedAt?: string;
+}
+
+export interface RatingExport {
+  conversationId: string;
+  stars: number;
+  comment?: string;
+  wantToTalkAgain: boolean;
+  createdAt: string;
+}
+
+export interface UserDataExport {
+  profile: UserProfileExport;
+  consents: UserConsent[];
+  conversations: ConversationExport[];
+  ratings: RatingExport[];
+  exportedAt: string;
+}
+
 export interface CompleteProfileRequest {
+  idNumber: string;
+  country: string;
+  city: string;
+  address?: string;
   nativeLanguage: Language;
   targetLanguage: Language;
   proficiencyLevel: ProficiencyLevel;

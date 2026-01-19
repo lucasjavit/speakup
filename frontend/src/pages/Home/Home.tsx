@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { Card, QueueModal } from '@/components/ui';
+import { Button, Card, QueueModal } from '@/components/ui';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
 import type { Session, UserStats } from '@/types';
@@ -151,17 +151,6 @@ export function Home() {
                 <span className={styles.statLabel}>This Month</span>
               </div>
             </div>
-            {!user.profileCompleted && (
-              <div className={styles.alert}>
-                <p>Complete your profile to start practicing!</p>
-                <Button
-                  size="sm"
-                  onClick={() => navigate('/complete-profile')}
-                >
-                  Complete Profile
-                </Button>
-              </div>
-            )}
           </Card>
 
           {/* Schedule and Practice Now Side by Side */}

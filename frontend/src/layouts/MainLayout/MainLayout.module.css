@@ -56,11 +56,43 @@
   height: 32px;
   border-radius: 50%;
   object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s, box-shadow 0.2s;
+}
+
+.avatar:hover {
+  opacity: 0.8;
+  box-shadow: 0 0 0 2px var(--color-primary, #667eea);
 }
 
 .userName {
   font-weight: 500;
   color: var(--color-text-primary, #1e293b);
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--color-text-secondary, #64748b);
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.logoutButton:hover {
+  color: var(--color-error, #ef4444);
+  background-color: var(--color-error-bg, rgba(239, 68, 68, 0.1));
+}
+
+.logoutButton svg {
+  width: 20px;
+  height: 20px;
 }
 
 .main {

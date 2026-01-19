@@ -4,6 +4,7 @@ import com.speakup.application.admin.AdminUserService;
 import com.speakup.application.admin.dto.AdminUserResponse;
 import com.speakup.application.admin.dto.UpdateUserRoleRequest;
 import com.speakup.application.admin.dto.UpdateUserStatusRequest;
+import com.speakup.infrastructure.security.UserPrincipal;
 import com.speakup.presentation.api.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,11 +69,13 @@ public class AdminUserController {
 
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('MODERATOR', 'SUPER_ADMIN')")
-    @Operation(summary = "Update user status", description = "Activates or deactivates a user")
+    @Operation(summary = "Update user status", description = "Activates or deactivates a user. Only SUPER_ADMIN can deactivate themselves.")
     public ResponseEntity<ApiResponse<AdminUserResponse>> updateUserStatus(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateUserStatusRequest request) {
-        AdminUserResponse user = adminUserService.updateStatus(id, request.active());
+            @Valid @RequestBody UpdateUserStatusRequest request,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        AdminUserResponse user = adminUserService.updateStatus(
+                id, request.active(), principal.getId(), principal.getRole());
         return ResponseEntity.ok(ApiResponse.success(user));
     }
 }

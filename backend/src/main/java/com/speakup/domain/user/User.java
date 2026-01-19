@@ -55,6 +55,15 @@ public class User extends BaseEntity {
 
     private String timezone;
 
+    @Column(name = "id_number")
+    private String idNumber;
+
+    private String country;
+
+    private String city;
+
+    private String address;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean profileCompleted = false;
@@ -71,8 +80,13 @@ public class User extends BaseEntity {
     /**
      * Mark profile as completed when all required fields are filled.
      */
-    public void completeProfile(Language nativeLanguage, Language targetLanguage,
+    public void completeProfile(String idNumber, String country, String city, String address,
+                                Language nativeLanguage, Language targetLanguage,
                                 ProficiencyLevel level, String timezone) {
+        this.idNumber = idNumber;
+        this.country = country;
+        this.city = city;
+        this.address = address;
         this.nativeLanguage = nativeLanguage;
         this.targetLanguage = targetLanguage;
         this.proficiencyLevel = level;

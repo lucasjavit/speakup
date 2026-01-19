@@ -2,6 +2,7 @@ package com.speakup.presentation.exception;
 
 import com.speakup.application.session.SessionNotFoundException;
 import com.speakup.domain.shared.DomainException;
+import com.speakup.domain.shared.ForbiddenOperationException;
 import com.speakup.domain.user.exception.DuplicateEmailException;
 import com.speakup.domain.user.exception.UserNotFoundException;
 import com.speakup.presentation.api.response.ApiResponse;
@@ -63,6 +64,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error("VALIDATION_ERROR", "Invalid request data", Map.of("fields", fieldErrors)));
+    }
+
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleForbiddenOperation(ForbiddenOperationException ex) {
+        log.warn("Forbidden operation: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error("FORBIDDEN", ex.getMessage()));
     }
 
     @ExceptionHandler(DomainException.class)

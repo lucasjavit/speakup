@@ -5,6 +5,7 @@ import com.speakup.domain.user.Role;
 import com.speakup.domain.user.User;
 import com.speakup.domain.user.UserRepository;
 import com.speakup.domain.user.exception.UserNotFoundException;
+import com.speakup.domain.shared.ForbiddenOperationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -70,11 +71,22 @@ public class AdminUserService {
 
     /**
      * Update user active status.
+     * Only SUPER_ADMIN can deactivate themselves. No admin can deactivate a SUPER_ADMIN except themselves.
      */
     @Transactional
-    public AdminUserResponse updateStatus(UUID id, boolean active) {
+    public AdminUserResponse updateStatus(UUID id, boolean active, UUID currentUserId, Role currentUserRole) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        // Validation: Only SUPER_ADMIN can deactivate a SUPER_ADMIN (themselves)
+        if (!active && user.getRole() == Role.SUPER_ADMIN) {
+            if (currentUserRole != Role.SUPER_ADMIN) {
+                throw new ForbiddenOperationException("Only SUPER_ADMIN can deactivate a SUPER_ADMIN");
+            }
+            if (!id.equals(currentUserId)) {
+                throw new ForbiddenOperationException("SUPER_ADMIN can only deactivate themselves");
+            }
+        }
 
         if (active) {
             user.activate();

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore, isAdmin } from '@/stores/authStore';
 import { Button } from '@/components/ui';
 import styles from './MainLayout.module.css';
@@ -9,6 +9,7 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
 
   return (
@@ -35,11 +36,20 @@ export function MainLayout({ children }: MainLayoutProps) {
                     src={user?.avatarUrl || '/default-avatar.png'}
                     alt={user?.name}
                     className={styles.avatar}
+                    onClick={() => navigate('/complete-profile')}
+                    title={user?.name || 'Edit profile'}
                   />
-                  <span className={styles.userName}>{user?.name}</span>
-                  <Button variant="ghost" size="sm" onClick={logout}>
-                    Logout
-                  </Button>
+                  <button
+                    className={styles.logoutButton}
+                    onClick={logout}
+                    title="Logout"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                  </button>
                 </div>
               </>
             ) : (
