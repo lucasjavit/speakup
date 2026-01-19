@@ -43,6 +43,20 @@
   width: 100%;
 }
 
+.statsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.statsHeaderIcon {
+  width: 22px;
+  height: 22px;
+  color: var(--color-primary, #667eea);
+}
+
 .practiceRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -174,7 +188,7 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
   color: white;
   font-size: 0.75rem;
   font-weight: 600;
@@ -397,7 +411,39 @@
   font-size: 0.6875rem;
   font-weight: 600;
   color: white;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
   padding: 0.25rem 0.5rem;
   border-radius: 9999px;
+}
+
+/* Find Partner Button - Gradient */
+.findPartnerButton {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.findPartnerButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.findPartnerButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.findPartnerButton:disabled {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
 }

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { Button, Card, QueueModal } from '@/components/ui';
+import { Card, QueueModal } from '@/components/ui';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
 import type { Session, UserStats } from '@/types';
@@ -90,7 +90,14 @@ export function Home() {
       {isAuthenticated && user && (
         <section className={styles.dashboard}>
           {/* Stats Card - Full Width at Top */}
-          <Card header={<h2>Your Statistics</h2>} className={styles.statsCard}>
+          <Card header={
+            <h2 className={styles.statsHeader}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+              </svg>
+              Your Statistics
+            </h2>
+          } className={styles.statsCard}>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
@@ -160,7 +167,14 @@ export function Home() {
           {/* Schedule and Practice Now Side by Side */}
           <div className={styles.practiceRow}>
             {/* Session Schedule - Left */}
-            <Card header={<h2>Session Schedule</h2>} className={styles.scheduleCard}>
+            <Card header={
+              <h2 className={styles.statsHeader}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                  <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                </svg>
+                Session Schedule
+              </h2>
+            } className={styles.scheduleCard}>
               {sessions.length === 0 ? (
                 <p className={styles.noSessions}>No sessions scheduled</p>
               ) : (
@@ -197,7 +211,14 @@ export function Home() {
             </Card>
 
             {/* Practice Now - Right */}
-            <Card header={<h2>Practice Now</h2>} className={styles.practiceCard}>
+            <Card header={
+              <h2 className={styles.statsHeader}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                  <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                </svg>
+                Practice Now
+              </h2>
+            } className={styles.practiceCard}>
               {isLoading ? (
                 <p className={styles.noSession}>Loading sessions...</p>
               ) : activeSession ? (
@@ -234,13 +255,13 @@ export function Home() {
                       <span className={styles.sessionBadge}>Live Now</span>
                     </div>
                   </div>
-                  <Button
-                    fullWidth
+                  <button
+                    className={styles.findPartnerButton}
                     disabled={!user.profileCompleted}
                     onClick={handleFindPartner}
                   >
                     Find a Partner
-                  </Button>
+                  </button>
                 </div>
               ) : (
                 <div className={styles.noSessionCard}>
