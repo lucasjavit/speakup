@@ -105,10 +105,11 @@
 /* Stats Section */
 .statsSection {
   margin-bottom: 1.5rem;
-  background: var(--bg-secondary);
+  background: var(--bg-primary, #ffffff);
   padding: 1.5rem;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .sectionHeader {
@@ -149,7 +150,7 @@
 }
 
 .statCard {
-  background: var(--bg-tertiary, #f1f5f9);
+  background: var(--bg-secondary, #f8fafc);
   padding: 1.25rem;
   border-radius: 12px;
   text-align: center;
@@ -158,11 +159,13 @@
   align-items: center;
   gap: 0.375rem;
   transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .statCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: var(--color-primary, #667eea);
 }
 
 .statIcon {
@@ -197,10 +200,11 @@
 
 /* Session Section */
 .sessionSection {
-  background: var(--bg-secondary);
+  background: var(--bg-primary, #ffffff);
   padding: 1.5rem;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .sessionSectionIcon {
@@ -223,10 +227,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: var(--bg-primary);
-  border-radius: 8px;
-  border: 2px solid var(--color-success);
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(52, 211, 153, 0.08) 100%);
+  border-radius: 12px;
+  border: 2px solid var(--color-success, #10b981);
 }
 
 .sessionInfo h3 {
@@ -253,18 +257,21 @@
 
 .joinButton {
   padding: 1rem 2rem;
-  background: var(--color-primary);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
 }
 
 .joinButton:hover:not(:disabled) {
-  background: var(--color-primary-dark);
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
 }
 
 .joinButton:disabled {
@@ -299,10 +306,17 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem;
-  background: var(--bg-primary);
-  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 10px;
   margin-bottom: 0.5rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.upcomingSessions li:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .upcomingSessions li strong {

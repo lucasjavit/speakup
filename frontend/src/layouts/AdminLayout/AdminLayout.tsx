@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation, Navigate } from 'react-router-dom';
+import { Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuthStore, isAdmin, canManageSessions, canManageUsers, canManagePayments } from '@/stores/authStore';
-import { BackButton, Button } from '@/components/ui';
+import { BackButton } from '@/components/ui';
 import styles from './AdminLayout.module.css';
 
 interface AdminLayoutProps {
@@ -11,6 +11,7 @@ interface AdminLayoutProps {
 export function AdminLayout({ children }: AdminLayoutProps) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Redirect if not authenticated or not admin
   if (!isAuthenticated || !user || !isAdmin(user.role)) {
@@ -62,14 +63,27 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 src={user.avatarUrl || '/default-avatar.png'}
                 alt={user.name}
                 className={styles.avatar}
+                onClick={() => navigate('/complete-profile')}
+                title="Edit profile"
               />
               <div className={styles.userInfo}>
                 <span className={styles.userName}>{user.name}</span>
                 <span className={styles.userRole}>{user.role.replace('_', ' ')}</span>
               </div>
-              <Button variant="ghost" size="sm" onClick={logout}>
-                Logout
-              </Button>
+              <button
+                className={styles.logoutButton}
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+                title="Logout"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
             </div>
           </div>
         </header>

@@ -14,6 +14,34 @@
   left: 1.5rem;
 }
 
+.logoutButton {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.logoutButton:hover {
+  background: var(--color-error-bg, #fee2e2);
+  border-color: var(--color-error, #dc2626);
+  color: var(--color-error, #dc2626);
+}
+
+.logoutButton svg {
+  width: 20px;
+  height: 20px;
+}
+
 .content {
   text-align: center;
   max-width: 480px;

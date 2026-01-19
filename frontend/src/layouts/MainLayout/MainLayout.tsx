@@ -41,7 +41,10 @@ export function MainLayout({ children }: MainLayoutProps) {
                   />
                   <button
                     className={styles.logoutButton}
-                    onClick={logout}
+                    onClick={() => {
+                      logout();
+                      navigate('/login');
+                    }}
                     title="Logout"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

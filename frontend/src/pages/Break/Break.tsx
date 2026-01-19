@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
 import { ratingService } from '@/services';
 import { BackButton, PostCallRatingModal, QueueModal } from '@/components/ui';
@@ -22,6 +23,7 @@ export function Break() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as BreakState | null;
+  const { logout } = useAuthStore();
   const { joinQueue: joinQueueStore } = useCallStore();
 
   // Use breakDurationSeconds from state, fallback to default
@@ -102,6 +104,11 @@ export function Break() {
     navigate('/');
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -114,6 +121,13 @@ export function Break() {
   return (
     <div className={styles.container}>
       <BackButton to="/" label="Home" className={styles.backButton} />
+      <button onClick={handleLogout} className={styles.logoutButton} title="Logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      </button>
       <div className={styles.content}>
         <div className={styles.iconWrapper}>
           <div className={styles.checkIcon}>
