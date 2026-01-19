@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { useWebSocket } from '@/hooks';
+import { useWebSocket, useActiveCallCheck } from '@/hooks';
 import { conversationService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import type { UserStats, Session, MatchFoundPayload } from '@/types';
@@ -12,6 +12,9 @@ export function Lobby() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const { joinQueue: joinQueueStore, startCall } = useCallStore();
+
+  // Check for active conversation on page load (e.g., after refresh)
+  const { isChecking: isCheckingActiveCall } = useActiveCallCheck();
 
   const [stats, setStats] = useState<UserStats | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -30,7 +33,9 @@ export function Lobby() {
         topic: payload.topic,
         isInitiator: payload.isInitiator,
         startedAt: null,
+        sessionId: payload.sessionId,
         callDurationSeconds: payload.callDurationSeconds || 600,
+        breakDurationSeconds: payload.breakDurationSeconds || 30,
       });
       navigate('/call');
     },
@@ -86,10 +91,12 @@ export function Lobby() {
     return `${minutes}m`;
   };
 
-  if (isLoading) {
+  if (isLoading || isCheckingActiveCall) {
     return (
       <div className={styles.container}>
-        <div className={styles.loading}>Loading...</div>
+        <div className={styles.loading}>
+          {isCheckingActiveCall ? 'Checking for active call...' : 'Loading...'}
+        </div>
       </div>
     );
   }

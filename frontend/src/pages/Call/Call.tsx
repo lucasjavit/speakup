@@ -276,6 +276,9 @@ export function Call() {
     }
     clearReconnectionState();
 
+    // Capture elapsed time before pausing
+    const elapsedSeconds = timer.timeElapsed;
+
     timer.pause();
     hangUp();
     destroy(); // Clean up peer connection
@@ -301,7 +304,17 @@ export function Call() {
 
     setCallState('ended');
     endCall();
-    navigate('/');
+
+    // Navigate to break screen with call summary
+    navigate('/break', {
+      state: {
+        partnerName: callInfo?.partnerName || 'Partner',
+        topic: callInfo?.topic || '',
+        duration: elapsedSeconds,
+        sessionId: callInfo?.sessionId || '',
+        breakDurationSeconds: callInfo?.breakDurationSeconds || 30,
+      }
+    });
   };
 
   // Store handleCallEnd in ref for use in callbacks

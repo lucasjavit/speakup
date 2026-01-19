@@ -67,6 +67,14 @@ public class Session extends BaseEntity {
     private Integer callDurationSeconds = 600;
 
     /**
+     * Duration of the break between calls in seconds.
+     * Default is 30 seconds.
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer breakDurationSeconds = 30;
+
+    /**
      * Check if the session is currently active (within time range).
      */
     public boolean isCurrentlyRunning() {

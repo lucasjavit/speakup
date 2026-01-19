@@ -23,15 +23,18 @@ public record ConversationResponse(
         ConversationStatus status,
         boolean hasRecordingA,
         boolean hasRecordingB,
-        Instant createdAt
+        Instant createdAt,
+        Integer callDurationSeconds,
+        Integer breakDurationSeconds
 ) {
 
     public static ConversationResponse from(Conversation conversation) {
+        var session = conversation.getSession();
         return ConversationResponse.builder()
                 .id(conversation.getId())
                 .userA(UserSummary.from(conversation.getUserA()))
                 .userB(UserSummary.from(conversation.getUserB()))
-                .sessionId(conversation.getSession() != null ? conversation.getSession().getId() : null)
+                .sessionId(session != null ? session.getId() : null)
                 .topic(conversation.getTopic())
                 .startedAt(conversation.getStartedAt())
                 .endedAt(conversation.getEndedAt())
@@ -40,6 +43,8 @@ public record ConversationResponse(
                 .hasRecordingA(conversation.getRecordingUrlA() != null)
                 .hasRecordingB(conversation.getRecordingUrlB() != null)
                 .createdAt(conversation.getCreatedAt())
+                .callDurationSeconds(session != null ? session.getCallDurationSeconds() : 600)
+                .breakDurationSeconds(session != null ? session.getBreakDurationSeconds() : 30)
                 .build();
     }
 

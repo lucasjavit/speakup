@@ -77,6 +77,19 @@ jwt:
   expiration: 86400000 # 24 hours
   refresh-expiration: 604800000 # 7 days
 
+# SpeakUp Configuration
+speakup:
+  topics:
+    provider: ${SPEAKUP_TOPICS_PROVIDER:static} # static or claude
+
+# Claude AI Configuration (for topic generation)
+claude:
+  api:
+    key: ${CLAUDE_API_KEY:}
+    url: https://api.anthropic.com/v1/messages
+    model: claude-3-haiku-20240307
+    max-tokens: 100
+
 # OpenAPI Documentation
 springdoc:
   api-docs:

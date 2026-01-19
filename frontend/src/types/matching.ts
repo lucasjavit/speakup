@@ -53,7 +53,9 @@ export interface MatchFoundPayload {
   partnerAvatar: string;
   topic: string;
   isInitiator: boolean;
+  sessionId: string;
   callDurationSeconds: number;
+  breakDurationSeconds: number;
 }
 
 export interface MatchCancelledPayload {

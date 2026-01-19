@@ -84,7 +84,9 @@ public class WebSocketMessage {
             String partnerAvatar,
             String topic,
             boolean isInitiator,
-            int callDurationSeconds) {
+            String sessionId,
+            int callDurationSeconds,
+            int breakDurationSeconds) {
         return WebSocketMessage.builder()
                 .type(TYPE_MATCH_FOUND)
                 .payload(Map.of(
@@ -94,7 +96,9 @@ public class WebSocketMessage {
                         "partnerAvatar", partnerAvatar != null ? partnerAvatar : "",
                         "topic", topic,
                         "isInitiator", isInitiator,
-                        "callDurationSeconds", callDurationSeconds
+                        "sessionId", sessionId,
+                        "callDurationSeconds", callDurationSeconds,
+                        "breakDurationSeconds", breakDurationSeconds
                 ))
                 .build();
     }

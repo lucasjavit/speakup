@@ -61,7 +61,12 @@ public class MatchingService {
         // Check if user has an active conversation
         Optional<Conversation> activeConversation = conversationRepository.findActiveByUserId(userId);
         if (activeConversation.isPresent()) {
-            throw new IllegalStateException("User already has an active conversation");
+            Conversation conversation = activeConversation.get();
+            // If the conversation is stale (e.g., user refreshed and lost state), cancel it
+            log.warn("User {} has an active conversation {}, cancelling it to allow queue join",
+                    userId, conversation.getId());
+            conversation.cancel();
+            conversationRepository.save(conversation);
         }
 
         // Create queue entry
@@ -241,8 +246,9 @@ public class MatchingService {
         log.info("Match created: {} <-> {} for conversation {}",
                 entryA.getUserId(), entryB.getUserId(), conversation.getId());
 
-        // Get call duration from session (default to 10 minutes if not set)
+        // Get call duration and break duration from session
         int callDurationSeconds = session != null ? session.getCallDurationSeconds() : 600;
+        int breakDurationSeconds = session != null ? session.getBreakDurationSeconds() : 30;
 
         // Notify both users via WebSocket
         webSocketSessionManager.notifyMatch(
@@ -254,7 +260,9 @@ public class MatchingService {
                 entryA.getUserAvatar(),
                 entryB.getUserAvatar(),
                 topic,
-                callDurationSeconds
+                sessionId,
+                callDurationSeconds,
+                breakDurationSeconds
         );
     }
 

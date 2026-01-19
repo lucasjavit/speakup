@@ -54,6 +54,7 @@ export interface Session {
   status: SessionStatus;
   currentlyRunning: boolean;
   callDurationSeconds: number;
+  breakDurationSeconds: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,6 +66,7 @@ export interface CreateSessionRequest {
   timezone: string;
   daysOfWeek: DayOfWeek[];
   callDurationSeconds?: number;
+  breakDurationSeconds?: number;
 }
 
 export interface UpdateSessionRequest {
@@ -74,6 +76,7 @@ export interface UpdateSessionRequest {
   timezone: string;
   daysOfWeek: DayOfWeek[];
   callDurationSeconds?: number;
+  breakDurationSeconds?: number;
 }
 
 /**

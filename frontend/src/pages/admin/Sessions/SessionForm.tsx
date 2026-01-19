@@ -26,6 +26,7 @@ export function SessionForm() {
   const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([]);
   const [callDurationMinutes, setCallDurationMinutes] = useState(10);
+  const [breakDurationSeconds, setBreakDurationSeconds] = useState(30);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(isEditing);
@@ -46,6 +47,7 @@ export function SessionForm() {
       setTimezone(session.timezone);
       setDaysOfWeek(session.daysOfWeek);
       setCallDurationMinutes(Math.round(session.callDurationSeconds / 60));
+      setBreakDurationSeconds(session.breakDurationSeconds || 30);
     } catch (err) {
       setError('Failed to load session');
       console.error(err);
@@ -79,6 +81,7 @@ export function SessionForm() {
         timezone,
         daysOfWeek,
         callDurationSeconds: callDurationMinutes * 60,
+        breakDurationSeconds,
       };
 
       if (isEditing) {
@@ -185,6 +188,23 @@ export function SessionForm() {
             />
             <span className={styles.hint}>
               Duration of each 1:1 call between users (1-60 minutes)
+            </span>
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="breakDuration" className={styles.label}>
+              Break Duration (seconds)
+            </label>
+            <Input
+              id="breakDuration"
+              type="number"
+              min={0}
+              max={300}
+              value={breakDurationSeconds}
+              onChange={(e) => setBreakDurationSeconds(Math.max(0, Math.min(300, parseInt(e.target.value) || 0)))}
+            />
+            <span className={styles.hint}>
+              Wait time between calls before users can rejoin (0-300 seconds)
             </span>
           </div>
 

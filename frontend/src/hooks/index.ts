@@ -9,3 +9,4 @@ export { useMediaRecorder } from './useMediaRecorder';
 export { useCallTimer } from './useCallTimer';
 export { useMediaDevices } from './useMediaDevices';
 export type { MediaDeviceInfo } from './useMediaDevices';
+export { useActiveCallCheck } from './useActiveCallCheck';

@@ -41,6 +41,9 @@ public class SessionService {
         if (request.callDurationSeconds() != null) {
             builder.callDurationSeconds(request.callDurationSeconds());
         }
+        if (request.breakDurationSeconds() != null) {
+            builder.breakDurationSeconds(request.breakDurationSeconds());
+        }
 
         Session session = builder.build();
         session.setDaysOfWeekSet(request.daysOfWeek());
@@ -95,6 +98,9 @@ public class SessionService {
         session.setDaysOfWeekSet(request.daysOfWeek());
         if (request.callDurationSeconds() != null) {
             session.setCallDurationSeconds(request.callDurationSeconds());
+        }
+        if (request.breakDurationSeconds() != null) {
+            session.setBreakDurationSeconds(request.breakDurationSeconds());
         }
 
         Session saved = sessionRepository.save(session);

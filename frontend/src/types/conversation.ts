@@ -21,6 +21,8 @@ export interface Conversation {
   hasRecordingA: boolean;
   hasRecordingB: boolean;
   createdAt: string;
+  callDurationSeconds: number;
+  breakDurationSeconds: number;
 }
 
 export interface UserStats {
@@ -50,5 +52,7 @@ export interface CallInfo {
   topic: string;
   isInitiator: boolean;
   startedAt: Date | null;
+  sessionId: string;
   callDurationSeconds: number;
+  breakDurationSeconds: number;
 }

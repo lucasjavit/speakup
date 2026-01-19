@@ -31,12 +31,23 @@ public record CreateSessionRequest(
 
         @Min(value = 60, message = "Call duration must be at least 60 seconds")
         @Max(value = 3600, message = "Call duration must be at most 3600 seconds (1 hour)")
-        Integer callDurationSeconds
+        Integer callDurationSeconds,
+
+        @Min(value = 0, message = "Break duration must be at least 0 seconds")
+        @Max(value = 300, message = "Break duration must be at most 300 seconds (5 minutes)")
+        Integer breakDurationSeconds
 ) {
     /**
      * Returns the call duration, defaulting to 600 seconds (10 minutes) if not specified.
      */
     public Integer callDurationSecondsOrDefault() {
         return callDurationSeconds != null ? callDurationSeconds : 600;
+    }
+
+    /**
+     * Returns the break duration, defaulting to 30 seconds if not specified.
+     */
+    public Integer breakDurationSecondsOrDefault() {
+        return breakDurationSeconds != null ? breakDurationSeconds : 30;
     }
 }

@@ -22,6 +22,7 @@ public record SessionResponse(
         SessionStatus status,
         boolean currentlyRunning,
         Integer callDurationSeconds,
+        Integer breakDurationSeconds,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -36,6 +37,7 @@ public record SessionResponse(
                 session.getStatus(),
                 session.isCurrentlyRunning(),
                 session.getCallDurationSeconds(),
+                session.getBreakDurationSeconds(),
                 session.getCreatedAt(),
                 session.getUpdatedAt()
         );

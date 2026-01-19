@@ -8,6 +8,7 @@ import { NotFound } from '@/pages/NotFound';
 import { Lobby } from '@/pages/Lobby';
 import { Queue } from '@/pages/Queue';
 import { Call } from '@/pages/Call';
+import { Break } from '@/pages/Break';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
   {
     path: '/call',
     element: <Call />,
+  },
+  {
+    path: '/break',
+    element: <Break />,
   },
   {
     path: '/complete-profile',

@@ -31,6 +31,10 @@ public record UpdateSessionRequest(
 
         @Min(value = 60, message = "Call duration must be at least 60 seconds")
         @Max(value = 3600, message = "Call duration must be at most 3600 seconds (1 hour)")
-        Integer callDurationSeconds
+        Integer callDurationSeconds,
+
+        @Min(value = 0, message = "Break duration must be at least 0 seconds")
+        @Max(value = 300, message = "Break duration must be at most 300 seconds (5 minutes)")
+        Integer breakDurationSeconds
 ) {
 }

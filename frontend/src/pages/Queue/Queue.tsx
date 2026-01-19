@@ -20,7 +20,9 @@ export function Queue() {
         topic: payload.topic,
         isInitiator: payload.isInitiator,
         startedAt: null,
+        sessionId: payload.sessionId,
         callDurationSeconds: payload.callDurationSeconds || 600,
+        breakDurationSeconds: payload.breakDurationSeconds || 30,
       });
       navigate('/call');
     },
