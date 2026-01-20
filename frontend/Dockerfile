@@ -32,7 +32,9 @@ RUN rm -rf /etc/nginx/conf.d/*
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Create nginx config inline (avoids COPY issues with Coolify)
-RUN cat > /etc/nginx/conf.d/default.conf << 'NGINX_EOF'
+# Note: BACKEND_URL is passed as build arg and used here
+ARG BACKEND_URL=http://backend:8080
+RUN cat > /etc/nginx/conf.d/default.conf << NGINX_EOF
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -51,11 +53,21 @@ server {
         add_header Content-Type text/plain;
     }
 
-    location / {
-        try_files $uri $uri/ /index.html;
+    # Proxy API requests to backend
+    location /api/ {
+        proxy_pass ${BACKEND_URL}/api/;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
