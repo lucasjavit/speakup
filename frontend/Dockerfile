@@ -37,9 +37,9 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Verify files are copied (debug)
 RUN ls -la /usr/share/nginx/html && ls -la /etc/nginx/conf.d/
 
-# Health check
+# Health check using 127.0.0.1 instead of localhost
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD wget -q --spider http://localhost:80/health || exit 1
+    CMD wget -q --spider http://127.0.0.1:80/health || exit 1
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
