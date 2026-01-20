@@ -31,10 +31,10 @@ RUN rm -rf /etc/nginx/conf.d/*
 # Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Create nginx config inline (avoids COPY issues with Coolify)
-# Note: BACKEND_URL is passed as build arg and used here
+# Create nginx config template and substitute BACKEND_URL at build time
 ARG BACKEND_URL=http://backend:8080
-RUN cat > /etc/nginx/conf.d/default.conf << NGINX_EOF
+RUN echo "BACKEND_URL is: $BACKEND_URL" && \
+    cat > /tmp/nginx.template << 'NGINX_TEMPLATE'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -55,19 +55,19 @@ server {
 
     # Proxy API requests to backend
     location /api/ {
-        proxy_pass ${BACKEND_URL}/api/;
+        proxy_pass BACKEND_URL_PLACEHOLDER/api/;
         proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location / {
-        try_files \$uri \$uri/ /index.html;
+        try_files $uri $uri/ /index.html;
     }
 
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
@@ -76,10 +76,12 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 }
-NGINX_EOF
+NGINX_TEMPLATE
+RUN sed "s|BACKEND_URL_PLACEHOLDER|$BACKEND_URL|g" /tmp/nginx.template > /etc/nginx/conf.d/default.conf && \
+    rm /tmp/nginx.template
 
-# Verify files are copied (debug)
-RUN ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf
+# Verify files and config (debug)
+RUN ls -la /usr/share/nginx/html && echo "=== NGINX CONFIG ===" && cat /etc/nginx/conf.d/default.conf
 
 # Health check using 127.0.0.1 instead of localhost
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
