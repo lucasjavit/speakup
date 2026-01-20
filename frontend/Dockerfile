@@ -24,8 +24,18 @@ RUN npm run build
 
 # Runtime stage
 FROM nginx:alpine
+
+# Remove default nginx config
+RUN rm -rf /etc/nginx/conf.d/*
+
+# Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Verify files are copied (debug)
+RUN ls -la /usr/share/nginx/html && ls -la /etc/nginx/conf.d/
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
