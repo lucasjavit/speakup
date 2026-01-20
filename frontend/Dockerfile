@@ -28,11 +28,15 @@ FROM nginx:alpine
 # Backend URL for proxy (can be internal docker name or public URL)
 ARG BACKEND_URL=http://backend:8080
 
-# Remove default nginx config
-RUN rm -rf /etc/nginx/conf.d/*
+# Remove ALL default nginx configs to avoid conflicts
+RUN rm -rf /etc/nginx/conf.d/* && \
+    rm -f /etc/nginx/nginx.conf.default
 
 # Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
+
+# Ensure index.html exists
+RUN test -f /usr/share/nginx/html/index.html || (echo "ERROR: index.html not found!" && exit 1)
 
 # Create nginx config template
 RUN cat > /etc/nginx/conf.d/default.conf.template << 'NGINX_EOF'
