@@ -31,11 +31,43 @@ RUN rm -rf /etc/nginx/conf.d/*
 # Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Create nginx config inline (avoids COPY issues with Coolify)
+RUN cat > /etc/nginx/conf.d/default.conf << 'NGINX_EOF'
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/json application/xml;
+
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+}
+NGINX_EOF
 
 # Verify files are copied (debug)
-RUN ls -la /usr/share/nginx/html && ls -la /etc/nginx/conf.d/
+RUN ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf
 
 # Health check using 127.0.0.1 instead of localhost
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
