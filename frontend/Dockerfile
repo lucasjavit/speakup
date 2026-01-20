@@ -25,14 +25,17 @@ RUN npm run build
 # Runtime stage
 FROM nginx:alpine
 
+# Backend URL for proxy (can be internal docker name or public URL)
+ARG BACKEND_URL=http://backend:8080
+
 # Remove default nginx config
 RUN rm -rf /etc/nginx/conf.d/*
 
 # Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Create nginx config with API proxy to internal backend
-RUN cat > /etc/nginx/conf.d/default.conf << 'NGINX_EOF'
+# Create nginx config template
+RUN cat > /etc/nginx/conf.d/default.conf.template << 'NGINX_EOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -51,9 +54,9 @@ server {
         add_header Content-Type text/plain;
     }
 
-    # Proxy API requests to internal backend service
+    # Proxy API requests to backend service
     location /api/ {
-        proxy_pass http://backend:8080/api/;
+        proxy_pass BACKEND_URL_PLACEHOLDER/api/;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -77,6 +80,10 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
 }
 NGINX_EOF
+
+# Replace placeholder with actual backend URL
+RUN sed "s|BACKEND_URL_PLACEHOLDER|${BACKEND_URL}|g" /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && \
+    rm /etc/nginx/conf.d/default.conf.template
 
 # Verify files and config
 RUN ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf
