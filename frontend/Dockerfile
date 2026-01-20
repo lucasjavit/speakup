@@ -34,8 +34,8 @@ COPY --from=build /app/dist /usr/share/nginx/html
 # Create nginx config with API proxy to internal backend
 RUN cat > /etc/nginx/conf.d/default.conf << 'NGINX_EOF'
 server {
-    listen 3000 default_server;
-    listen [::]:3000 default_server;
+    listen 80 default_server;
+    listen [::]:80 default_server;
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
@@ -83,7 +83,7 @@ RUN ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD wget -q --spider http://127.0.0.1:3000/health || exit 1
+    CMD wget -q --spider http://127.0.0.1:80/health || exit 1
 
-EXPOSE 3000
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
