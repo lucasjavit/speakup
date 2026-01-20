@@ -31,10 +31,8 @@ RUN rm -rf /etc/nginx/conf.d/*
 # Copy built files
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Create nginx config template and substitute BACKEND_URL at build time
-ARG BACKEND_URL=http://backend:8080
-RUN echo "BACKEND_URL is: $BACKEND_URL" && \
-    cat > /tmp/nginx.template << 'NGINX_TEMPLATE'
+# Create nginx config with API proxy to internal backend
+RUN cat > /etc/nginx/conf.d/default.conf << 'NGINX_EOF'
 server {
     listen 3000 default_server;
     listen [::]:3000 default_server;
@@ -53,14 +51,16 @@ server {
         add_header Content-Type text/plain;
     }
 
-    # Proxy API requests to backend
+    # Proxy API requests to internal backend service
     location /api/ {
-        proxy_pass BACKEND_URL_PLACEHOLDER/api/;
+        proxy_pass http://backend:8080/api/;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_connect_timeout 30s;
+        proxy_read_timeout 60s;
     }
 
     location / {
@@ -76,12 +76,10 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
 }
-NGINX_TEMPLATE
-RUN sed "s|BACKEND_URL_PLACEHOLDER|$BACKEND_URL|g" /tmp/nginx.template > /etc/nginx/conf.d/default.conf && \
-    rm /tmp/nginx.template
+NGINX_EOF
 
-# Verify files and config (debug)
-RUN ls -la /usr/share/nginx/html && echo "=== NGINX CONFIG ===" && cat /etc/nginx/conf.d/default.conf
+# Verify files and config
+RUN ls -la /usr/share/nginx/html && cat /etc/nginx/conf.d/default.conf
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \

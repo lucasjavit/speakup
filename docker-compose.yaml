@@ -39,7 +39,8 @@ services:
         - VITE_PEERJS_HOST=${PEERJS_HOST}
         - VITE_PEERJS_PORT=${PEERJS_PORT:-80}
         - VITE_PEERJS_PATH=/peerjs
-        - BACKEND_URL=${BACKEND_URL:-http://backend:8080}
+    depends_on:
+      - backend
     restart: unless-stopped
     networks:
       - speakup-network
