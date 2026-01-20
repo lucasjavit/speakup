@@ -10,7 +10,7 @@ import type { UserStats, Session } from '@/types';
 import styles from './Lobby.module.css';
 
 export function Lobby() {
-  const { user } = useAuthStore();
+  const { user: _user } = useAuthStore();
   const { joinQueue: joinQueueStore } = useCallStore();
 
   // Check for active conversation on page load (e.g., after refresh)
