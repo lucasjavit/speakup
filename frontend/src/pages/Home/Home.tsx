@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { Button, Card, QueueModal } from '@/components/ui';
+import { Button, Card, QueueModal, Tooltip } from '@/components/ui';
+import { InsufficientCreditsModal } from '@/components/credits';
+import { creditService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
-import type { Session, UserStats } from '@/types';
+import type { Session, UserStats, CreditWallet } from '@/types';
 import styles from './Home.module.css';
 
 export function Home() {
@@ -15,8 +17,12 @@ export function Home() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
+  const [wallet, setWallet] = useState<CreditWallet | null>(null);
+  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+  const [isCheckingCredits, setIsCheckingCredits] = useState(false);
 
   // Load data for authenticated users
   useEffect(() => {
@@ -25,25 +31,44 @@ export function Home() {
       Promise.all([
         conversationService.getUserStats(),
         sessionService.getActiveSessions(),
+        creditService.getWallet(),
+        creditService.isFreeModeEnabled(),
       ])
-        .then(([statsData, sessionsData]) => {
+        .then(([statsData, sessionsData, walletData, freeMode]) => {
           setStats(statsData);
           setSessions(sessionsData || []);
           const running = sessionsData?.find((s: Session) => s.currentlyRunning);
           setActiveSession(running || null);
+          setWallet(walletData);
+          setIsFreeModeEnabled(freeMode);
         })
         .catch(console.error)
         .finally(() => setIsLoading(false));
     }
   }, [isAuthenticated, user]);
 
-  const handleFindPartner = () => {
+  const handleFindPartner = async () => {
     if (!activeSession) {
       return;
     }
 
-    joinQueueStore(activeSession.id);
-    setIsQueueOpen(true);
+    // Check if user has credits before joining queue
+    try {
+      setIsCheckingCredits(true);
+      const canJoin = await creditService.canJoinSession();
+      if (!canJoin) {
+        setShowInsufficientCredits(true);
+        return;
+      }
+      joinQueueStore(activeSession.id);
+      setIsQueueOpen(true);
+    } catch (err) {
+      console.error('Error checking credits:', err);
+      // Show insufficient credits modal on error to be safe
+      setShowInsufficientCredits(true);
+    } finally {
+      setIsCheckingCredits(false);
+    }
   };
 
   const formatDuration = (seconds: number): string => {
@@ -201,12 +226,41 @@ export function Home() {
 
             {/* Practice Now - Right */}
             <Card header={
-              <h2 className={styles.statsHeader}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
-                  <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-                </svg>
-                Practice Now
-              </h2>
+              <div className={styles.practiceHeader}>
+                <h2 className={styles.statsHeader}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                  </svg>
+                  Practice Now
+                </h2>
+                {!isFreeModeEnabled && (
+                  <div className={styles.practiceCredits}>
+                    <Tooltip content="Conversations available" position="top">
+                      <div
+                        className={styles.creditsBadge}
+                        onClick={() => navigate('/credits')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <svg viewBox="0 0 24 24" fill="currentColor" className={styles.creditsIcon}>
+                          <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/>
+                        </svg>
+                        <span>{wallet?.conversationCredits || 0}</span>
+                      </div>
+                    </Tooltip>
+                    <Tooltip content="Buy more conversations" position="top">
+                      <button
+                        className={styles.buyMoreButton}
+                        onClick={() => navigate('/credits/buy')}
+                      >
+                        <svg viewBox="0 0 24 24" fill="currentColor" className={styles.buyMoreIcon}>
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
+                        </svg>
+                        Buy
+                      </button>
+                    </Tooltip>
+                  </div>
+                )}
+              </div>
             } className={styles.practiceCard}>
               {isLoading ? (
                 <p className={styles.noSession}>Loading sessions...</p>
@@ -246,10 +300,10 @@ export function Home() {
                   </div>
                   <button
                     className={styles.findPartnerButton}
-                    disabled={!user.profileCompleted}
+                    disabled={!user.profileCompleted || isCheckingCredits}
                     onClick={handleFindPartner}
                   >
-                    Find a Partner
+                    {isCheckingCredits ? 'Checking...' : 'Find a Partner'}
                   </button>
                 </div>
               ) : (
@@ -276,6 +330,11 @@ export function Home() {
           onClose={() => setIsQueueOpen(false)}
         />
       )}
+
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCredits}
+        onClose={() => setShowInsufficientCredits(false)}
+      />
     </div>
   );
 }

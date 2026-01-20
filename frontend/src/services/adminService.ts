@@ -8,6 +8,10 @@ import type {
   AdminUser,
   Role,
   DashboardStats,
+  AdminPurchase,
+  PaymentStatus,
+  FreeModeStatus,
+  ApplicationSetting,
 } from '@/types';
 
 interface PaginatedResponse<T> {
@@ -84,5 +88,31 @@ export const adminService = {
 
   updateUserStatus: async (id: string, active: boolean): Promise<AdminUser> => {
     return apiCall<AdminUser>(api.patch<ApiResult<AdminUser>>(`/admin/users/${id}/status`, { active }));
+  },
+
+  // Payments
+  getPayments: async (page = 0, size = 20, statuses?: PaymentStatus[]): Promise<PaginatedResponse<AdminPurchase>> => {
+    const params = new URLSearchParams({ page: String(page), size: String(size) });
+    if (statuses && statuses.length > 0) {
+      statuses.forEach(status => params.append('status', status));
+    }
+    return apiCall<PaginatedResponse<AdminPurchase>>(
+      api.get<ApiResult<PaginatedResponse<AdminPurchase>>>(`/admin/payments?${params}`)
+    );
+  },
+
+  // Settings
+  getFreeModeStatus: async (): Promise<FreeModeStatus> => {
+    return apiCall<FreeModeStatus>(api.get<ApiResult<FreeModeStatus>>('/admin/settings/free-mode'));
+  },
+
+  updateFreeMode: async (enabled: boolean, message?: string): Promise<FreeModeStatus> => {
+    return apiCall<FreeModeStatus>(
+      api.put<ApiResult<FreeModeStatus>>('/admin/settings/free-mode', { enabled, message })
+    );
+  },
+
+  getAllSettings: async (): Promise<ApplicationSetting[]> => {
+    return apiCall<ApplicationSetting[]>(api.get<ApiResult<ApplicationSetting[]>>('/admin/settings'));
   },
 };

@@ -90,6 +90,18 @@ claude:
     model: claude-3-haiku-20240307
     max-tokens: 100
 
+# Stripe Configuration
+# IMPORTANT: Set these environment variables in production
+# STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PUBLIC_KEY
+stripe:
+  api:
+    key: ${STRIPE_API_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    public-key: ${STRIPE_PUBLIC_KEY:}
+  checkout:
+    success-url: ${STRIPE_SUCCESS_URL:http://localhost:3000/credits/success}
+    cancel-url: ${STRIPE_CANCEL_URL:http://localhost:3000/credits/buy}
+
 # OpenAPI Documentation
 springdoc:
   api-docs:

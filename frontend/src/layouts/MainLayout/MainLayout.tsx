@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore, isAdmin } from '@/stores/authStore';
+import { creditService } from '@/services';
 import { Button } from '@/components/ui';
 import styles from './MainLayout.module.css';
 
@@ -11,6 +12,15 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      creditService.isFreeModeEnabled()
+        .then(setIsFreeModeEnabled)
+        .catch(console.error);
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className={styles.layout}>
@@ -26,6 +36,11 @@ export function MainLayout({ children }: MainLayoutProps) {
                 <Link to="/" className={styles.navLink}>
                   Home
                 </Link>
+                {!isFreeModeEnabled && (
+                  <Link to="/credits" className={styles.navLink}>
+                    Credits
+                  </Link>
+                )}
                 {isAdmin(user?.role) && (
                   <Link to="/admin" className={styles.navLink}>
                     Admin

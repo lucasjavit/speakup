@@ -1,0 +1,1 @@
+export { ProtectedCallRoute } from './ProtectedCallRoute';

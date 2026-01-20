@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
 import { useActiveCallCheck } from '@/hooks';
-import { conversationService } from '@/services';
+import { conversationService, creditService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { BackButton, QueueModal } from '@/components/ui';
+import { CreditBalance, InsufficientCreditsModal } from '@/components/credits';
 import type { UserStats, Session } from '@/types';
 import styles from './Lobby.module.css';
 
@@ -21,6 +22,8 @@ export function Lobby() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+  const [isCheckingCredits, setIsCheckingCredits] = useState(false);
 
   // Load user stats and sessions
   useEffect(() => {
@@ -48,11 +51,24 @@ export function Lobby() {
     loadData();
   }, []);
 
-  const handleJoinSession = () => {
+  const handleJoinSession = async () => {
     if (!activeSession) return;
 
-    joinQueueStore(activeSession.id);
-    setIsQueueOpen(true);
+    try {
+      setIsCheckingCredits(true);
+      const canJoin = await creditService.canJoinSession();
+      if (!canJoin) {
+        setShowInsufficientCredits(true);
+        return;
+      }
+      joinQueueStore(activeSession.id);
+      setIsQueueOpen(true);
+    } catch (err) {
+      console.error('Error checking credits:', err);
+      setShowInsufficientCredits(true);
+    } finally {
+      setIsCheckingCredits(false);
+    }
   };
 
   const formatDuration = (seconds: number): string => {
@@ -86,6 +102,11 @@ export function Lobby() {
           <button onClick={() => setError(null)}>Dismiss</button>
         </div>
       )}
+
+      {/* Credits Section */}
+      <section className={styles.creditsSection}>
+        <CreditBalance />
+      </section>
 
       {/* Stats Section */}
       <section className={styles.statsSection}>
@@ -157,8 +178,9 @@ export function Lobby() {
             <button
               onClick={handleJoinSession}
               className={styles.joinButton}
+              disabled={isCheckingCredits}
             >
-              Join Session
+              {isCheckingCredits ? 'Checking...' : 'Join Session'}
             </button>
           </div>
         ) : (
@@ -196,6 +218,11 @@ export function Lobby() {
           onClose={() => setIsQueueOpen(false)}
         />
       )}
+
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCredits}
+        onClose={() => setShowInsufficientCredits(false)}
+      />
     </div>
   );
 }

@@ -241,6 +241,7 @@ public class MatchingService {
         String topic = topicGenerator.generateTopic();
 
         // Create conversation record
+        // Credits will be consumed when conversation ends (if duration >= 2 min)
         Conversation conversation = Conversation.builder()
                 .userA(userA)
                 .userB(userB)

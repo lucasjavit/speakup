@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { ratingService } from '@/services';
+import { ratingService, creditService } from '@/services';
 import { BackButton, PostCallRatingModal, QueueModal } from '@/components/ui';
+import { CreditBalance, InsufficientCreditsModal } from '@/components/credits';
 import styles from './Break.module.css';
 
 interface BreakState {
@@ -38,6 +39,10 @@ export function Break() {
 
   // Queue modal state
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+
+  // Credit check state
+  const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
+  const [isCheckingCredits, setIsCheckingCredits] = useState(false);
 
   // Check if rating already exists and show modal on mount
   useEffect(() => {
@@ -89,12 +94,25 @@ export function Break() {
     setRatingCompleted(true);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!canContinue || !ratingCompleted) return;
 
     if (state?.sessionId) {
-      joinQueueStore(state.sessionId);
-      setIsQueueOpen(true);
+      try {
+        setIsCheckingCredits(true);
+        const canJoin = await creditService.canJoinSession();
+        if (!canJoin) {
+          setShowInsufficientCredits(true);
+          return;
+        }
+        joinQueueStore(state.sessionId);
+        setIsQueueOpen(true);
+      } catch (err) {
+        console.error('Error checking credits:', err);
+        setShowInsufficientCredits(true);
+      } finally {
+        setIsCheckingCredits(false);
+      }
     } else {
       navigate('/');
     }
@@ -138,6 +156,11 @@ export function Break() {
         </div>
 
         <h1 className={styles.title}>Great conversation!</h1>
+
+        {/* Credits Balance */}
+        <div className={styles.creditsSection}>
+          <CreditBalance />
+        </div>
 
         {state && (
           <div className={styles.summaryCard}>
@@ -193,14 +216,16 @@ export function Break() {
         <div className={styles.actions}>
           <button
             onClick={handleContinue}
-            disabled={!canContinue || !ratingCompleted}
+            disabled={!canContinue || !ratingCompleted || isCheckingCredits}
             className={styles.continueButton}
           >
-            {!ratingCompleted
-              ? 'Complete rating first'
-              : canContinue
-                ? 'Find New Partner'
-                : `Wait ${countdown}s`}
+            {isCheckingCredits
+              ? 'Checking...'
+              : !ratingCompleted
+                ? 'Complete rating first'
+                : canContinue
+                  ? 'Find New Partner'
+                  : `Wait ${countdown}s`}
           </button>
           <button onClick={handleExit} className={styles.exitButton}>
             Exit to Home
@@ -227,6 +252,11 @@ export function Break() {
           onClose={() => setIsQueueOpen(false)}
         />
       )}
+
+      <InsufficientCreditsModal
+        isOpen={showInsufficientCredits}
+        onClose={() => setShowInsufficientCredits(false)}
+      />
     </div>
   );
 }

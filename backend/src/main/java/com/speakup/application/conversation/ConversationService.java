@@ -2,6 +2,7 @@ package com.speakup.application.conversation;
 
 import com.speakup.application.conversation.dto.ConversationResponse;
 import com.speakup.application.conversation.dto.UserStats;
+import com.speakup.application.credit.CreditService;
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class ConversationService {
 
     private final ConversationRepository conversationRepository;
+    private final CreditService creditService;
 
     /**
      * Get a conversation by ID.
@@ -87,8 +89,12 @@ public class ConversationService {
         log.info("Conversation {} started", conversationId);
     }
 
+    private static final int MIN_DURATION_FOR_CREDIT_CONSUMPTION = 120; // 2 minutes in seconds
+
     /**
      * End a conversation.
+     * Credits are consumed only if the conversation lasted at least 2 minutes.
+     * This prevents charging for failed or very short calls.
      */
     @Transactional
     public void endConversation(UUID conversationId, UUID userId, boolean completed) {
@@ -103,6 +109,24 @@ public class ConversationService {
 
         if (completed) {
             conversation.complete();
+
+            // Only consume credits if conversation lasted at least 2 minutes
+            Integer duration = conversation.getDurationSeconds();
+            if (duration != null && duration >= MIN_DURATION_FOR_CREDIT_CONSUMPTION) {
+                creditService.consumeConversation(
+                        conversation.getUserA().getId(),
+                        conversationId.toString()
+                );
+                creditService.consumeConversation(
+                        conversation.getUserB().getId(),
+                        conversationId.toString()
+                );
+                log.info("Conversation {} completed with duration {}s - credits consumed",
+                        conversationId, duration);
+            } else {
+                log.info("Conversation {} completed with duration {}s - too short, no credits consumed",
+                        conversationId, duration);
+            }
         } else {
             conversation.cancel();
         }
