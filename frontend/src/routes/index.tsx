@@ -1,6 +1,7 @@
 import { createBrowserRouter, Outlet } from 'react-router-dom';
 import { MainLayout } from '@/layouts/MainLayout';
 import { AdminLayout } from '@/layouts/AdminLayout';
+import { ProtectedCallRoute } from '@/components/guards';
 import { Home } from '@/pages/Home';
 import { Login } from '@/pages/Login';
 import { CompleteProfile } from '@/pages/CompleteProfile';
@@ -8,9 +9,13 @@ import { NotFound } from '@/pages/NotFound';
 import { Lobby } from '@/pages/Lobby';
 import { Call } from '@/pages/Call';
 import { Break } from '@/pages/Break';
+import { Credits } from '@/pages/Credits';
+import { BuyCredits } from '@/pages/BuyCredits';
+import { PaymentSuccess } from '@/pages/PaymentSuccess';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
+import { AdminPayments } from '@/pages/admin/Payments';
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +35,18 @@ export const router = createBrowserRouter([
         element: <Lobby />,
       },
       {
+        path: 'credits',
+        element: <Credits />,
+      },
+      {
+        path: 'credits/buy',
+        element: <BuyCredits />,
+      },
+      {
+        path: 'credits/success',
+        element: <PaymentSuccess />,
+      },
+      {
         path: '*',
         element: <NotFound />,
       },
@@ -41,7 +58,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/call',
-    element: <Call />,
+    element: (
+      <ProtectedCallRoute>
+        <Call />
+      </ProtectedCallRoute>
+    ),
   },
   {
     path: '/break',
@@ -78,6 +99,10 @@ export const router = createBrowserRouter([
       {
         path: 'users',
         element: <AdminUsers />,
+      },
+      {
+        path: 'payments',
+        element: <AdminPayments />,
       },
     ],
   },

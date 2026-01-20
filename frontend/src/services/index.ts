@@ -6,3 +6,5 @@ export { peerService } from './peerService';
 export { recordingService, isRecordingSupported } from './recordingService';
 export { ratingService } from './ratingService';
 export { relationshipService } from './relationshipService';
+export { creditService } from './creditService';
+export { paymentService } from './paymentService';

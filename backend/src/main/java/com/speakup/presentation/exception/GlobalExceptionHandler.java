@@ -1,5 +1,6 @@
 package com.speakup.presentation.exception;
 
+import com.speakup.application.payment.TooManyPendingPurchasesException;
 import com.speakup.application.session.SessionNotFoundException;
 import com.speakup.domain.shared.DomainException;
 import com.speakup.domain.shared.ForbiddenOperationException;
@@ -72,6 +73,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error("FORBIDDEN", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TooManyPendingPurchasesException.class)
+    public ResponseEntity<ApiResponse<Void>> handleTooManyPendingPurchases(TooManyPendingPurchasesException ex) {
+        log.warn("Rate limit exceeded: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ApiResponse.error("TOO_MANY_PENDING_PURCHASES", ex.getMessage()));
     }
 
     @ExceptionHandler(DomainException.class)

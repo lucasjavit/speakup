@@ -102,6 +102,11 @@
   text-decoration: underline;
 }
 
+/* Credits Section */
+.creditsSection {
+  margin-bottom: 1.5rem;
+}
+
 /* Stats Section */
 .statsSection {
   margin-bottom: 1.5rem;

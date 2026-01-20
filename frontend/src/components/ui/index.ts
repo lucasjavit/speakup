@@ -30,3 +30,5 @@ export type { PostCallRatingModalProps } from './PostCallRatingModal';
 
 export { QueueModal } from './QueueModal';
 export type { QueueModalProps } from './QueueModal';
+
+export { Tooltip } from './Tooltip';
