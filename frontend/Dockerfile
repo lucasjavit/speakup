@@ -36,8 +36,8 @@ ARG BACKEND_URL=http://backend:8080
 RUN echo "BACKEND_URL is: $BACKEND_URL" && \
     cat > /tmp/nginx.template << 'NGINX_TEMPLATE'
 server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
+    listen 3000 default_server;
+    listen [::]:3000 default_server;
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
@@ -83,9 +83,9 @@ RUN sed "s|BACKEND_URL_PLACEHOLDER|$BACKEND_URL|g" /tmp/nginx.template > /etc/ng
 # Verify files and config (debug)
 RUN ls -la /usr/share/nginx/html && echo "=== NGINX CONFIG ===" && cat /etc/nginx/conf.d/default.conf
 
-# Health check using 127.0.0.1 instead of localhost
+# Health check
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
-    CMD wget -q --spider http://127.0.0.1:80/health || exit 1
+    CMD wget -q --spider http://127.0.0.1:3000/health || exit 1
 
-EXPOSE 80
+EXPOSE 3000
 CMD ["nginx", "-g", "daemon off;"]
