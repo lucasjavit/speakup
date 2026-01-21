@@ -1,4 +1,5 @@
 export { userService } from './userService';
+export { authService } from './authService';
 export { adminService } from './adminService';
 export { matchingService } from './matchingService';
 export { conversationService } from './conversationService';

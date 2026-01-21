@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Card } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
-import { userService } from '@/services/userService';
+import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
 
 type Tab = 'profile' | 'billing';
@@ -68,13 +68,8 @@ export function CompleteProfile() {
       if (!isEditMode || !token) return;
 
       try {
-        const response = await fetch('/api/v1/auth/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const userData = await response.json();
+        const userData = await authService.getCurrentUser();
+        if (userData) {
           setUser(userData);
           setIdNumber(userData.maskedIdNumber || '');
           setCountry(userData.country || '');
@@ -195,31 +190,19 @@ export function CompleteProfile() {
     setError('');
 
     try {
-      const response = await fetch('/api/v1/users/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          idNumber,
-          country,
-          city,
-          address: address || undefined,
-          nativeLanguage,
-          targetLanguage,
-          proficiencyLevel,
-          timezone,
-        }),
+      const result = await userService.completeProfile({
+        idNumber,
+        country,
+        city,
+        address: address || undefined,
+        nativeLanguage,
+        targetLanguage,
+        proficiencyLevel,
+        timezone,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to update profile');
-      }
-
-      const result = await response.json();
-      // API returns { success: true, data: {...} }, merge with existing user to preserve fields like avatarUrl, role
-      const updatedUser = { ...user, ...result.data };
+      // API returns the updated user, merge with existing user to preserve fields like avatarUrl, role
+      const updatedUser = { ...user, ...result };
       setUser(updatedUser);
 
       // Register DATA_PROCESSING consent (only on first registration, not edit)

@@ -18,7 +18,11 @@ export const userService = {
     return apiCall<User>(api.get<ApiResult<User>>('/users/me'));
   },
 
-  completeProfile: async (id: string, data: CompleteProfileRequest): Promise<User> => {
+  completeProfile: async (data: CompleteProfileRequest): Promise<User> => {
+    return apiCall<User>(api.put<ApiResult<User>>('/users/profile', data));
+  },
+
+  completeProfileById: async (id: string, data: CompleteProfileRequest): Promise<User> => {
     return apiCall<User>(api.put<ApiResult<User>>(`/users/${id}/profile`, data));
   },
 

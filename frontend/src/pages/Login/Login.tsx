@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Card } from '@/components/ui';
 import { useAuthStore } from '@/stores/authStore';
+import { authService } from '@/services';
 import styles from './Login.module.css';
 
 export function Login() {
@@ -19,19 +20,7 @@ export function Login() {
       }
 
       // Send ID token to backend for validation
-      const response = await fetch('/api/v1/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idToken: credentialResponse.credential,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Authentication failed');
-      }
-
-      const data = await response.json();
+      const data = await authService.loginWithGoogle(credentialResponse.credential);
       login(data.user, data.accessToken, data.refreshToken);
 
       if (data.user.profileCompleted) {
