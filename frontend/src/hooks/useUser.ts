@@ -22,7 +22,7 @@ export function useCompleteProfile() {
 
   return useMutation({
     mutationFn: ({ userId, data }: { userId: string; data: CompleteProfileRequest }) =>
-      userService.completeProfile(userId, data),
+      userService.completeProfileById(userId, data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['user', data.id] });
       queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
