@@ -95,6 +95,13 @@ export function useMediaDevices(): UseMediaDevicesReturn {
   }, [selectedAudioInput, selectedVideoInput, selectedAudioOutput]);
 
   useEffect(() => {
+    // Check if mediaDevices API is available (requires HTTPS or localhost)
+    if (!navigator.mediaDevices) {
+      setError('Media devices not available. Please use HTTPS.');
+      setIsLoading(false);
+      return;
+    }
+
     refreshDevices();
 
     // Listen for device changes
