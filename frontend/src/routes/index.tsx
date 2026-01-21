@@ -16,6 +16,7 @@ import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
 import { AdminPayments } from '@/pages/admin/Payments';
+import { Error } from '@/pages/Error';
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/error',
+    element: <Error />,
   },
   {
     path: '/call',

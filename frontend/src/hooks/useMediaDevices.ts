@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { showHttpsRequiredError, showMediaAccessDeniedError } from '@/stores/errorStore';
 
 export interface MediaDeviceInfo {
   deviceId: string;
@@ -89,6 +90,7 @@ export function useMediaDevices(): UseMediaDevicesReturn {
     } catch (err) {
       console.error('Error getting media devices:', err);
       setError('Could not access media devices. Please check permissions.');
+      showMediaAccessDeniedError();
     } finally {
       setIsLoading(false);
     }
@@ -99,6 +101,7 @@ export function useMediaDevices(): UseMediaDevicesReturn {
     if (!navigator.mediaDevices) {
       setError('Media devices not available. Please use HTTPS.');
       setIsLoading(false);
+      showHttpsRequiredError();
       return;
     }
 

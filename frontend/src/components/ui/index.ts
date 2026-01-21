@@ -32,3 +32,6 @@ export { QueueModal } from './QueueModal';
 export type { QueueModalProps } from './QueueModal';
 
 export { Tooltip } from './Tooltip';
+
+export { ErrorModal } from './ErrorModal';
+export type { ErrorModalProps } from './ErrorModal';
