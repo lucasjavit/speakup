@@ -36,13 +36,8 @@
 2. Configurações:
    - Name: `speakup-postgres`
    - Version: `16`
-   - Database: `speakup`
-   - Username: `speakup`
-   - Password: (gerar senha forte)
 3. **Deploy**
-4. Anote:
-   - Host interno: `speakup-postgres` (nome do container)
-   - Port: `5432`
+4. Anote o host e senha gerados pelo Coolify
 
 ## Passo 2: Criar Redis
 
@@ -51,9 +46,7 @@
    - Name: `speakup-redis`
    - Version: `7`
 3. **Deploy**
-4. Anote:
-   - Host interno: `speakup-redis`
-   - Port: `6379`
+4. Anote o host e senha gerados pelo Coolify
 
 ## Passo 3: Criar Backend
 
@@ -67,21 +60,22 @@
 3. **Environment Variables:**
    ```
    SPRING_PROFILES_ACTIVE=prod
-   DB_HOST=speakup-postgres
+   DB_HOST=<coolify-postgres-host>
    DB_PORT=5432
-   DB_NAME=speakup
-   DB_USERNAME=speakup
-   DB_PASSWORD=<senha-do-postgres>
-   REDIS_HOST=speakup-redis
+   DB_NAME=postgres
+   DB_USERNAME=postgres
+   DB_PASSWORD=<coolify-postgres-password>
+   REDIS_HOST=<coolify-redis-host>
    REDIS_PORT=6379
+   REDIS_PASSWORD=<coolify-redis-password>
    JWT_SECRET=<gerar-com-openssl-rand-base64-64>
    GOOGLE_CLIENT_ID=<seu-google-client-id>
-   STRIPE_API_KEY=<sk_live_ou_sk_test>
+   STRIPE_API_KEY=<sk_test_ou_sk_live>
    STRIPE_WEBHOOK_SECRET=<whsec_...>
-   STRIPE_PUBLIC_KEY=<pk_live_ou_pk_test>
-   STRIPE_SUCCESS_URL=https://SEU_DOMINIO_FRONTEND/credits/success
-   STRIPE_CANCEL_URL=https://SEU_DOMINIO_FRONTEND/credits/buy
-   CLAUDE_API_KEY=<sk-ant-...>
+   STRIPE_PUBLIC_KEY=<pk_test_ou_pk_live>
+   STRIPE_SUCCESS_URL=<url-do-frontend>/credits/success
+   STRIPE_CANCEL_URL=<url-do-frontend>/credits/buy
+   CLAUDE_API_KEY=<sua-api-key-openai-ou-anthropic>
    ```
 4. **Domain:** `api.speakup.com.br` (ou subdomínio que preferir)
 5. **Deploy**
@@ -148,31 +142,32 @@ No Stripe Dashboard:
 ## Variáveis de Ambiente - Resumo
 
 ### Backend (Environment Variables)
-| Variável | Exemplo |
-|----------|---------|
+| Variável | Descrição |
+|----------|-----------|
 | SPRING_PROFILES_ACTIVE | prod |
-| DB_HOST | speakup-postgres |
+| DB_HOST | Host do PostgreSQL (do Coolify) |
 | DB_PORT | 5432 |
-| DB_NAME | speakup |
-| DB_USERNAME | speakup |
-| DB_PASSWORD | (senha forte) |
-| REDIS_HOST | speakup-redis |
+| DB_NAME | Nome do banco |
+| DB_USERNAME | Usuário do banco |
+| DB_PASSWORD | Senha do banco |
+| REDIS_HOST | Host do Redis (do Coolify) |
 | REDIS_PORT | 6379 |
-| JWT_SECRET | (64+ chars base64) |
-| GOOGLE_CLIENT_ID | xxx.apps.googleusercontent.com |
-| STRIPE_API_KEY | sk_live_xxx ou sk_test_xxx |
-| STRIPE_WEBHOOK_SECRET | whsec_xxx |
-| STRIPE_PUBLIC_KEY | pk_live_xxx ou pk_test_xxx |
-| STRIPE_SUCCESS_URL | https://speakup.com.br/credits/success |
-| STRIPE_CANCEL_URL | https://speakup.com.br/credits/buy |
-| CLAUDE_API_KEY | sk-ant-xxx |
+| REDIS_PASSWORD | Senha do Redis |
+| JWT_SECRET | Gerar com: `openssl rand -base64 64` |
+| GOOGLE_CLIENT_ID | ID do OAuth do Google Cloud |
+| STRIPE_API_KEY | Chave secreta do Stripe (sk_test ou sk_live) |
+| STRIPE_WEBHOOK_SECRET | Secret do webhook (whsec_...) |
+| STRIPE_PUBLIC_KEY | Chave pública do Stripe (pk_test ou pk_live) |
+| STRIPE_SUCCESS_URL | URL do frontend + /credits/success |
+| STRIPE_CANCEL_URL | URL do frontend + /credits/buy |
+| CLAUDE_API_KEY | API key para AI (opcional) |
 
 ### Frontend (Build Arguments)
-| Variável | Exemplo |
-|----------|---------|
-| VITE_API_BASE_URL | https://api.speakup.com.br/api/v1 |
-| VITE_GOOGLE_CLIENT_ID | xxx.apps.googleusercontent.com |
-| VITE_PEERJS_HOST | peerjs.speakup.com.br |
+| Variável | Descrição |
+|----------|-----------|
+| VITE_API_BASE_URL | URL completa do backend + /api/v1 |
+| VITE_GOOGLE_CLIENT_ID | ID do OAuth do Google Cloud |
+| VITE_PEERJS_HOST | Host do PeerJS (sem https://) |
 | VITE_PEERJS_PORT | 443 |
 | VITE_PEERJS_PATH | /peerjs |
 
