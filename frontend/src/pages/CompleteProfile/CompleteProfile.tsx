@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Card } from '@/components/ui';
+import { UserLevel } from '@/components/ui/UserLevel';
 import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
 
-type Tab = 'profile' | 'billing';
+type Tab = 'profile';
 type Language = 'ENGLISH' | 'PORTUGUESE' | 'SPANISH' | 'FRENCH' | 'GERMAN' | 'ITALIAN' | 'JAPANESE' | 'KOREAN' | 'MANDARIN';
 type ProficiencyLevel = 'BEGINNER' | 'ELEMENTARY' | 'INTERMEDIATE' | 'UPPER_INTERMEDIATE' | 'ADVANCED' | 'FLUENT';
 
@@ -246,37 +247,10 @@ export function CompleteProfile() {
         )}
 
         {/* Sidebar - only show in edit mode */}
-        {isEditMode && (
-          <aside className={styles.sidebar}>
-            <nav className={styles.sidebarNav}>
-              <button
-                type="button"
-                className={`${styles.sidebarLink} ${currentTab === 'profile' ? styles.active : ''}`}
-                onClick={() => handleTabChange('profile')}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.sidebarIcon}>
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                Profile
-              </button>
-              <button
-                type="button"
-                className={`${styles.sidebarLink} ${currentTab === 'billing' ? styles.active : ''}`}
-                onClick={() => handleTabChange('billing')}
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.sidebarIcon}>
-                  <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-                </svg>
-                Billing
-              </button>
-            </nav>
-          </aside>
-        )}
 
         {/* Content */}
         <div className={styles.content}>
-          {currentTab === 'profile' ? (
-            <Card className={styles.card}>
+          <Card className={styles.card}>
               <div className={styles.header}>
                 {isEditMode && (
                   <div className={styles.avatarSection}>
@@ -293,6 +267,7 @@ export function CompleteProfile() {
                 <p className={styles.subtitle}>
                   {isEditMode ? 'Update your personal information and preferences' : 'Tell us about your language learning goals'}
                 </p>
+                {isEditMode && user && <UserLevel user={user} variant="profile" />}
               </div>
 
               <form onSubmit={handleSubmit} className={styles.form}>
@@ -500,20 +475,6 @@ export function CompleteProfile() {
                 </Button>
               </form>
             </Card>
-          ) : (
-            <Card className={styles.card}>
-              <div className={styles.header}>
-                <h1 className={styles.title}>Billing</h1>
-                <p className={styles.subtitle}>Manage your subscription and payment methods</p>
-              </div>
-              <div className={styles.billingPlaceholder}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.billingIcon}>
-                  <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-                </svg>
-                <p>Billing features coming soon</p>
-              </div>
-            </Card>
-          )}
         </div>
       </div>
     </div>

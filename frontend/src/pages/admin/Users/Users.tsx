@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, Card, Input } from '@/components/ui';
+import { UserLevel } from '@/components/ui/UserLevel';
 import { adminService } from '@/services';
 import { useAuthStore, isSuperAdmin } from '@/stores/authStore';
 import type { AdminUser, Role } from '@/types';
@@ -89,6 +90,7 @@ export function AdminUsers() {
                 <tr>
                   <th>User</th>
                   <th>Email</th>
+                  <th>Proficiency Level</th>
                   <th>Role</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -108,6 +110,9 @@ export function AdminUsers() {
                       </div>
                     </td>
                     <td>{user.email}</td>
+                    <td>
+                      <UserLevel user={user} variant="card" />
+                    </td>
                     <td>
                       {isSuperAdmin(currentUser?.role) && user.id !== currentUser?.id ? (
                         <select

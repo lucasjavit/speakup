@@ -1,0 +1,56 @@
+.userLevel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.userLevel.card {
+  font-size: 0.875rem;
+}
+
+.userLevel.profile {
+  font-size: 1rem;
+  padding: 1rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+}
+
+.declaredLevel,
+.evaluatedLevel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.evaluationsCount {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-left: 0.5rem;
+}
+
+.noEvaluations {
+  margin-top: 0.5rem;
+  padding: 1rem;
+  background: var(--color-background);
+  border-radius: 6px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.noEvaluations p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

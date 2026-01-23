@@ -35,3 +35,5 @@ export { Tooltip } from './Tooltip';
 
 export { ErrorModal } from './ErrorModal';
 export type { ErrorModalProps } from './ErrorModal';
+
+export { UserLevel } from './UserLevel';

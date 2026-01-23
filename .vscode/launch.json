@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot - SpeakUp Backend (dev)",
+      "request": "launch",
+      "mainClass": "com.speakup.SpeakUpApplication",
+      "projectName": "speakup-backend",
+      "cwd": "${workspaceFolder}/backend",
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "dev"
+      },
+      "vmArgs": "-Dspring-boot.run.profiles=dev"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ package com.speakup.application.rating;
 
 import com.speakup.application.rating.dto.RatingResponse;
 import com.speakup.application.rating.dto.SubmitRatingRequest;
+import com.speakup.application.user.EvaluatedLevelService;
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationRepository;
 import com.speakup.domain.rating.FluencyLevel;
@@ -32,6 +33,7 @@ public class RatingService {
     private final ConversationRepository conversationRepository;
     private final UserRepository userRepository;
     private final UserRelationshipRepository relationshipRepository;
+    private final EvaluatedLevelService evaluatedLevelService;
 
     /**
      * Submit a rating for a conversation.
@@ -86,6 +88,9 @@ public class RatingService {
 
         log.info("Rating submitted: user {} rated user {} with {} stars for conversation {}",
                 raterId, ratedUser.getId(), request.stars(), request.conversationId());
+
+        // Update evaluated level for the rated user
+        evaluatedLevelService.updateUserEvaluatedLevel(ratedUser.getId());
 
         // Handle "want to talk again" - create favorite relationship
         boolean mutualInterest = false;

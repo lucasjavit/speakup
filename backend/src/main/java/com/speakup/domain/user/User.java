@@ -53,6 +53,14 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProficiencyLevel proficiencyLevel;
 
+    @Enumerated(EnumType.STRING)
+    private ProficiencyLevel evaluatedLevel;
+
+    @Builder.Default
+    private Integer totalEvaluations = 0;
+
+    private java.time.Instant lastEvaluationAt;
+
     private String timezone;
 
     @Column(name = "id_number")

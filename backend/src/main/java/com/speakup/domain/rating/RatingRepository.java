@@ -29,6 +29,11 @@ public interface RatingRepository {
     List<Rating> findByRatedUserId(UUID ratedUserId);
 
     /**
+     * Find all ratings received by a user ordered by creation date descending.
+     */
+    List<Rating> findByRatedUserIdOrderByCreatedAtDesc(UUID ratedUserId);
+
+    /**
      * Find all ratings given by a user.
      */
     List<Rating> findByRaterId(UUID raterId);

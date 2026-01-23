@@ -59,8 +59,9 @@ spring:
       time-to-live: 1800000 # 30 minutes default
 
 # Google Authentication
+# IMPORTANT: Set GOOGLE_CLIENT_ID environment variable
 google:
-  client-id: ${GOOGLE_CLIENT_ID:802273589819-nlgi3e15ad42kq6c7b8jbnqv9mtu49ij.apps.googleusercontent.com}
+  client-id: ${GOOGLE_CLIENT_ID}
 
 # Server Configuration
 server:

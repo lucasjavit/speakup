@@ -38,6 +38,10 @@ public interface JpaRatingRepository extends JpaRepository<Rating, UUID>, Rating
     List<Rating> findByRatedUserId(@Param("ratedUserId") UUID ratedUserId);
 
     @Override
+    @Query("SELECT r FROM Rating r WHERE r.ratedUser.id = :ratedUserId ORDER BY r.createdAt DESC")
+    List<Rating> findByRatedUserIdOrderByCreatedAtDesc(@Param("ratedUserId") UUID ratedUserId);
+
+    @Override
     @Query("SELECT r FROM Rating r WHERE r.rater.id = :raterId ORDER BY r.createdAt DESC")
     List<Rating> findByRaterId(@Param("raterId") UUID raterId);
 

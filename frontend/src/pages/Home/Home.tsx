@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
 import { Button, Card, QueueModal, Tooltip } from '@/components/ui';
+import { UserLevel } from '@/components/ui/UserLevel';
 import { InsufficientCreditsModal } from '@/components/credits';
 import { creditService } from '@/services';
 import { sessionService } from '@/services/sessionService';
@@ -93,6 +94,18 @@ export function Home() {
     return `${minutes} min`;
   };
 
+  const formatProficiencyLevel = (level: string): string => {
+    const levelMap: Record<string, string> = {
+      'BEGINNER': 'A1 - Beginner',
+      'ELEMENTARY': 'A2 - Elementary',
+      'INTERMEDIATE': 'B1 - Intermediate',
+      'UPPER_INTERMEDIATE': 'B2 - Upper Intermediate',
+      'ADVANCED': 'C1 - Advanced',
+      'FLUENT': 'C2 - Fluent',
+    };
+    return levelMap[level] || level;
+  };
+
   return (
     <div className={styles.container}>
       {!isAuthenticated && (
@@ -116,12 +129,35 @@ export function Home() {
         <section className={styles.dashboard}>
           {/* Stats Card - Full Width at Top */}
           <Card header={
-            <h2 className={styles.statsHeader}>
-              <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-              </svg>
-              Your Statistics
-            </h2>
+            <div className={styles.statsHeaderContainer}>
+              <h2 className={styles.statsHeader}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                </svg>
+                Your Statistics
+              </h2>
+              {user.evaluatedLevel && (
+                <div className={styles.statsHeaderLevel}>
+                  <Tooltip
+                    content={
+                      <div className={styles.levelTooltip}>
+                        <strong>Your Evaluated Level</strong>
+                        <p>Based on {user.totalEvaluations || 0} evaluation{(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners</p>
+                        <small>Click to view your full profile</small>
+                      </div>
+                    }
+                    position="bottom"
+                  >
+                    <button
+                      className={styles.levelBadge}
+                      onClick={() => navigate('/complete-profile')}
+                    >
+                      {formatProficiencyLevel(user.evaluatedLevel)}
+                    </button>
+                  </Tooltip>
+                </div>
+              )}
+            </div>
           } className={styles.statsCard}>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>

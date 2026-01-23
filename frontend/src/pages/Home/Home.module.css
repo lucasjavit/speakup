@@ -43,6 +43,14 @@
   width: 100%;
 }
 
+.statsHeaderContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+}
+
 .statsHeader {
   display: flex;
   align-items: center;
@@ -55,6 +63,68 @@
   width: 22px;
   height: 22px;
   color: var(--color-primary, #667eea);
+}
+
+.statsHeaderLevel {
+  display: flex;
+  align-items: center;
+}
+
+.levelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--color-primary, #667eea) 0%, #764ba2 100%);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  text-transform: capitalize;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.levelBadge:hover {
+  background: linear-gradient(135deg, #7c8ef5 0%, #8b5fc4 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.levelBadge::before {
+  content: '🎯';
+  font-size: 1rem;
+}
+
+.levelTooltip {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem;
+}
+
+.levelTooltip strong {
+  font-size: 0.875rem;
+  color: white;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.levelTooltip p {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.levelTooltip small {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin-top: 0.25rem;
 }
 
 .practiceRow {

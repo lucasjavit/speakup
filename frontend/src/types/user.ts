@@ -28,6 +28,8 @@ export interface User {
   nativeLanguage?: Language;
   targetLanguage?: Language;
   proficiencyLevel?: ProficiencyLevel;
+  evaluatedLevel?: ProficiencyLevel;
+  totalEvaluations?: number;
   timezone?: string;
   profileCompleted: boolean;
   active: boolean;

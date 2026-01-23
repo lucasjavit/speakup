@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/admin/dashboard/**").hasAnyRole("MODERATOR", "PAYMENT_ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/api/v1/admin/sessions/**").hasAnyRole("MODERATOR", "SUPER_ADMIN")
                         .requestMatchers("/api/v1/admin/users/**").hasAnyRole("MODERATOR", "SUPER_ADMIN")
+                        .requestMatchers("/api/v1/admin/products/**").hasRole("SUPER_ADMIN")
                         .requestMatchers("/api/v1/admin/payments/**").hasAnyRole("PAYMENT_ADMIN", "SUPER_ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

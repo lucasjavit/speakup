@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 /**
  * Authentication controller for handling auth-related endpoints.
  */
@@ -41,12 +43,20 @@ public class AuthController {
 
     @PostMapping("/google")
     @Operation(summary = "Authenticate with Google", description = "Validates Google ID Token and returns JWT tokens")
-    public ResponseEntity<AuthResponse> authenticateWithGoogle(@Valid @RequestBody GoogleAuthRequest request) {
+    public ResponseEntity<?> authenticateWithGoogle(@Valid @RequestBody GoogleAuthRequest request) {
+        log.debug("Received Google authentication request");
+        
+        if (request.idToken() == null || request.idToken().isBlank()) {
+            log.warn("Google ID Token is null or blank");
+            return ResponseEntity.status(401).body(Map.of("error", "INVALID_TOKEN", "message", "Google ID Token is required"));
+        }
+
         var payloadOpt = googleTokenVerifier.verify(request.idToken());
 
         if (payloadOpt.isEmpty()) {
-            log.warn("Invalid Google ID Token received");
-            return ResponseEntity.status(401).build();
+            log.warn("Invalid Google ID Token received - verification failed. Token length: {}", 
+                    request.idToken() != null ? request.idToken().length() : 0);
+            return ResponseEntity.status(401).body(Map.of("error", "INVALID_TOKEN", "message", "Google ID Token verification failed. Please ensure the client ID matches and the token is valid."));
         }
 
         GoogleIdToken.Payload payload = payloadOpt.get();

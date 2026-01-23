@@ -1,0 +1,69 @@
+# Production Profile Configuration
+# This file contains settings specific to production deployment
+
+# Google Authentication
+# REQUIRED: Must set GOOGLE_CLIENT_ID environment variable in Coolify/Docker
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+
+# JWT Configuration
+# REQUIRED: Must set JWT_SECRET environment variable (long random string)
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+# Stripe Configuration
+# REQUIRED: Set these in Coolify environment variables
+stripe:
+  api:
+    key: ${STRIPE_API_KEY}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+    public-key: ${STRIPE_PUBLIC_KEY}
+  checkout:
+    success-url: ${STRIPE_SUCCESS_URL}
+    cancel-url: ${STRIPE_CANCEL_URL}
+
+# Database Configuration (optimized for production)
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000
+
+  # JPA Configuration (strict validation)
+  jpa:
+    hibernate:
+      ddl-auto: validate # NEVER use 'update' or 'create' in production
+    show-sql: false
+    properties:
+      hibernate:
+        generate_statistics: false
+
+# Logging (minimal for performance)
+logging:
+  level:
+    root: WARN
+    com.speakup: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# OpenAPI/Swagger (disabled in production)
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+# Server Configuration
+server:
+  compression:
+    enabled: true
+  error:
+    include-message: never # Don't expose internal errors
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
