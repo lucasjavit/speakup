@@ -42,7 +42,7 @@ export function CompleteProfile() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { token, user, setUser } = useAuthStore();
 
-  const currentTab = (searchParams.get('tab') as Tab) || 'profile';
+  // const currentTab = (searchParams.get('tab') as Tab) || 'profile';
   const [idNumber, setIdNumber] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
@@ -225,9 +225,9 @@ export function CompleteProfile() {
     }
   };
 
-  const handleTabChange = (tab: Tab) => {
-    setSearchParams({ tab });
-  };
+  // const handleTabChange = (tab: Tab) => {
+  //   setSearchParams({ tab });
+  // };
 
   return (
     <div className={styles.container}>

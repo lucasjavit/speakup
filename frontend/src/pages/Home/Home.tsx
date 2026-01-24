@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
 import { Button, Card, QueueModal, Tooltip } from '@/components/ui';
-import { UserLevel } from '@/components/ui/UserLevel';
 import { InsufficientCreditsModal } from '@/components/credits';
 import { creditService } from '@/services';
 import { sessionService } from '@/services/sessionService';
@@ -128,7 +127,7 @@ export function Home() {
       {isAuthenticated && user && (
         <section className={styles.dashboard}>
           {/* Stats Card - Full Width at Top */}
-          <Card header={
+          <Card header={<div></div>} className={styles.statsCard}>
             <div className={styles.statsHeaderContainer}>
               <h2 className={styles.statsHeader}>
                 <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
@@ -158,7 +157,6 @@ export function Home() {
                 </div>
               )}
             </div>
-          } className={styles.statsCard}>
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
