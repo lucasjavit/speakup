@@ -137,23 +137,13 @@ export function Home() {
               </h2>
               {user.evaluatedLevel && (
                 <div className={styles.statsHeaderLevel}>
-                  <Tooltip
-                    content={
-                      <div className={styles.levelTooltip}>
-                        <strong>Your Evaluated Level</strong>
-                        <p>Based on {user.totalEvaluations || 0} evaluation{(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners</p>
-                        <small>Click to view your full profile</small>
-                      </div>
-                    }
-                    position="bottom"
+                  <button
+                    className={styles.levelBadge}
+                    onClick={() => navigate('/complete-profile')}
+                    title={`Your Evaluated Level based on ${user.totalEvaluations || 0} evaluation${(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners`}
                   >
-                    <button
-                      className={styles.levelBadge}
-                      onClick={() => navigate('/complete-profile')}
-                    >
-                      {formatProficiencyLevel(user.evaluatedLevel)}
-                    </button>
-                  </Tooltip>
+                    {formatProficiencyLevel(user.evaluatedLevel)}
+                  </button>
                 </div>
               )}
             </div>

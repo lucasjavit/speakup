@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card } from '@/components/ui';
 import { UserLevel } from '@/components/ui/UserLevel';
 import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
-
-type Tab = 'profile';
 type Language = 'ENGLISH' | 'PORTUGUESE' | 'SPANISH' | 'FRENCH' | 'GERMAN' | 'ITALIAN' | 'JAPANESE' | 'KOREAN' | 'MANDARIN';
 type ProficiencyLevel = 'BEGINNER' | 'ELEMENTARY' | 'INTERMEDIATE' | 'UPPER_INTERMEDIATE' | 'ADVANCED' | 'FLUENT';
 
@@ -39,7 +37,6 @@ const proficiencyLevels: { value: ProficiencyLevel; label: string; description: 
 export function CompleteProfile() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { token, user, setUser } = useAuthStore();
 
   // const currentTab = (searchParams.get('tab') as Tab) || 'profile';
