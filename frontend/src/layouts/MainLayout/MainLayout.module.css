@@ -22,10 +22,25 @@
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--color-primary, #667eea);
   text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.logo:hover {
+  opacity: 0.8;
+}
+
+.logoIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  margin-bottom: 1.5rem;
 }
 
 .nav {
