@@ -127,26 +127,30 @@ export function Home() {
       {isAuthenticated && user && (
         <section className={styles.dashboard}>
           {/* Stats Card - Full Width at Top */}
-          <Card header={<div></div>} className={styles.statsCard}>
-            <div className={styles.statsHeaderContainer}>
-              <h2 className={styles.statsHeader}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-                </svg>
-                Your Statistics
-              </h2>
-              {user.evaluatedLevel && (
-                <div className={styles.statsHeaderLevel}>
-                  <button
-                    className={styles.levelBadge}
-                    onClick={() => navigate('/complete-profile')}
-                    title={`Your Evaluated Level based on ${user.totalEvaluations || 0} evaluation${(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners`}
-                  >
-                    {formatProficiencyLevel(user.evaluatedLevel)}
-                  </button>
-                </div>
-              )}
-            </div>
+          <Card
+            header={
+              <div className={styles.statsHeaderContainer}>
+                <h2 className={styles.statsHeader}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                  </svg>
+                  Your Statistics
+                </h2>
+                {user.evaluatedLevel && (
+                  <div className={styles.statsHeaderLevel}>
+                    <button
+                      className={styles.levelBadge}
+                      onClick={() => navigate('/complete-profile')}
+                      title={`Your Evaluated Level based on ${user.totalEvaluations || 0} evaluation${(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners`}
+                    >
+                      {formatProficiencyLevel(user.evaluatedLevel)}
+                    </button>
+                  </div>
+                )}
+              </div>
+            }
+            className={styles.statsCard}
+          >
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statIcon}>
