@@ -71,14 +71,14 @@ public class EvaluatedLevelService {
      * Converts a FluencyLevel to numeric points for average calculation.
      *
      * @param fluencyLevel the fluency level from rating
-     * @return numeric points (1.0 to 4.5)
+     * @return numeric points (1.0 to 4.0)
      */
     private double fluencyLevelToPoints(FluencyLevel fluencyLevel) {
         return switch (fluencyLevel) {
             case BASIC -> 1.0;
             case ELEMENTARY -> 2.0;
             case LEVEL_UP -> 3.0;
-            case EXPERT -> 4.5;
+            case EXPERT -> 4.0;
         };
     }
 
@@ -89,12 +89,10 @@ public class EvaluatedLevelService {
      * @return the corresponding proficiency level
      */
     private ProficiencyLevel pointsToProficiencyLevel(double points) {
-        if (points < 1.5) return ProficiencyLevel.BEGINNER;
+        if (points < 1.5) return ProficiencyLevel.BASIC;
         if (points < 2.5) return ProficiencyLevel.ELEMENTARY;
-        if (points < 3.5) return ProficiencyLevel.INTERMEDIATE;
-        if (points < 4.0) return ProficiencyLevel.UPPER_INTERMEDIATE;
-        if (points < 4.75) return ProficiencyLevel.ADVANCED;
-        return ProficiencyLevel.FLUENT;
+        if (points < 3.5) return ProficiencyLevel.LEVEL_UP;
+        return ProficiencyLevel.EXPERT;
     }
 
     /**

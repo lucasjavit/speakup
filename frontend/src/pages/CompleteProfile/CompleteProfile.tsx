@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
 type Language = 'ENGLISH' | 'PORTUGUESE' | 'SPANISH' | 'FRENCH' | 'GERMAN' | 'ITALIAN' | 'JAPANESE' | 'KOREAN' | 'MANDARIN';
-type ProficiencyLevel = 'BEGINNER' | 'ELEMENTARY' | 'INTERMEDIATE' | 'UPPER_INTERMEDIATE' | 'ADVANCED' | 'FLUENT';
+type ProficiencyLevel = 'BASIC' | 'ELEMENTARY' | 'LEVEL_UP' | 'EXPERT';
 
 interface Country {
   name: string;
@@ -26,12 +26,10 @@ const languages: { value: Language; label: string }[] = [
 ];
 
 const proficiencyLevels: { value: ProficiencyLevel; label: string; description: string }[] = [
-  { value: 'BEGINNER', label: 'Beginner (A1)', description: 'Just starting out' },
-  { value: 'ELEMENTARY', label: 'Elementary (A2)', description: 'Basic phrases and vocabulary' },
-  { value: 'INTERMEDIATE', label: 'Intermediate (B1)', description: 'Can hold simple conversations' },
-  { value: 'UPPER_INTERMEDIATE', label: 'Upper Intermediate (B2)', description: 'Comfortable in most situations' },
-  { value: 'ADVANCED', label: 'Advanced (C1)', description: 'Fluent with occasional mistakes' },
-  { value: 'FLUENT', label: 'Fluent (C2)', description: 'Near-native speaker' },
+  { value: 'BASIC', label: 'Basic', description: 'Just starting out' },
+  { value: 'ELEMENTARY', label: 'Elementary', description: 'Basic phrases and vocabulary' },
+  { value: 'LEVEL_UP', label: 'Level Up', description: 'Can hold simple conversations' },
+  { value: 'EXPERT', label: 'Expert', description: 'Comfortable in most situations' },
 ];
 
 export function CompleteProfile() {

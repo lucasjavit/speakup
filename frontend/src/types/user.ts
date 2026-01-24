@@ -11,7 +11,7 @@ export type Language =
   | 'KOREAN'
   | 'MANDARIN';
 
-export type ProficiencyLevel = 'BEGINNER' | 'ELEMENTARY' | 'INTERMEDIATE' | 'UPPER_INTERMEDIATE' | 'ADVANCED' | 'FLUENT';
+export type ProficiencyLevel = 'BASIC' | 'ELEMENTARY' | 'LEVEL_UP' | 'EXPERT';
 
 export type Role = 'USER' | 'MODERATOR' | 'PAYMENT_ADMIN' | 'SUPER_ADMIN';
 

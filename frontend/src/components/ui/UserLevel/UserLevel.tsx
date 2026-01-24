@@ -8,12 +8,10 @@ interface UserLevelProps {
 
 const getLevelLabel = (level: ProficiencyLevel): string => {
   const labels: Record<ProficiencyLevel, string> = {
-    BEGINNER: 'A1 - Beginner',
-    ELEMENTARY: 'A2 - Elementary',
-    INTERMEDIATE: 'B1 - Intermediate',
-    UPPER_INTERMEDIATE: 'B2 - Upper Intermediate',
-    ADVANCED: 'C1 - Advanced',
-    FLUENT: 'C2 - Fluent',
+    BASIC: 'Basic',
+    ELEMENTARY: 'Elementary',
+    LEVEL_UP: 'Level Up',
+    EXPERT: 'Expert',
   };
   return labels[level];
 };
