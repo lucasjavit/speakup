@@ -109,7 +109,7 @@ export function Home() {
     <div className={styles.container}>
       {!isAuthenticated && (
         <section className={styles.hero}>
-          <h1 className={styles.title}>SpeakUp</h1>
+          <h1 className={styles.title}>SpeakYou</h1>
           <p className={styles.subtitle}>
             Practice languages with real people through video conversations
           </p>

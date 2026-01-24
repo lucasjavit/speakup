@@ -27,7 +27,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <Link to="/" className={styles.logo}>
-            SpeakUp
+            SpeakYou
           </Link>
 
           <nav className={styles.nav}>
@@ -82,7 +82,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>
-        <p>&copy; {new Date().getFullYear()} SpeakUp. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} SpeakYou. All rights reserved.</p>
       </footer>
     </div>
   );

@@ -30,7 +30,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <aside className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <Link to="/admin" className={styles.logo}>
-            SpeakUp Admin
+            SpeakYou Admin
           </Link>
         </div>
 

@@ -42,7 +42,7 @@ export function Login() {
     <div className={styles.container}>
       <Card className={styles.card}>
         <div className={styles.header}>
-          <h1 className={styles.title}>SpeakUp</h1>
+          <h1 className={styles.title}>SpeakYou</h1>
           <p className={styles.subtitle}>Sign in to start practicing</p>
         </div>
 

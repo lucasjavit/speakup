@@ -24,8 +24,32 @@
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--color-primary, #667eea);
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 25%, #4facfe 50%, #00f2fe 75%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-decoration: none;
+  background-size: 300% auto;
+  animation: gradient-shift 4s ease infinite;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.3));
+}
+
+.logo:hover {
+  transform: translateY(-2px) scale(1.05);
+  filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.5)) brightness(1.15);
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .nav {
