@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { Button, Card, QueueModal, Tooltip, LoginModal } from '@/components/ui';
+import { Card, QueueModal, Tooltip, LoginModal } from '@/components/ui';
 import { InsufficientCreditsModal } from '@/components/credits';
 import { LandingPage } from '@/components/LandingPage';
 import { creditService } from '@/services';
@@ -170,7 +170,7 @@ export function Home() {
                   color: '#1e293b',
                   textAlign: 'center'
                 }}>
-                  {activeSession.name}
+                  {activeSession?.name}
                 </h3>
                 <p style={{
                   fontSize: '1.125rem',
@@ -179,7 +179,7 @@ export function Home() {
                   textAlign: 'center',
                   fontWeight: 500
                 }}>
-                  {formatTime(activeSession.startTime)} - {formatTime(activeSession.endTime)}
+                  {activeSession && formatTime(activeSession.startTime)} - {activeSession && formatTime(activeSession.endTime)}
                 </p>
                 <div style={{
                   marginBottom: '1.5rem',
