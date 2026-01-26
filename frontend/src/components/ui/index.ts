@@ -37,3 +37,6 @@ export { ErrorModal } from './ErrorModal';
 export type { ErrorModalProps } from './ErrorModal';
 
 export { UserLevel } from './UserLevel';
+
+export { LoginModal } from './LoginModal/LoginModal';
+export type { LoginModalProps } from './LoginModal/LoginModal';

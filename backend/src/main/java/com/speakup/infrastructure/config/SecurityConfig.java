@@ -37,6 +37,9 @@ public class SecurityConfig {
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/v1/auth/**",
             "/api/v1/products",  // Public products list
+            "/api/v1/sessions/active",  // Public active sessions list
+            "/api/v1/sessions/running",  // Public running sessions list
+            "/api/v1/public/**",  // Public endpoints (topics, etc.)
             "/api/v1/stripe/webhook",  // Stripe webhook (validates signature internally)
             "/api-docs/**",
             "/swagger-ui/**",

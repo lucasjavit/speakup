@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useCallStore } from '@/stores/callStore';
-import { Button, Card, QueueModal, Tooltip } from '@/components/ui';
+import { Button, Card, QueueModal, Tooltip, LoginModal } from '@/components/ui';
 import { InsufficientCreditsModal } from '@/components/credits';
+import { LandingPage } from '@/components/LandingPage';
 import { creditService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
@@ -23,6 +24,26 @@ export function Home() {
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
   const [isCheckingCredits, setIsCheckingCredits] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  // Load public sessions for unauthenticated users
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoading(true);
+      sessionService.getPublicRunningSessions()
+        .then((sessionsData) => {
+          console.log('Public sessions loaded:', sessionsData);
+          setSessions(sessionsData || []);
+          const running = sessionsData?.find((s: Session) => s.currentlyRunning);
+          console.log('Active session:', running);
+          setActiveSession(running || null);
+        })
+        .catch((error) => {
+          console.error('Error loading public sessions:', error);
+        })
+        .finally(() => setIsLoading(false));
+    }
+  }, [isAuthenticated]);
 
   // Load data for authenticated users
   useEffect(() => {
@@ -103,21 +124,246 @@ export function Home() {
     return levelMap[level] || level;
   };
 
+  const handleJoinSessionPublic = () => {
+    setShowLoginModal(true);
+  };
+
   return (
     <div className={styles.container}>
       {!isAuthenticated && (
-        <section className={styles.hero}>
-          <h1 className={styles.title}>SpeakYou</h1>
-          <p className={styles.subtitle}>
-            Practice languages with real people through video conversations
-          </p>
-          <div className={styles.actions}>
-            <Button size="lg" onClick={() => (window.location.href = '/login')}>
-              Get Started
-            </Button>
-            <Button variant="outline" size="lg">
-              Learn More
-            </Button>
+        <LandingPage
+          isLoading={isLoading}
+          activeSession={activeSession}
+          onJoinSession={handleJoinSessionPublic}
+          onSignIn={() => setShowLoginModal(true)}
+          formatTime={formatTime}
+        />
+      )}
+
+      {!isAuthenticated && false && (
+        <section style={{ marginTop: '2rem', maxWidth: '600px', margin: '2rem auto' }}>
+          <Card
+            header={
+              <h2 className={styles.statsHeader}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                  <circle cx="12" cy="12" r="10" fill="#10b981"/>
+                </svg>
+                Practice Session
+              </h2>
+            }
+          >
+            {isLoading ? (
+              <div className={styles.noSessionCard}>
+                <p className={styles.noSessionText}>Loading sessions...</p>
+              </div>
+            ) : activeSession ? (
+              <div style={{
+                padding: '2rem',
+                background: 'linear-gradient(135deg, #f0fdf4 0%, #e7f8f0 100%)',
+                borderRadius: '12px',
+                border: '2px solid #10b981'
+              }}>
+                <h3 style={{
+                  fontSize: '2rem',
+                  fontWeight: 700,
+                  marginBottom: '0.75rem',
+                  color: '#1e293b',
+                  textAlign: 'center'
+                }}>
+                  {activeSession.name}
+                </h3>
+                <p style={{
+                  fontSize: '1.125rem',
+                  color: '#64748b',
+                  marginBottom: '1.5rem',
+                  textAlign: 'center',
+                  fontWeight: 500
+                }}>
+                  {formatTime(activeSession.startTime)} - {formatTime(activeSession.endTime)}
+                </p>
+                <div style={{
+                  marginBottom: '1.5rem',
+                  display: 'flex',
+                  justifyContent: 'center'
+                }}>
+                  <span className={styles.sessionBadge}>Now Running</span>
+                </div>
+                <button
+                  className={styles.findPartnerButton}
+                  onClick={handleJoinSessionPublic}
+                >
+                  Join Session
+                </button>
+              </div>
+            ) : (
+              <div className={styles.noSessionCard}>
+                <div className={styles.noSessionIcon}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12,6 12,12 16,14" />
+                  </svg>
+                </div>
+                <p className={styles.noSessionText}>No session is currently running</p>
+                <p className={styles.noSessionHint}>Check back during scheduled session times</p>
+              </div>
+            )}
+          </Card>
+
+          {/* How It Works Section */}
+          <div style={{ marginTop: '3rem' }}>
+            <h2 style={{
+              fontSize: '2rem',
+              fontWeight: 700,
+              textAlign: 'center',
+              color: '#1e293b',
+              marginBottom: '2rem'
+            }}>
+              How It Works
+            </h2>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem'
+            }}>
+              {/* Step 1 */}
+              <div style={{
+                padding: '2rem',
+                background: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                textAlign: 'center',
+                transition: 'transform 0.2s ease',
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  margin: '0 auto 1rem',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '2rem'
+                }}>
+                  👤
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                  Sign In
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.5' }}>
+                  Create your account with Google in seconds. No complex registration required.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div style={{
+                padding: '2rem',
+                background: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                textAlign: 'center',
+                transition: 'transform 0.2s ease',
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  margin: '0 auto 1rem',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '2rem'
+                }}>
+                  🎯
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                  Join Session
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.5' }}>
+                  Choose an active session and get matched with a conversation partner instantly.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div style={{
+                padding: '2rem',
+                background: 'white',
+                borderRadius: '16px',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+                textAlign: 'center',
+                transition: 'transform 0.2s ease',
+              }}>
+                <div style={{
+                  width: '64px',
+                  height: '64px',
+                  margin: '0 auto 1rem',
+                  background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '2rem'
+                }}>
+                  💬
+                </div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem', color: '#1e293b' }}>
+                  Practice Speaking
+                </h3>
+                <p style={{ fontSize: '0.875rem', color: '#64748b', lineHeight: '1.5' }}>
+                  Have real conversations via video call and improve your language skills naturally.
+                </p>
+              </div>
+            </div>
+
+            {/* Features */}
+            <div style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '16px',
+              padding: '2.5rem',
+              color: 'white',
+              marginTop: '2rem'
+            }}>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem', textAlign: 'center' }}>
+                Why Choose SpeakYou?
+              </h3>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: '1.5rem'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>✅</span>
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Real Conversations</strong>
+                    <span style={{ fontSize: '0.875rem', opacity: 0.9 }}>Practice with real people, not bots</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>⚡</span>
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Instant Matching</strong>
+                    <span style={{ fontSize: '0.875rem', opacity: 0.9 }}>Get paired quickly with available partners</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>📊</span>
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Track Progress</strong>
+                    <span style={{ fontSize: '0.875rem', opacity: 0.9 }}>Monitor your improvement over time</span>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🎓</span>
+                  <div>
+                    <strong style={{ display: 'block', marginBottom: '0.25rem' }}>Level Assessment</strong>
+                    <span style={{ fontSize: '0.875rem', opacity: 0.9 }}>Get evaluated by your conversation partners</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -360,6 +606,11 @@ export function Home() {
       <InsufficientCreditsModal
         isOpen={showInsufficientCredits}
         onClose={() => setShowInsufficientCredits(false)}
+      />
+
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
       />
     </div>
   );

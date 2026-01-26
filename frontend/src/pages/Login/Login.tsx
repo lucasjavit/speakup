@@ -23,7 +23,12 @@ export function Login() {
       const data = await authService.loginWithGoogle(credentialResponse.credential);
       login(data.user, data.accessToken, data.refreshToken);
 
-      if (data.user.profileCompleted) {
+      // Check for redirect URL from LoginModal
+      const redirectUrl = sessionStorage.getItem('loginRedirect');
+      if (redirectUrl) {
+        sessionStorage.removeItem('loginRedirect');
+        navigate(redirectUrl);
+      } else if (data.user.profileCompleted) {
         navigate('/');
       } else {
         navigate('/complete-profile');

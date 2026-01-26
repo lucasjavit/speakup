@@ -5,7 +5,12 @@
       "Bash(timeout:*)",
       "Bash(unlink:*)",
       "Bash(docker-compose ps:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "Bash(mvn clean compile:*)",
+      "Bash(npm run build:*)",
+      "Bash(git rm:*)",
+      "Bash(ls:*)",
+      "Bash(git add:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\lucas\\..ai_projects\\speakup-kanban\\src\\components"
