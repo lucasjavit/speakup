@@ -179,7 +179,7 @@ export function Home() {
                   textAlign: 'center',
                   fontWeight: 500
                 }}>
-                  {activeSession && formatTime(activeSession.startTime)} - {activeSession && formatTime(activeSession.endTime)}
+                  {activeSession ? `${formatTime(activeSession.startTime)} - ${formatTime(activeSession.endTime)}` : ''}
                 </p>
                 <div style={{
                   marginBottom: '1.5rem',
