@@ -106,7 +106,7 @@ export function LandingPage({
                 </div>
 
                 <p className={styles.waitingText}>
-                  <strong>{waitingPartner}</strong> is waiting for you!
+                  <strong>{waitingPartner}</strong> is in the queue waiting to talk to you!
                 </p>
 
                 <button
