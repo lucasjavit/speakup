@@ -19,7 +19,7 @@ export function Home() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
-  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState(false);
+  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
@@ -73,6 +73,13 @@ export function Home() {
 
   const handleFindPartner = async () => {
     if (!activeSession) {
+      return;
+    }
+
+    // Skip credit check if free mode is enabled
+    if (isFreeModeEnabled === true) {
+      joinQueueStore(activeSession.id);
+      setIsQueueOpen(true);
       return;
     }
 
@@ -544,7 +551,7 @@ export function Home() {
                   </svg>
                   Practice Now
                 </h2>
-                {!isFreeModeEnabled && (
+                {isFreeModeEnabled === false && (
                   <div className={styles.practiceCredits}>
                     <Tooltip content="Conversations available" position="top">
                       <div
