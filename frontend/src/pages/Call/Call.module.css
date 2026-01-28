@@ -221,7 +221,7 @@
 /* Timer */
 .timer {
   position: absolute;
-  top: 5rem;
+  top: 6.5rem;
   left: 50%;
   transform: translateX(-50%);
   padding: 0.75rem 1.5rem;
@@ -230,7 +230,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  z-index: 10;
+  z-index: 9;
   color: var(--text-primary, #1e293b);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
@@ -620,6 +620,7 @@
 
   .timer {
     font-size: 1.25rem;
+    top: 5.5rem;
   }
 
   .topicBanner {
