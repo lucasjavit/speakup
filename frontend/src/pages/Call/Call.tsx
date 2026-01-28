@@ -326,6 +326,23 @@ export function Call() {
     }
   }, [remoteStream, layoutMode, swapVideos]);
 
+  // When localStream first becomes available, re-apply after paint so the ref is definitely set (fix: own video only shows after changing layout)
+  useEffect(() => {
+    if (!localStream) return;
+    const apply = () => {
+      if (localVideoRef.current && localVideoRef.current.srcObject !== localStream) {
+        localVideoRef.current.srcObject = localStream;
+      }
+    };
+    apply();
+    const raf = requestAnimationFrame(apply);
+    const t = setTimeout(apply, 150);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
+  }, [localStream]);
+
   // Sync layout mode with preference store (load on mount)
   useEffect(() => {
     setLayoutMode(preferredLayoutMode);

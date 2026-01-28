@@ -56,6 +56,7 @@ export function Home() {
         creditService.isFreeModeEnabled(),
       ])
         .then(([statsData, sessionsData, walletData, freeMode]) => {
+          console.log('Stats loaded:', statsData);
           setStats(statsData);
           setSessions(sessionsData || []);
           const running = sessionsData?.find((s: Session) => s.currentlyRunning);
@@ -63,7 +64,9 @@ export function Home() {
           setWallet(walletData);
           setIsFreeModeEnabled(freeMode);
         })
-        .catch(console.error)
+        .catch((error) => {
+          console.error('Error loading data:', error);
+        })
         .finally(() => setIsLoading(false));
     }
   }, [isAuthenticated, user]);
@@ -95,10 +98,15 @@ export function Home() {
   const formatDuration = (seconds: number): string => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
     }
-    return `${minutes}m`;
+    if (minutes > 0) {
+      return `${minutes}m`;
+    }
+    return `${secs}s`;
   };
 
   const formatTime = (time: string): string => {
@@ -455,8 +463,8 @@ export function Home() {
                 </div>
                 <span className={styles.statValue}>
                   {stats?.averageDurationSeconds
-                    ? `${Math.round(stats.averageDurationSeconds / 60)}m`
-                    : '0m'}
+                    ? `${Math.round(stats.averageDurationSeconds)}s (${formatDuration(stats.averageDurationSeconds)})`
+                    : '0s (0m)'}
                 </span>
                 <span className={styles.statLabel}>Average Call Duration</span>
               </div>
