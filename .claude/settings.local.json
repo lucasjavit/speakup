@@ -14,7 +14,9 @@
       "Bash(grep:*)",
       "Bash(psql:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(docker ps:*)",
+      "Bash(docker exec:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\lucas\\..ai_projects\\speakup-kanban\\src\\components"

@@ -88,9 +88,9 @@ export function Call() {
   const handlePartnerDisconnected = useCallback(() => {
     console.log('Partner disconnected');
 
-    // If still in device selector, partner left before call started - go back to lobby
+    // If still in device selector, partner left before call started - go to break without evaluation
     if (showDeviceSelector) {
-      console.log('Partner left during device selection - returning to lobby');
+      console.log('Partner left during device selection - going to break without evaluation');
       setShowDeviceSelector(false);
       setCallState('ended');
       endCall();
@@ -100,7 +100,12 @@ export function Call() {
         notifyCallEndedRef.current(callInfo.conversationId, 'ERROR');
       }
 
-      navigate('/');
+      navigate('/break', {
+        state: {
+          skipEvaluation: true,
+          conversationId: callInfo?.conversationId
+        }
+      });
       return;
     }
 
@@ -143,11 +148,28 @@ export function Call() {
     setBackgroundTheme(next);
   }, [backgroundTheme, setBackgroundTheme]);
 
+  // Handle call ended with error (partner didn't join) - go to break without evaluation
+  const handleCallEndedWithError = useCallback(() => {
+    console.log('Call ended with error - partner did not join. Going to break without evaluation.');
+    setShowDeviceSelector(false);
+    setCallState('ended');
+    endCall();
+
+    // Navigate to break without evaluation
+    navigate('/break', {
+      state: {
+        skipEvaluation: true,
+        conversationId: callInfo?.conversationId
+      }
+    });
+  }, [callInfo, endCall, navigate]);
+
   // WebSocket for notifications
   const { notifyCallEnded } = useWebSocket({
     onPartnerDisconnected: handlePartnerDisconnected,
     onPartnerReconnected: handlePartnerReconnected,
     onReconnectionTimeout: handleReconnectionTimeout,
+    onCallEndedWithError: handleCallEndedWithError,
   });
 
   // Update ref when notifyCallEnded is available
@@ -172,7 +194,7 @@ export function Call() {
     if (showDeviceSelector && callInfo) {
       console.log('Starting device selector timeout (30s)');
       deviceSelectorTimeoutRef.current = setTimeout(() => {
-        console.log('Device selector timeout - returning to lobby');
+        console.log('Device selector timeout - going to break without evaluation');
         setShowDeviceSelector(false);
         setCallState('ended');
         endCall();
@@ -183,7 +205,12 @@ export function Call() {
           notifyCallEndedRef.current(callInfo.conversationId, 'ERROR');
         }
 
-        navigate('/');
+        navigate('/break', {
+          state: {
+            skipEvaluation: true,
+            conversationId: callInfo?.conversationId
+          }
+        });
       }, 30000); // 30 seconds
 
       return () => {
@@ -483,19 +510,27 @@ export function Call() {
     // Check if call actually started (connected and had meaningful duration)
     const callActuallyStarted = callState === 'connected' && elapsedSeconds > 5;
 
-    // If call didn't start or had an error early on, go back to lobby instead of break
+    // If call didn't start or had an error early on, go to break without evaluation
     if (!callActuallyStarted || reason === 'error') {
-      console.log('Call did not properly start, returning to lobby');
+      console.log('Call did not properly start, going to break without evaluation');
       setCallState('ended');
       endCall();
 
       // Notify backend to cancel the conversation
       if (callInfo) {
         await conversationService.endConversation(callInfo.conversationId, false);
-        notifyCallEnded(callInfo.conversationId, 'ERROR');
+        if (notifyCallEndedRef.current) {
+          notifyCallEndedRef.current(callInfo.conversationId, 'ERROR');
+        }
       }
 
-      navigate('/');
+      // Navigate to break without evaluation
+      navigate('/break', {
+        state: {
+          skipEvaluation: true,
+          conversationId: callInfo?.conversationId
+        }
+      });
       return;
     }
 

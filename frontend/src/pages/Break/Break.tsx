@@ -7,14 +7,15 @@ import { CreditBalance, InsufficientCreditsModal } from '@/components/credits';
 import styles from './Break.module.css';
 
 interface BreakState {
-  conversationId: string;
-  partnerId: string;
-  partnerName: string;
-  partnerAvatar: string | null;
-  topic: string;
-  duration: number;
-  sessionId: string;
-  breakDurationSeconds: number;
+  conversationId?: string;
+  partnerId?: string;
+  partnerName?: string;
+  partnerAvatar?: string | null;
+  topic?: string;
+  duration?: number;
+  sessionId?: string;
+  breakDurationSeconds?: number;
+  skipEvaluation?: boolean;
 }
 
 const DEFAULT_BREAK_DURATION_SECONDS = 30;
@@ -44,6 +45,12 @@ export function Break() {
 
   // Check if rating already exists and show modal on mount
   useEffect(() => {
+    // Skip evaluation if explicitly requested (e.g., call didn't start properly)
+    if (state?.skipEvaluation) {
+      setRatingCompleted(true);
+      return;
+    }
+
     if (state?.conversationId) {
       ratingService.getRatingForConversation(state.conversationId)
         .then(rating => {
@@ -64,7 +71,7 @@ export function Break() {
       // No conversation ID, skip rating
       setRatingCompleted(true);
     }
-  }, [state?.conversationId]);
+  }, [state?.conversationId, state?.skipEvaluation]);
 
   // Countdown timer
   useEffect(() => {
@@ -141,14 +148,20 @@ export function Break() {
             </div>
           </div>
 
-          <h1 className={styles.title}>Great conversation!</h1>
+          {/* Show different title if call didn't start properly */}
+          {state?.skipEvaluation ? (
+            <h1 className={styles.title}>Call could not be completed</h1>
+          ) : (
+            <h1 className={styles.title}>Great conversation!</h1>
+          )}
 
           {/* Credits Balance */}
           <div className={styles.creditsSection}>
             <CreditBalance />
           </div>
 
-          {state && (
+          {/* Only show summary if we have valid state and not skipping evaluation */}
+          {state && !state.skipEvaluation && state.partnerName && (
             <div className={styles.summaryCard}>
               <div className={styles.summaryRow}>
                 <div className={styles.summaryIcon}>

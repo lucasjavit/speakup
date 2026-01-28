@@ -304,6 +304,13 @@ public class WebSocketSessionManager {
                     // Also clean up any pending disconnection info
                     disconnectedUsers.remove(conversation.userAId);
                     disconnectedUsers.remove(conversation.userBId);
+
+                    // If reason is ERROR, notify partner to also redirect to lobby
+                    if ("ERROR".equals(reason)) {
+                        UUID partnerId = conversation.getPartnerId(userId);
+                        log.info("Call ended with ERROR - notifying partner {} to return to lobby", partnerId);
+                        webSocketHandler.sendMessageToUser(partnerId, WebSocketMessage.callEndedWithError());
+                    }
                 }
             } catch (IllegalArgumentException e) {
                 log.warn("Invalid conversation ID in CALL_ENDED: {}", conversationIdStr);

@@ -39,6 +39,7 @@ public class WebSocketMessage {
     public static final String TYPE_PARTNER_RECONNECTED = "PARTNER_RECONNECTED";
     public static final String TYPE_WAITING_RECONNECTION = "WAITING_RECONNECTION";
     public static final String TYPE_RECONNECTION_TIMEOUT = "RECONNECTION_TIMEOUT";
+    public static final String TYPE_CALL_ENDED_ERROR = "CALL_ENDED_ERROR";
     public static final String TYPE_ERROR = "ERROR";
     public static final String TYPE_PONG = "PONG";
 
@@ -138,6 +139,13 @@ public class WebSocketMessage {
         return WebSocketMessage.builder()
                 .type(TYPE_RECONNECTION_TIMEOUT)
                 .payload(Map.of("reason", "Partner did not reconnect in time"))
+                .build();
+    }
+
+    public static WebSocketMessage callEndedWithError() {
+        return WebSocketMessage.builder()
+                .type(TYPE_CALL_ENDED_ERROR)
+                .payload(Map.of("reason", "Partner did not join the call"))
                 .build();
     }
 

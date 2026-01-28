@@ -20,6 +20,7 @@ interface UseWebSocketOptions {
   onPartnerReconnected?: () => void;
   onWaitingReconnection?: (payload: WaitingReconnectionPayload) => void;
   onReconnectionTimeout?: () => void;
+  onCallEndedWithError?: () => void;
   onMatchCancelled?: (reason: string) => void;
   onError?: (payload: ErrorPayload) => void;
   onConnect?: () => void;
@@ -48,6 +49,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
         onPartnerReconnected,
         onWaitingReconnection,
         onReconnectionTimeout,
+        onCallEndedWithError,
         onMatchCancelled,
         onError,
       } = callbacksRef.current;
@@ -86,6 +88,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
         }
         case 'RECONNECTION_TIMEOUT':
           onReconnectionTimeout?.();
+          break;
+        case 'CALL_ENDED_ERROR':
+          onCallEndedWithError?.();
           break;
         case 'MATCH_CANCELLED': {
           const reason = message.payload?.reason as string;
