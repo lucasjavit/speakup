@@ -114,6 +114,32 @@ export function Home() {
     return `${minutes} min`;
   };
 
+  const getLevelIcon = (level: string) => {
+    const icons: Record<string, JSX.Element> = {
+      'BASIC': (
+        <svg viewBox="0 0 24 24" fill="#22c55e" style={{ width: '1em', height: '1em', marginRight: '0.25rem' }}>
+          <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+        </svg>
+      ),
+      'ELEMENTARY': (
+        <svg viewBox="0 0 24 24" fill="#0ea5e9" style={{ width: '1em', height: '1em', marginRight: '0.25rem' }}>
+          <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+        </svg>
+      ),
+      'LEVEL_UP': (
+        <svg viewBox="0 0 24 24" fill="#f97316" style={{ width: '1em', height: '1em', marginRight: '0.25rem' }}>
+          <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+        </svg>
+      ),
+      'EXPERT': (
+        <svg viewBox="0 0 24 24" fill="#eab308" style={{ width: '1em', height: '1em', marginRight: '0.25rem' }}>
+          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+        </svg>
+      ),
+    };
+    return icons[level] || null;
+  };
+
   const formatProficiencyLevel = (level: string): string => {
     const levelMap: Record<string, string> = {
       'BASIC': 'Basic',
@@ -382,13 +408,18 @@ export function Home() {
                 </h2>
                 {user.evaluatedLevel && (
                   <div className={styles.statsHeaderLevel}>
-                    <button
-                      className={styles.levelBadge}
-                      onClick={() => navigate('/complete-profile')}
-                      title={`Your Evaluated Level based on ${user.totalEvaluations || 0} evaluation${(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners`}
+                    <Tooltip
+                      content={`Your Evaluated Level based on ${user.totalEvaluations || 0} evaluation${(user.totalEvaluations || 0) !== 1 ? 's' : ''} from conversation partners`}
+                      position="bottom"
                     >
-                      {formatProficiencyLevel(user.evaluatedLevel)}
-                    </button>
+                      <button
+                        className={styles.levelBadge}
+                        onClick={() => navigate('/complete-profile')}
+                      >
+                        {getLevelIcon(user.evaluatedLevel)}
+                        {formatProficiencyLevel(user.evaluatedLevel)}
+                      </button>
+                    </Tooltip>
                   </div>
                 )}
               </div>

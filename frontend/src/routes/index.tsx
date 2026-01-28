@@ -48,6 +48,10 @@ export const router = createBrowserRouter([
         element: <PaymentSuccess />,
       },
       {
+        path: 'break',
+        element: <Break />,
+      },
+      {
         path: '*',
         element: <NotFound />,
       },
@@ -68,10 +72,6 @@ export const router = createBrowserRouter([
         <Call />
       </ProtectedCallRoute>
     ),
-  },
-  {
-    path: '/break',
-    element: <Break />,
   },
   {
     path: '/complete-profile',

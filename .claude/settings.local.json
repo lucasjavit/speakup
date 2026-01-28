@@ -10,7 +10,11 @@
       "Bash(npm run build:*)",
       "Bash(git rm:*)",
       "Bash(ls:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(grep:*)",
+      "Bash(psql:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "additionalDirectories": [
       "c:\\Users\\lucas\\..ai_projects\\speakup-kanban\\src\\components"

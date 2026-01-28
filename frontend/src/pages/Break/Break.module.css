@@ -1,52 +1,23 @@
 .container {
-  min-height: 100vh;
+  min-height: calc(100vh - 200px);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  padding: 1rem;
-  position: relative;
-}
-
-.backButton {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-}
-
-.logoutButton {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: var(--text-secondary);
-}
-
-.logoutButton:hover {
-  background: var(--color-error-bg, #fee2e2);
-  border-color: var(--color-error, #dc2626);
-  color: var(--color-error, #dc2626);
-}
-
-.logoutButton svg {
-  width: 20px;
-  height: 20px;
+  padding: 2rem 1rem;
 }
 
 .content {
   text-align: center;
-  max-width: 480px;
+  max-width: 520px;
   width: 100%;
-  padding: 2rem;
+}
+
+.card {
+  background: var(--bg-primary, #ffffff);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .iconWrapper {
@@ -524,7 +495,12 @@
 /* Responsive */
 @media (max-width: 480px) {
   .content {
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 2rem 1.5rem;
+    border-radius: 20px;
   }
 
   .title {

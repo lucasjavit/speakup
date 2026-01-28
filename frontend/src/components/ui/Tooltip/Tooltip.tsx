@@ -13,11 +13,28 @@ export function Tooltip({ children, content, position = 'top' }: TooltipProps) {
   const [coords, setCoords] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showTooltip = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setIsVisible(true);
+  };
+
+  const hideTooltip = () => {
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 200);
+  };
 
   useEffect(() => {
     if (isVisible && triggerRef.current && tooltipRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
       let top = 0;
       let left = 0;
@@ -41,9 +58,32 @@ export function Tooltip({ children, content, position = 'top' }: TooltipProps) {
           break;
       }
 
+      // Adjust if tooltip goes off-screen horizontally
+      if (left < 8) {
+        left = 8;
+      } else if (left + tooltipRect.width > viewportWidth - 8) {
+        left = viewportWidth - tooltipRect.width - 8;
+      }
+
+      // Adjust if tooltip goes off-screen vertically
+      if (top < 8) {
+        top = triggerRect.bottom + 8; // Show below if no space above
+      } else if (top + tooltipRect.height > viewportHeight - 8) {
+        top = triggerRect.top - tooltipRect.height - 8; // Show above if no space below
+      }
+
       setCoords({ top, left });
     }
   }, [isVisible, position]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const tooltip = isVisible && (
     <div
@@ -60,8 +100,17 @@ export function Tooltip({ children, content, position = 'top' }: TooltipProps) {
     <div
       ref={triggerRef}
       className={styles.wrapper}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onTouchStart={showTooltip}
+      onTouchEnd={hideTooltip}
+      onClick={(e) => {
+        // On mobile, first tap shows tooltip, second tap triggers action
+        if (window.innerWidth <= 768 && !isVisible) {
+          e.preventDefault();
+          showTooltip();
+        }
+      }}
     >
       {children}
       {createPortal(tooltip, document.body)}
