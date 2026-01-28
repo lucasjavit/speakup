@@ -36,7 +36,6 @@ export function Call() {
   const [showDeviceSelector, setShowDeviceSelector] = useState(true);
   const [devicesSelected, setDevicesSelected] = useState(false);
   const [reconnectionCountdown, setReconnectionCountdown] = useState(0);
-  const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Layout mode state
   type LayoutMode = 'spotlight' | 'side-equal' | 'side-70-30';
@@ -53,7 +52,9 @@ export function Call() {
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
 
   const reconnectionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCallEndRef = useRef<((reason: 'timer' | 'user_left' | 'partner_left' | 'peer_closed' | 'error') => void) | null>(null);
+  const notifyCallEndedRef = useRef<((conversationId: string, reason: string) => void) | null>(null);
 
   // Handle partner reconnection
   const handlePartnerReconnected = useCallback(() => {
@@ -94,9 +95,9 @@ export function Call() {
       setCallState('ended');
       endCall();
 
-      if (callInfo) {
+      if (callInfo && notifyCallEndedRef.current) {
         conversationService.endConversation(callInfo.conversationId, false);
-        notifyCallEnded(callInfo.conversationId, 'ERROR');
+        notifyCallEndedRef.current(callInfo.conversationId, 'ERROR');
       }
 
       navigate('/');
@@ -119,7 +120,7 @@ export function Call() {
         return prev - 1;
       });
     }, 1000);
-  }, [showDeviceSelector, callInfo, setWaitingReconnection, handleReconnectionTimeout, endCall, navigate, notifyCallEnded]);
+  }, [showDeviceSelector, callInfo, setWaitingReconnection, handleReconnectionTimeout, endCall, navigate]);
 
   // Layout control functions (sync with preference store)
   const toggleLayout = useCallback(() => {
@@ -149,6 +150,11 @@ export function Call() {
     onReconnectionTimeout: handleReconnectionTimeout,
   });
 
+  // Update ref when notifyCallEnded is available
+  useEffect(() => {
+    notifyCallEndedRef.current = notifyCallEnded;
+  }, [notifyCallEnded]);
+
   // Cleanup reconnection timer on unmount
   useEffect(() => {
     return () => {
@@ -172,9 +178,9 @@ export function Call() {
         endCall();
 
         // Notify backend to cancel
-        if (callInfo) {
+        if (callInfo && notifyCallEndedRef.current) {
           conversationService.endConversation(callInfo.conversationId, false);
-          notifyCallEnded(callInfo.conversationId, 'ERROR');
+          notifyCallEndedRef.current(callInfo.conversationId, 'ERROR');
         }
 
         navigate('/');
@@ -186,7 +192,7 @@ export function Call() {
         }
       };
     }
-  }, [showDeviceSelector, callInfo, endCall, navigate, notifyCallEnded]);
+  }, [showDeviceSelector, callInfo, endCall, navigate]);
 
   // Peer connection
   const {
