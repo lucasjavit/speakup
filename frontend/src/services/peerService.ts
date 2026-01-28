@@ -439,6 +439,11 @@ class PeerService {
   isInCall(): boolean {
     return this.currentCall !== null && this.currentCall.open;
   }
+
+  // Get current RTCPeerConnection for stats (e.g. network quality indicator)
+  getPeerConnection(): RTCPeerConnection | null {
+    return this.currentCall?.peerConnection ?? null;
+  }
 }
 
 // Export singleton instance

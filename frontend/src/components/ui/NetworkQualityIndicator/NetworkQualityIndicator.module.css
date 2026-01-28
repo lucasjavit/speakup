@@ -1,0 +1,169 @@
+.indicator {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color, #e2e8f0);
+  z-index: 15;
+  cursor: default;
+  transition: all 0.2s;
+}
+
+.indicator:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.indicator:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Signal Bars */
+.bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 16px;
+}
+
+.bar {
+  width: 3px;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.bar:nth-child(1) {
+  height: 25%;
+}
+
+.bar:nth-child(2) {
+  height: 50%;
+}
+
+.bar:nth-child(3) {
+  height: 75%;
+}
+
+.bar:nth-child(4) {
+  height: 100%;
+}
+
+.bar.active {
+  opacity: 1;
+}
+
+/* Latency Text */
+.latency {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 180px;
+  padding: 0.75rem;
+  background: rgba(30, 41, 59, 0.98);
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all 0.2s;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.tooltip::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: 1rem;
+  width: 8px;
+  height: 8px;
+  background: rgba(30, 41, 59, 0.98);
+  transform: rotate(45deg);
+}
+
+.tooltipTitle {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.375rem;
+}
+
+.tooltipRow:last-child {
+  margin-bottom: 0;
+}
+
+.tooltipLabel {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.tooltipValue {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .indicator {
+    top: 0.75rem;
+    right: 1rem;
+    padding: 0.375rem 0.625rem;
+  }
+
+  .bars {
+    height: 14px;
+  }
+
+  .bar {
+    width: 2.5px;
+  }
+
+  .latency {
+    font-size: 0.6875rem;
+  }
+
+  .tooltip {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+  }
+
+  .indicator:hover .tooltip {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .tooltip::before {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) rotate(45deg);
+  }
+}

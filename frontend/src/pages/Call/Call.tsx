@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCallStore } from '@/stores/callStore';
 import { useAuthStore } from '@/stores/authStore';
+import { usePreferenceStore } from '@/stores/preferenceStore';
 import { usePeerConnection, useCallTimer, useMediaRecorder, useWebSocket } from '@/hooks';
 import { conversationService, peerService } from '@/services';
 import { DeviceSelector } from '@/components/video/DeviceSelector';
+import { SettingsModal } from '@/components/ui/SettingsModal/SettingsModal';
+import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
 import styles from './Call.module.css';
 
 interface MediaDeviceOption {
@@ -34,6 +37,17 @@ export function Call() {
   const [showDeviceSelector, setShowDeviceSelector] = useState(true);
   const [devicesSelected, setDevicesSelected] = useState(false);
   const [reconnectionCountdown, setReconnectionCountdown] = useState(0);
+
+  // Layout mode state
+  type LayoutMode = 'spotlight' | 'side-equal' | 'side-70-30';
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>('spotlight');
+  const [swapVideos, setSwapVideos] = useState(false);
+
+  // Settings modal state
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Preferences
+  const { backgroundTheme, showNetworkIndicator, layoutMode: preferredLayoutMode, setLayoutMode: setPreferredLayoutMode } = usePreferenceStore();
 
   // Device selector state
   const [audioDevices, setAudioDevices] = useState<MediaDeviceOption[]>([]);
@@ -90,6 +104,19 @@ export function Call() {
       });
     }, 1000);
   }, [callInfo?.partnerName, setWaitingReconnection, handleReconnectionTimeout]);
+
+  // Layout control functions (sync with preference store)
+  const toggleLayout = useCallback(() => {
+    setLayoutMode(current => {
+      const next = current === 'spotlight' ? 'side-equal' : current === 'side-equal' ? 'side-70-30' : 'spotlight';
+      setPreferredLayoutMode(next);
+      return next;
+    });
+  }, [setPreferredLayoutMode]);
+
+  const handleSwapVideos = useCallback(() => {
+    setSwapVideos(prev => !prev);
+  }, []);
 
   // WebSocket for notifications
   const { notifyCallEnded } = useWebSocket({
@@ -278,6 +305,11 @@ export function Call() {
       remoteVideoRef.current.srcObject = remoteStream;
     }
   }, [remoteStream]);
+
+  // Sync layout mode with preference store (load on mount)
+  useEffect(() => {
+    setLayoutMode(preferredLayoutMode);
+  }, [preferredLayoutMode]);
 
   // Enumerate available devices when call is connected
   useEffect(() => {
@@ -493,55 +525,187 @@ export function Call() {
     );
   };
 
+  // Peer connection for network quality indicator (when in call)
+  const peerConnection = callState === 'connected' ? peerService.getPeerConnection() : null;
+
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${styles[`bg-${backgroundTheme}`]}`}>
       {/* Topic Banner */}
       <div className={styles.topicBanner}>
         <span className={styles.topicLabel}>Topic:</span>
         <span className={styles.topicText}>{callInfo.topic}</span>
       </div>
 
-      {/* Video Grid */}
-      <div className={styles.videoGrid}>
-        {/* Remote Video (Partner) */}
-        <div className={styles.videoContainer}>
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className={styles.remoteVideo}
-          />
-          {!remoteStream && (
-            <div className={styles.videoPlaceholder}>
-              <div className={styles.avatar}>
-                {callInfo.partnerAvatar ? (
-                  <img src={callInfo.partnerAvatar} alt={callInfo.partnerName} />
-                ) : (
-                  <span>{callInfo.partnerName[0]}</span>
-                )}
-              </div>
-              <p>{callInfo.partnerName}</p>
-              {callState === 'connecting' && <span>Connecting...</span>}
-            </div>
-          )}
-          <div className={styles.nameTag}>{callInfo.partnerName}</div>
+      {/* Network quality indicator (when enabled in settings and call is connected) */}
+      {showNetworkIndicator && peerConnection && (
+        <div className={styles.networkIndicatorWrapper}>
+          <NetworkQualityIndicator peerConnection={peerConnection} />
         </div>
+      )}
 
-        {/* Local Video (Self) */}
-        <div className={styles.localVideoWrapper}>
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            className={styles.localVideo}
-          />
-          {!isVideoEnabled && (
-            <div className={styles.cameraOff}>
-              <span>Camera Off</span>
+      {/* Video Grid */}
+      <div className={`${styles.videoGrid} ${styles[`layout-${layoutMode}`]}`}>
+        {/* Spotlight Mode */}
+        {layoutMode === 'spotlight' && (
+          <>
+            {/* Remote Video (Partner) - Main */}
+            <div className={styles.videoContainer}>
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className={styles.remoteVideo}
+              />
+              {!remoteStream && (
+                <div className={styles.videoPlaceholder}>
+                  <div className={styles.avatar}>
+                    {callInfo.partnerAvatar ? (
+                      <img src={callInfo.partnerAvatar} alt={callInfo.partnerName} />
+                    ) : (
+                      <span>{callInfo.partnerName[0]}</span>
+                    )}
+                  </div>
+                  <p>{callInfo.partnerName}</p>
+                  {callState === 'connecting' && <span>Connecting...</span>}
+                </div>
+              )}
+              <div className={styles.nameTag}>{callInfo.partnerName}</div>
             </div>
-          )}
-        </div>
+
+            {/* Local Video (Self) - PiP */}
+            <div className={styles.localVideoWrapper}>
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className={styles.localVideo}
+              />
+              {!isVideoEnabled && (
+                <div className={styles.cameraOff}>
+                  <span>Camera Off</span>
+                </div>
+              )}
+              <div className={styles.nameTagLocal}>You</div>
+            </div>
+          </>
+        )}
+
+        {/* Side-by-Side Equal Mode */}
+        {layoutMode === 'side-equal' && (
+          <div className={styles.sideBySideContainer}>
+            <div className={styles.videoBox}>
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className={styles.video}
+              />
+              {!remoteStream && (
+                <div className={styles.videoPlaceholder}>
+                  <div className={styles.avatar}>
+                    {callInfo.partnerAvatar ? (
+                      <img src={callInfo.partnerAvatar} alt={callInfo.partnerName} />
+                    ) : (
+                      <span>{callInfo.partnerName[0]}</span>
+                    )}
+                  </div>
+                  <p>{callInfo.partnerName}</p>
+                </div>
+              )}
+              <div className={styles.nameTag}>{callInfo.partnerName}</div>
+            </div>
+
+            <div className={styles.videoBox}>
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className={styles.video}
+              />
+              {!isVideoEnabled && (
+                <div className={styles.cameraOff}>
+                  <span>Camera Off</span>
+                </div>
+              )}
+              <div className={styles.nameTag}>You</div>
+            </div>
+          </div>
+        )}
+
+        {/* Side-by-Side 70/30 Mode */}
+        {layoutMode === 'side-70-30' && (
+          <div className={styles.sideBySideContainer}>
+            {/* Larger video (70%) - can be swapped */}
+            <div className={`${styles.videoBox} ${styles.video70}`}>
+              <video
+                ref={swapVideos ? localVideoRef : remoteVideoRef}
+                autoPlay
+                playsInline
+                muted={swapVideos}
+                className={styles.video}
+              />
+              {swapVideos ? (
+                !isVideoEnabled && (
+                  <div className={styles.cameraOff}>
+                    <span>Camera Off</span>
+                  </div>
+                )
+              ) : (
+                !remoteStream && (
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.avatar}>
+                      {callInfo.partnerAvatar ? (
+                        <img src={callInfo.partnerAvatar} alt={callInfo.partnerName} />
+                      ) : (
+                        <span>{callInfo.partnerName[0]}</span>
+                      )}
+                    </div>
+                    <p>{callInfo.partnerName}</p>
+                  </div>
+                )
+              )}
+              <div className={styles.nameTag}>
+                {swapVideos ? 'You' : callInfo.partnerName}
+              </div>
+            </div>
+
+            {/* Smaller video (30%) */}
+            <div className={`${styles.videoBox} ${styles.video30}`}>
+              <video
+                ref={swapVideos ? remoteVideoRef : localVideoRef}
+                autoPlay
+                playsInline
+                muted={!swapVideos}
+                className={styles.video}
+              />
+              {swapVideos ? (
+                !remoteStream && (
+                  <div className={styles.videoPlaceholder}>
+                    <div className={styles.avatar}>
+                      {callInfo.partnerAvatar ? (
+                        <img src={callInfo.partnerAvatar} alt={callInfo.partnerName} />
+                      ) : (
+                        <span>{callInfo.partnerName[0]}</span>
+                      )}
+                    </div>
+                    <p>{callInfo.partnerName}</p>
+                  </div>
+                )
+              ) : (
+                !isVideoEnabled && (
+                  <div className={styles.cameraOff}>
+                    <span>Camera Off</span>
+                  </div>
+                )
+              )}
+              <div className={styles.nameTag}>
+                {swapVideos ? callInfo.partnerName : 'You'}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Timer */}
@@ -631,6 +795,53 @@ export function Call() {
             )}
           </button>
 
+          {/* Settings Button */}
+          <button
+            onClick={() => setShowSettings(true)}
+            className={styles.controlButton}
+            title="Settings"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+          </button>
+
+          {/* Layout Toggle Button */}
+          <button
+            onClick={toggleLayout}
+            className={styles.controlButton}
+            title="Change Layout"
+          >
+            {layoutMode === 'spotlight' && (
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8 14H5V7h6v10zm8 0h-6V7h6v10z"/>
+              </svg>
+            )}
+            {layoutMode === 'side-equal' && (
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 5v14h18V5H3zm16 12H5V7h14v10z"/>
+              </svg>
+            )}
+            {layoutMode === 'side-70-30' && (
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 14H5V7h12v10z"/>
+              </svg>
+            )}
+          </button>
+
+          {/* Swap Button (only visible in 70/30 mode) */}
+          {layoutMode === 'side-70-30' && (
+            <button
+              onClick={handleSwapVideos}
+              className={styles.controlButton}
+              title="Swap Videos"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/>
+              </svg>
+            </button>
+          )}
+
           <button
             onClick={handleLeaveClick}
             className={`${styles.controlButton} ${styles.endCall}`}
@@ -665,6 +876,12 @@ export function Call() {
           </div>
         </div>
       )}
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
 
       {/* Waiting for Partner Reconnection */}
       {renderReconnectionOverlay()}

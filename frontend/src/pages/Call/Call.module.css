@@ -1,10 +1,31 @@
 .container {
   position: fixed;
   inset: 0;
-  background: #111;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
   display: flex;
   flex-direction: column;
-  color: white;
+  color: var(--text-primary, #1e293b);
+}
+
+/* Background themes */
+.container.bg-light-gray {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+}
+
+.container.bg-blue-sky {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
+.container.bg-warm-sunset {
+  background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%);
+}
+
+.container.bg-cool-mint {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.container.bg-soft-purple {
+  background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%);
 }
 
 /* Topic Banner */
@@ -14,13 +35,14 @@
   left: 0;
   right: 0;
   padding: 1rem 1.5rem;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), transparent);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), transparent);
   z-index: 10;
+  backdrop-filter: blur(8px);
 }
 
 .topicLabel {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary, #64748b);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -28,8 +50,9 @@
 .topicText {
   display: block;
   font-size: 1.125rem;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 0.25rem;
+  color: var(--text-primary, #1e293b);
 }
 
 /* Video Grid */
@@ -40,6 +63,12 @@
   align-items: center;
   padding: 4rem 1rem 6rem;
   position: relative;
+  transition: all 0.3s ease;
+}
+
+/* Spotlight Mode (default) */
+.videoGrid.layout-spotlight {
+  flex-direction: column;
 }
 
 .videoContainer {
@@ -47,12 +76,48 @@
   width: 100%;
   max-width: 900px;
   aspect-ratio: 16 / 9;
-  background: #222;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  border: 2px solid var(--border-color, #e2e8f0);
 }
 
 .remoteVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Side-by-Side Container */
+.sideBySideContainer {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1400px;
+  height: 100%;
+  max-height: 700px;
+}
+
+.videoBox {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--border-color, #e2e8f0);
+  flex: 1;
+}
+
+.videoBox.video70 {
+  flex: 7;
+}
+
+.videoBox.video30 {
+  flex: 3;
+}
+
+.video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -66,7 +131,8 @@
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  background: #333;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: var(--text-primary, #1e293b);
 }
 
 .avatar {
@@ -80,6 +146,8 @@
   font-size: 2.5rem;
   font-weight: 600;
   overflow: hidden;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
 .avatar img {
@@ -93,9 +161,26 @@
   bottom: 1rem;
   left: 1rem;
   padding: 0.5rem 1rem;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
   font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.nameTagLocal {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Local Video (PiP) */
@@ -105,17 +190,19 @@
   right: 1.5rem;
   width: 180px;
   aspect-ratio: 16 / 9;
-  background: #222;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border: 2px solid var(--border-color, #e2e8f0);
+  z-index: 5;
 }
 
 .localVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scaleX(-1); /* Mirror */
+  transform: scaleX(-1);
 }
 
 .cameraOff {
@@ -124,9 +211,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #333;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary, #64748b);
+  font-weight: 500;
 }
 
 /* Timer */
@@ -135,18 +223,30 @@
   top: 5rem;
   left: 50%;
   transform: translateX(-50%);
-  padding: 0.5rem 1.5rem;
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   z-index: 10;
+  color: var(--text-primary, #1e293b);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  border: 2px solid var(--border-color, #e2e8f0);
 }
 
 .timerWarning {
-  color: #ff6b6b;
+  color: #dc2626;
   animation: pulse 1s ease-in-out infinite;
+}
+
+/* Network quality indicator (top-right during call) */
+.networkIndicatorWrapper {
+  position: absolute;
+  top: 5rem;
+  right: 1.5rem;
+  z-index: 10;
 }
 
 @keyframes pulse {
@@ -169,13 +269,15 @@
   flex-direction: column;
   align-items: center;
   gap: 0.75rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.95), transparent);
+  backdrop-filter: blur(12px);
 }
 
 .controlButtons {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Device Selectors */
@@ -183,57 +285,72 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .deviceSelect {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
-  padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--border-color, #e2e8f0);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .deviceIcon {
   width: 16px;
   height: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary, #64748b);
   flex-shrink: 0;
 }
 
 .select {
   background: transparent;
   border: none;
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.375rem 0.5rem;
+  color: var(--text-primary, #1e293b);
+  font-size: 0.875rem;
+  padding: 0;
   cursor: pointer;
-  max-width: 150px;
   outline: none;
+  font-weight: 500;
+  max-width: 150px;
 }
 
 .select option {
-  background: #222;
-  color: white;
+  background: white;
+  color: var(--text-primary, #1e293b);
+}
+
+.select:focus {
+  outline: none;
 }
 
 .controlButton {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  border: 2px solid var(--border-color, #e2e8f0);
+  background: #ffffff;
+  color: var(--text-primary, #1e293b);
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .controlButton:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-primary);
+}
+
+.controlButton:active {
+  transform: translateY(0);
 }
 
 .controlButton svg {
@@ -241,18 +358,29 @@
   height: 24px;
 }
 
+.controlButton.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
 .controlButton.disabled {
-  background: rgba(255, 100, 100, 0.3);
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
 }
 
 .controlButton.endCall {
-  background: #e53935;
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
   width: 64px;
   height: 64px;
 }
 
 .controlButton.endCall:hover {
-  background: #c62828;
+  background: #b91c1c;
+  border-color: #b91c1c;
 }
 
 .controlButton.endCall svg {
@@ -267,17 +395,21 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 0.75rem 1.5rem;
-  background: rgba(229, 57, 53, 0.9);
+  background: rgba(239, 68, 68, 0.95);
+  backdrop-filter: blur(8px);
   border-radius: 8px;
   font-size: 0.875rem;
   z-index: 20;
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* Confirm Dialog */
 .confirmOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -285,20 +417,23 @@
 }
 
 .confirmDialog {
-  background: #222;
+  background: #ffffff;
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 16px;
   text-align: center;
   max-width: 320px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .confirmDialog h3 {
   font-size: 1.25rem;
   margin-bottom: 0.5rem;
+  color: var(--text-primary, #1e293b);
 }
 
 .confirmDialog p {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary, #64748b);
   margin-bottom: 1.5rem;
 }
 
@@ -315,16 +450,26 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .confirmButtons button:first-child {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.confirmButtons button:first-child:hover {
+  background: var(--bg-tertiary, #e2e8f0);
 }
 
 .confirmLeave {
-  background: #e53935;
+  background: #dc2626;
   color: white;
+}
+
+.confirmLeave:hover {
+  background: #b91c1c;
 }
 
 /* Device Selector Wrapper */
@@ -341,7 +486,8 @@
 .reconnectionOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -349,22 +495,24 @@
 }
 
 .reconnectionDialog {
-  background: #1a1a2e;
+  background: #ffffff;
   padding: 2.5rem;
   border-radius: 16px;
   text-align: center;
   max-width: 380px;
   width: 90%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 .reconnectionDialog h3 {
   font-size: 1.5rem;
   margin-bottom: 1rem;
-  color: #fff;
+  color: var(--text-primary, #1e293b);
 }
 
 .reconnectionDialog p {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary, #64748b);
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
@@ -372,7 +520,7 @@
 .reconnectionSpinner {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(255, 255, 255, 0.2);
+  border: 4px solid var(--border-color, #e2e8f0);
   border-top-color: var(--color-primary, #6366f1);
   border-radius: 50%;
   margin: 0 auto 1.5rem;
@@ -395,13 +543,13 @@
 .countdownNumber {
   font-size: 3rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary, #1e293b);
   font-variant-numeric: tabular-nums;
 }
 
 .countdownLabel {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-secondary, #64748b);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -409,26 +557,54 @@
 .leaveNowButton {
   padding: 0.75rem 2rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--border-color, #e2e8f0);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary, #64748b);
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .leaveNowButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.5);
+  background: var(--bg-secondary, #f1f5f9);
+  color: var(--text-primary, #1e293b);
+  border-color: var(--text-secondary, #64748b);
 }
 
 /* Responsive */
-@media (max-width: 640px) {
+@media (max-width: 1024px) {
+  .sideBySideContainer {
+    max-height: 500px;
+  }
+
+  .videoBox.video70 {
+    flex: 6;
+  }
+
+  .videoBox.video30 {
+    flex: 4;
+  }
+}
+
+@media (max-width: 768px) {
+  .sideBySideContainer {
+    flex-direction: column;
+    max-height: none;
+  }
+
+  .videoBox {
+    flex: 1 !important;
+    min-height: 250px;
+  }
+
   .localVideoWrapper {
     width: 120px;
-    bottom: 8rem;
+    bottom: 5rem;
     right: 1rem;
+  }
+
+  .controls {
+    padding: 0.75rem 1rem 1rem;
   }
 
   .controlButton {
