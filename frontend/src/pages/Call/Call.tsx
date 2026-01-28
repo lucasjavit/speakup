@@ -424,6 +424,25 @@ export function Call() {
     hangUp();
     destroy(); // Clean up peer connection
 
+    // Check if call actually started (connected and had meaningful duration)
+    const callActuallyStarted = callState === 'connected' && elapsedSeconds > 5;
+
+    // If call didn't start or had an error early on, go back to lobby instead of break
+    if (!callActuallyStarted || reason === 'error') {
+      console.log('Call did not properly start, returning to lobby');
+      setCallState('ended');
+      endCall();
+
+      // Notify backend to cancel the conversation
+      if (callInfo) {
+        await conversationService.endConversation(callInfo.conversationId, false);
+        notifyCallEnded(callInfo.conversationId, 'ERROR');
+      }
+
+      navigate('/');
+      return;
+    }
+
     // Stop recording and upload
     if (recorder.isRecording && callInfo) {
       try {
