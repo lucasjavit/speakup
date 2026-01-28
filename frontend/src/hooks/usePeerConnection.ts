@@ -72,19 +72,19 @@ export function usePeerConnection(options: UsePeerConnectionOptions = {}): UsePe
       setError(null);
       console.log('usePeerConnection: initializing with userId:', userId);
 
-      // Get local stream FIRST (before PeerJS init) so it's ready for incoming calls
+      // Initialize PeerJS FIRST (destroy() is called inside, which would stop any existing stream)
+      console.log('usePeerConnection: initializing PeerJS...');
+      await peerService.initialize(userId);
+      setIsConnected(true);
+      console.log('usePeerConnection: PeerJS connected');
+
+      // Now get local stream AFTER PeerJS init (so destroy() doesn't stop it)
       console.log('usePeerConnection: getting local stream...');
       const stream = await peerService.getLocalStream();
       setLocalStream(stream);
       setIsAudioEnabled(peerService.isAudioEnabled());
       setIsVideoEnabled(peerService.isVideoEnabled());
-      console.log('usePeerConnection: local stream obtained');
-
-      // Now initialize PeerJS
-      console.log('usePeerConnection: initializing PeerJS...');
-      await peerService.initialize(userId);
-      setIsConnected(true);
-      console.log('usePeerConnection: PeerJS connected, ready for calls');
+      console.log('usePeerConnection: local stream obtained, ready for calls');
     } catch (err) {
       console.error('usePeerConnection: initialization failed:', err);
       const error = err instanceof Error ? err : new Error('Failed to initialize peer');
