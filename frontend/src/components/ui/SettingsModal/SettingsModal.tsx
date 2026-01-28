@@ -9,10 +9,8 @@ interface SettingsModalProps {
 
 const BACKGROUND_OPTIONS: { id: BackgroundTheme; name: string; preview: string }[] = [
   { id: 'light-gray', name: 'Light Gray', preview: 'linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%)' },
-  { id: 'blue-sky', name: 'Blue Sky', preview: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%)' },
-  { id: 'warm-sunset', name: 'Warm Sunset', preview: 'linear-gradient(135deg, #fed7aa 0%, #fdba74 100%)' },
-  { id: 'cool-mint', name: 'Cool Mint', preview: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)' },
-  { id: 'soft-purple', name: 'Soft Purple', preview: 'linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 100%)' },
+  { id: 'dark', name: 'Dark', preview: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' },
+  { id: 'white', name: 'White', preview: '#ffffff' },
 ];
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {

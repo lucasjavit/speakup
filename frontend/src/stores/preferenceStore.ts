@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type BackgroundTheme = 'light-gray' | 'blue-sky' | 'warm-sunset' | 'cool-mint' | 'soft-purple';
+export type BackgroundTheme = 'light-gray' | 'dark' | 'white';
 
 interface PreferenceState {
   // Background
@@ -32,6 +32,17 @@ export const usePreferenceStore = create<PreferenceState>()(
     }),
     {
       name: 'speakup-preferences',
+      version: 1,
+      migrate: (persisted: unknown) => {
+        const state = persisted as { backgroundTheme?: string; showNetworkIndicator?: boolean; layoutMode?: string };
+        const validThemes: BackgroundTheme[] = ['light-gray', 'dark', 'white'];
+        return {
+          ...state,
+          backgroundTheme: state?.backgroundTheme && validThemes.includes(state.backgroundTheme as BackgroundTheme)
+            ? (state.backgroundTheme as BackgroundTheme)
+            : 'light-gray',
+        };
+      },
       partialize: (state) => ({
         backgroundTheme: state.backgroundTheme,
         showNetworkIndicator: state.showNetworkIndicator,

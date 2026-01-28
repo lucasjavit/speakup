@@ -6,7 +6,6 @@ import { usePreferenceStore } from '@/stores/preferenceStore';
 import { usePeerConnection, useCallTimer, useMediaRecorder, useWebSocket } from '@/hooks';
 import { conversationService, peerService } from '@/services';
 import { DeviceSelector } from '@/components/video/DeviceSelector';
-import { SettingsModal } from '@/components/ui/SettingsModal/SettingsModal';
 import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
 import styles from './Call.module.css';
 
@@ -43,11 +42,8 @@ export function Call() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('spotlight');
   const [swapVideos, setSwapVideos] = useState(false);
 
-  // Settings modal state
-  const [showSettings, setShowSettings] = useState(false);
-
   // Preferences
-  const { backgroundTheme, showNetworkIndicator, layoutMode: preferredLayoutMode, setLayoutMode: setPreferredLayoutMode } = usePreferenceStore();
+  const { backgroundTheme, setBackgroundTheme, showNetworkIndicator, layoutMode: preferredLayoutMode, setLayoutMode: setPreferredLayoutMode } = usePreferenceStore();
 
   // Device selector state
   const [audioDevices, setAudioDevices] = useState<MediaDeviceOption[]>([]);
@@ -117,6 +113,14 @@ export function Call() {
   const handleSwapVideos = useCallback(() => {
     setSwapVideos(prev => !prev);
   }, []);
+
+  // Cycle background: light-gray -> dark -> white -> light-gray
+  const BACKGROUND_CYCLE = ['light-gray', 'dark', 'white'] as const;
+  const cycleBackground = useCallback(() => {
+    const idx = BACKGROUND_CYCLE.indexOf(backgroundTheme as typeof BACKGROUND_CYCLE[number]);
+    const next = BACKGROUND_CYCLE[(idx + 1) % BACKGROUND_CYCLE.length];
+    setBackgroundTheme(next);
+  }, [backgroundTheme, setBackgroundTheme]);
 
   // WebSocket for notifications
   const { notifyCallEnded } = useWebSocket({
@@ -293,18 +297,18 @@ export function Call() {
     };
   }, [devicesSelected]);
 
-  // Update video elements when streams change
+  // Update video elements when streams change or layout changes (new video elements get new refs)
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
     }
-  }, [localStream]);
+  }, [localStream, layoutMode, swapVideos]);
 
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
     }
-  }, [remoteStream]);
+  }, [remoteStream, layoutMode, swapVideos]);
 
   // Sync layout mode with preference store (load on mount)
   useEffect(() => {
@@ -795,14 +799,14 @@ export function Call() {
             )}
           </button>
 
-          {/* Settings Button */}
+          {/* Cycle background (light gray / dark / white) */}
           <button
-            onClick={() => setShowSettings(true)}
+            onClick={cycleBackground}
             className={styles.controlButton}
-            title="Settings"
+            title="Change background"
           >
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.04.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+              <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98-.22-1.98-.34-2.98-.34-2.34 0-4.52.67-6.38 1.84C11.5 12.5 12 11.28 12 10c0-2.21-1.79-4-4-4-.7 0-1.36.18-1.94.5C6.5 4.5 9 3 12 3z"/>
             </svg>
           </button>
 
@@ -876,12 +880,6 @@ export function Call() {
           </div>
         </div>
       )}
-
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={showSettings}
-        onClose={() => setShowSettings(false)}
-      />
 
       {/* Waiting for Partner Reconnection */}
       {renderReconnectionOverlay()}
