@@ -36,6 +36,7 @@ export function Call() {
   const [showDeviceSelector, setShowDeviceSelector] = useState(true);
   const [devicesSelected, setDevicesSelected] = useState(false);
   const [reconnectionCountdown, setReconnectionCountdown] = useState(0);
+  const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Layout mode state
   type LayoutMode = 'spotlight' | 'side-equal' | 'side-70-30';
@@ -84,7 +85,26 @@ export function Call() {
 
   // Handle partner disconnection - start waiting for reconnection
   const handlePartnerDisconnected = useCallback(() => {
-    console.log('Partner disconnected, starting reconnection timer');
+    console.log('Partner disconnected');
+
+    // If still in device selector, partner left before call started - go back to lobby
+    if (showDeviceSelector) {
+      console.log('Partner left during device selection - returning to lobby');
+      setShowDeviceSelector(false);
+      setCallState('ended');
+      endCall();
+
+      if (callInfo) {
+        conversationService.endConversation(callInfo.conversationId, false);
+        notifyCallEnded(callInfo.conversationId, 'ERROR');
+      }
+
+      navigate('/');
+      return;
+    }
+
+    // If call already started, start reconnection timer
+    console.log('Partner disconnected during call, starting reconnection timer');
     setWaitingReconnection(true, callInfo?.partnerName, RECONNECTION_TIMEOUT_SECONDS);
     setReconnectionCountdown(RECONNECTION_TIMEOUT_SECONDS);
 
@@ -99,7 +119,7 @@ export function Call() {
         return prev - 1;
       });
     }, 1000);
-  }, [callInfo?.partnerName, setWaitingReconnection, handleReconnectionTimeout]);
+  }, [showDeviceSelector, callInfo, setWaitingReconnection, handleReconnectionTimeout, endCall, navigate, notifyCallEnded]);
 
   // Layout control functions (sync with preference store)
   const toggleLayout = useCallback(() => {
@@ -135,8 +155,38 @@ export function Call() {
       if (reconnectionTimerRef.current) {
         clearInterval(reconnectionTimerRef.current);
       }
+      if (deviceSelectorTimeoutRef.current) {
+        clearTimeout(deviceSelectorTimeoutRef.current);
+      }
     };
   }, []);
+
+  // Timeout for device selection (30 seconds)
+  useEffect(() => {
+    if (showDeviceSelector && callInfo) {
+      console.log('Starting device selector timeout (30s)');
+      deviceSelectorTimeoutRef.current = setTimeout(() => {
+        console.log('Device selector timeout - returning to lobby');
+        setShowDeviceSelector(false);
+        setCallState('ended');
+        endCall();
+
+        // Notify backend to cancel
+        if (callInfo) {
+          conversationService.endConversation(callInfo.conversationId, false);
+          notifyCallEnded(callInfo.conversationId, 'ERROR');
+        }
+
+        navigate('/');
+      }, 30000); // 30 seconds
+
+      return () => {
+        if (deviceSelectorTimeoutRef.current) {
+          clearTimeout(deviceSelectorTimeoutRef.current);
+        }
+      };
+    }
+  }, [showDeviceSelector, callInfo, endCall, navigate, notifyCallEnded]);
 
   // Peer connection
   const {
