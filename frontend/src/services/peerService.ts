@@ -144,13 +144,6 @@ class PeerService {
       ...(this.selectedAudioDeviceId ? { deviceId: { exact: this.selectedAudioDeviceId } } : {}),
     } : false;
 
-    console.log('getLocalStream: Requesting stream with constraints:', {
-      video: videoConstraints,
-      audio: audioConstraints,
-      selectedVideoDeviceId: this.selectedVideoDeviceId,
-      selectedAudioDeviceId: this.selectedAudioDeviceId,
-    });
-
     // Try to get video + audio first
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({
@@ -159,10 +152,6 @@ class PeerService {
       });
 
       console.log('Got local stream with video and audio');
-      console.log('Stream tracks:', {
-        videoTracks: this.localStream.getVideoTracks().map(t => ({ id: t.id, label: t.label, enabled: t.enabled, readyState: t.readyState })),
-        audioTracks: this.localStream.getAudioTracks().map(t => ({ id: t.id, label: t.label, enabled: t.enabled, readyState: t.readyState })),
-      });
       return this.localStream;
     } catch (error) {
       console.warn('Could not get video+audio, trying audio only:', error);
