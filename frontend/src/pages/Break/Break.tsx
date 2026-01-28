@@ -23,7 +23,6 @@ export function Break() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as BreakState | null;
-  const { logout } = useAuthStore();
   const { joinQueue: joinQueueStore } = useCallStore();
 
   // Use breakDurationSeconds from state, fallback to default
