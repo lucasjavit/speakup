@@ -297,7 +297,23 @@ export function Call() {
     };
   }, [devicesSelected]);
 
-  // Update video elements when streams change or layout changes (new video elements get new refs)
+  // Ref callbacks: assign stream as soon as the video element is mounted (fixes one user not seeing own video)
+  const setLocalVideoRef = useCallback(
+    (el: HTMLVideoElement | null) => {
+      (localVideoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el;
+      if (el && localStream) el.srcObject = localStream;
+    },
+    [localStream]
+  );
+  const setRemoteVideoRef = useCallback(
+    (el: HTMLVideoElement | null) => {
+      (remoteVideoRef as React.MutableRefObject<HTMLVideoElement | null>).current = el;
+      if (el && remoteStream) el.srcObject = remoteStream;
+    },
+    [remoteStream]
+  );
+
+  // Update video elements when streams or layout change (backup for ref callbacks)
   useEffect(() => {
     if (localVideoRef.current && localStream) {
       localVideoRef.current.srcObject = localStream;
@@ -555,7 +571,7 @@ export function Call() {
             {/* Remote Video (Partner) - Main */}
             <div className={styles.videoContainer}>
               <video
-                ref={remoteVideoRef}
+                ref={setRemoteVideoRef}
                 autoPlay
                 playsInline
                 className={styles.remoteVideo}
@@ -579,7 +595,7 @@ export function Call() {
             {/* Local Video (Self) - PiP */}
             <div className={styles.localVideoWrapper}>
               <video
-                ref={localVideoRef}
+                ref={setLocalVideoRef}
                 autoPlay
                 playsInline
                 muted
@@ -600,7 +616,7 @@ export function Call() {
           <div className={styles.sideBySideContainer}>
             <div className={styles.videoBox}>
               <video
-                ref={remoteVideoRef}
+                ref={setRemoteVideoRef}
                 autoPlay
                 playsInline
                 className={styles.video}
@@ -622,7 +638,7 @@ export function Call() {
 
             <div className={styles.videoBox}>
               <video
-                ref={localVideoRef}
+                ref={setLocalVideoRef}
                 autoPlay
                 playsInline
                 muted
@@ -644,7 +660,7 @@ export function Call() {
             {/* Larger video (70%) - can be swapped */}
             <div className={`${styles.videoBox} ${styles.video70}`}>
               <video
-                ref={swapVideos ? localVideoRef : remoteVideoRef}
+                ref={swapVideos ? setLocalVideoRef : setRemoteVideoRef}
                 autoPlay
                 playsInline
                 muted={swapVideos}
@@ -678,7 +694,7 @@ export function Call() {
             {/* Smaller video (30%) */}
             <div className={`${styles.videoBox} ${styles.video30}`}>
               <video
-                ref={swapVideos ? remoteVideoRef : localVideoRef}
+                ref={swapVideos ? setRemoteVideoRef : setLocalVideoRef}
                 autoPlay
                 playsInline
                 muted={!swapVideos}
@@ -806,7 +822,7 @@ export function Call() {
             title="Change background"
           >
             <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98-.22-1.98-.34-2.98-.34-2.34 0-4.52.67-6.38 1.84C11.5 12.5 12 11.28 12 10c0-2.21-1.79-4-4-4-.7 0-1.36.18-1.94.5C6.5 4.5 9 3 12 3z"/>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.02-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 8 6.5 8 8 8.67 8 9.5 7.33 11 6.5 11zm3-4C8.67 7 8 6.33 8 5.5S8.67 4 9.5 4s1.5.67 1.5 1.5S10.33 7 9.5 7zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 4 14.5 4s1.5.67 1.5 1.5S15.33 7 14.5 7zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 8 17.5 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
             </svg>
           </button>
 
