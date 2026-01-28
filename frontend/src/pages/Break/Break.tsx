@@ -16,6 +16,7 @@ interface BreakState {
   sessionId?: string;
   breakDurationSeconds?: number;
   skipEvaluation?: boolean;
+  wasInCall?: boolean; // True if user was in call when it failed, false if stuck in device selector
 }
 
 const DEFAULT_BREAK_DURATION_SECONDS = 30;
@@ -150,7 +151,15 @@ export function Break() {
 
           {/* Show different title if call didn't start properly */}
           {state?.skipEvaluation ? (
-            <h1 className={styles.title}>Call could not be completed</h1>
+            <>
+              <h1 className={styles.title}>Call could not be completed</h1>
+              {/* Only show "partner didn't join" message if this user was in the call */}
+              {state.wasInCall && (
+                <p className={styles.subtitle}>
+                  Your partner was unable to join the call. Please try again.
+                </p>
+              )}
+            </>
           ) : (
             <h1 className={styles.title}>Great conversation!</h1>
           )}

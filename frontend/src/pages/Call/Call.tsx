@@ -103,7 +103,8 @@ export function Call() {
       navigate('/break', {
         state: {
           skipEvaluation: true,
-          conversationId: callInfo?.conversationId
+          conversationId: callInfo?.conversationId,
+          wasInCall: false // User was still in device selector
         }
       });
       return;
@@ -151,6 +152,7 @@ export function Call() {
   // Handle call ended with error (partner didn't join) - go to break without evaluation
   const handleCallEndedWithError = useCallback(() => {
     console.log('Call ended with error - partner did not join. Going to break without evaluation.');
+    const wasInCall = !showDeviceSelector; // If not in device selector, user was in call
     setShowDeviceSelector(false);
     setCallState('ended');
     endCall();
@@ -159,10 +161,11 @@ export function Call() {
     navigate('/break', {
       state: {
         skipEvaluation: true,
-        conversationId: callInfo?.conversationId
+        conversationId: callInfo?.conversationId,
+        wasInCall // Pass flag to show appropriate message
       }
     });
-  }, [callInfo, endCall, navigate]);
+  }, [callInfo, endCall, navigate, showDeviceSelector]);
 
   // WebSocket for notifications
   const { notifyCallEnded } = useWebSocket({
@@ -208,7 +211,8 @@ export function Call() {
         navigate('/break', {
           state: {
             skipEvaluation: true,
-            conversationId: callInfo?.conversationId
+            conversationId: callInfo?.conversationId,
+            wasInCall: false // Timeout happened in device selector
           }
         });
       }, 30000); // 30 seconds
@@ -525,10 +529,12 @@ export function Call() {
       }
 
       // Navigate to break without evaluation
+      // wasInCall: true if we got past device selection (callState was 'connected')
       navigate('/break', {
         state: {
           skipEvaluation: true,
-          conversationId: callInfo?.conversationId
+          conversationId: callInfo?.conversationId,
+          wasInCall: callState === 'connected'
         }
       });
       return;
