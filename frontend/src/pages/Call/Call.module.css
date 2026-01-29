@@ -230,7 +230,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  z-index: 9;
+  z-index: 11;
   color: var(--text-primary, #1e293b);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(8px);
