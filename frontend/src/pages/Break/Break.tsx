@@ -202,7 +202,7 @@ export function Break() {
                 </div>
                 <div className={styles.summaryText}>
                   <span className={styles.summaryLabel}>Duration</span>
-                  <span className={styles.summaryValue}>{formatDuration(state.duration)}</span>
+                  <span className={styles.summaryValue}>{formatDuration(state.duration || 0)}</span>
                 </div>
               </div>
             </div>
@@ -246,9 +246,9 @@ export function Break() {
       {state && (
         <PostCallRatingModal
           isOpen={showRatingModal}
-          conversationId={state.conversationId}
-          partnerId={state.partnerId}
-          partnerName={state.partnerName}
+          conversationId={state.conversationId || ''}
+          partnerId={state.partnerId || ''}
+          partnerName={state.partnerName || 'Partner'}
           onComplete={handleRatingComplete}
         />
       )}

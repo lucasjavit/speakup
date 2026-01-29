@@ -54,7 +54,7 @@ export function Call() {
   const reconnectionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCallEndRef = useRef<((reason: 'timer' | 'user_left' | 'partner_left' | 'peer_closed' | 'error') => void) | null>(null);
-  const notifyCallEndedRef = useRef<((conversationId: string, reason: string) => void) | null>(null);
+  const notifyCallEndedRef = useRef<((conversationId: string, reason: 'TIMER' | 'USER_LEFT' | 'ERROR') => void) | null>(null);
 
   // Handle partner reconnection
   const handlePartnerReconnected = useCallback(() => {
@@ -556,7 +556,8 @@ export function Call() {
     if (callInfo) {
       const completed = reason === 'timer' || reason === 'user_left';
       await conversationService.endConversation(callInfo.conversationId, completed);
-      notifyCallEnded(callInfo.conversationId, reason === 'timer' ? 'TIMER' : reason === 'error' ? 'ERROR' : 'USER_LEFT');
+      const wsReason: 'TIMER' | 'USER_LEFT' | 'ERROR' = reason === 'timer' ? 'TIMER' : reason === 'partner_left' || reason === 'user_left' ? 'USER_LEFT' : 'ERROR';
+      notifyCallEnded(callInfo.conversationId, wsReason);
     }
 
     setCallState('ended');

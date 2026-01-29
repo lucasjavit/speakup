@@ -24,6 +24,7 @@ export type WebSocketMessageType =
   | 'PARTNER_RECONNECTED'
   | 'WAITING_RECONNECTION'
   | 'RECONNECTION_TIMEOUT'
+  | 'CALL_ENDED_ERROR'
   | 'ERROR'
   | 'PONG';
 
