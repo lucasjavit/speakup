@@ -223,7 +223,7 @@
 /* Timer */
 .timer {
   position: absolute;
-  top: 1rem;
+  top: 4.5rem;
   left: 1.5rem;
   padding: 0.625rem 1.25rem;
   background: rgba(255, 255, 255, 0.96);
@@ -248,7 +248,7 @@
 /* Network quality indicator (top-right during call) */
 .networkIndicatorWrapper {
   position: absolute;
-  top: 1rem;
+  top: 4.5rem;
   right: 1.5rem;
   z-index: 10;
 }
@@ -623,7 +623,7 @@
 
   .timer {
     font-size: 1.125rem;
-    top: 0.75rem;
+    top: 3.5rem;
     left: 0.75rem;
     padding: 0.5rem 0.875rem;
     min-width: 80px;
@@ -646,7 +646,7 @@
   }
 
   .networkIndicatorWrapper {
-    top: 0.75rem;
+    top: 3.5rem;
     right: 0.75rem;
   }
 
