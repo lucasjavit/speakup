@@ -37,6 +37,7 @@ public class MatchingService {
     private final UserRelationshipRepository relationshipRepository;
     private final WebSocketSessionManager webSocketSessionManager;
     private final TopicGenerator topicGenerator;
+    private final EmptyQueueNotifier emptyQueueNotifier;
 
     /**
      * Add a user to the matching queue.
@@ -84,6 +85,9 @@ public class MatchingService {
 
         queueService.addToQueue(entry);
         log.info("User {} joined queue for session {}", userId, sessionId);
+
+        // Notify all users if queue is empty (no other users online)
+        emptyQueueNotifier.notifyIfEmpty(userId, user.getName());
 
         // Attempt immediate matching
         tryMatch(sessionId);

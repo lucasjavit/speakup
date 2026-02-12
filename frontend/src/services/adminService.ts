@@ -166,4 +166,16 @@ export const adminService = {
   getAllSettings: async (): Promise<ApplicationSetting[]> => {
     return apiCall<ApplicationSetting[]>(api.get<ApiResult<ApplicationSetting[]>>('/admin/settings'));
   },
+
+  getNotifyOnEmptyQueue: async (): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue')
+    );
+  },
+
+  updateNotifyOnEmptyQueue: async (enabled: boolean): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue', { enabled })
+    );
+  },
 };

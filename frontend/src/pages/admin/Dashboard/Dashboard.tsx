@@ -10,6 +10,8 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isTogglingFreeMode, setIsTogglingFreeMode] = useState(false);
+  const [notifyOnEmptyQueue, setNotifyOnEmptyQueue] = useState(false);
+  const [isTogglingNotify, setIsTogglingNotify] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -18,12 +20,14 @@ export function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [statsData, freeModeData] = await Promise.all([
+      const [statsData, freeModeData, notifyData] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getFreeModeStatus(),
+        adminService.getNotifyOnEmptyQueue(),
       ]);
       setStats(statsData);
       setFreeMode(freeModeData);
+      setNotifyOnEmptyQueue(notifyData.enabled);
     } catch (err) {
       setError('Failed to load dashboard data');
       console.error(err);
@@ -44,6 +48,19 @@ export function AdminDashboard() {
       setError('Failed to update free mode');
     } finally {
       setIsTogglingFreeMode(false);
+    }
+  };
+
+  const handleToggleNotify = async () => {
+    try {
+      setIsTogglingNotify(true);
+      const result = await adminService.updateNotifyOnEmptyQueue(!notifyOnEmptyQueue);
+      setNotifyOnEmptyQueue(result.enabled);
+    } catch (err) {
+      console.error('Failed to toggle notify on empty queue:', err);
+      setError('Failed to update notification setting');
+    } finally {
+      setIsTogglingNotify(false);
     }
   };
 
@@ -91,6 +108,45 @@ export function AdminDashboard() {
                 <circle cx="12" cy="12" r="8" />
               </svg>
               Modo gratuito está ativo
+            </span>
+          </div>
+        )}
+      </Card>
+
+      {/* Notify on Empty Queue Card */}
+      <Card className={styles.notifyCard}>
+        <div className={styles.freeModeHeader}>
+          <div className={styles.freeModeInfo}>
+            <h3 className={styles.notifyTitle}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className={styles.freeModeIcon}>
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              </svg>
+              Notificar Fila Vazia
+            </h3>
+            <p className={styles.freeModeDescription}>
+              Quando ativado, envia um email para todos os usuários quando alguém entra na fila e não há ninguém online. Cooldown de 30 minutos entre envios.
+            </p>
+          </div>
+          <button
+            className={`${styles.freeModeToggle} ${notifyOnEmptyQueue ? styles.enabled : styles.disabled}`}
+            onClick={handleToggleNotify}
+            disabled={isTogglingNotify}
+          >
+            <span className={styles.toggleTrack}>
+              <span className={styles.toggleThumb} />
+            </span>
+            <span className={styles.toggleLabel}>
+              {isTogglingNotify ? 'Atualizando...' : notifyOnEmptyQueue ? 'Ativado' : 'Desativado'}
+            </span>
+          </button>
+        </div>
+        {notifyOnEmptyQueue && (
+          <div className={styles.notifyActive}>
+            <span className={styles.notifyActiveBadge}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="8" />
+              </svg>
+              Notificação por email está ativa
             </span>
           </div>
         )}

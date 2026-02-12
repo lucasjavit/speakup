@@ -81,6 +81,32 @@ public class SettingsService {
     }
 
     /**
+     * Check if notify on empty queue is enabled.
+     */
+    public boolean isNotifyOnEmptyQueueEnabled() {
+        return settingRepository.findByKey(SettingKey.NOTIFY_ON_EMPTY_QUEUE)
+                .map(ApplicationSetting::getValueAsBoolean)
+                .orElse(false);
+    }
+
+    /**
+     * Update notify on empty queue setting.
+     */
+    @Transactional
+    public boolean updateNotifyOnEmptyQueue(boolean enabled) {
+        ApplicationSetting setting = settingRepository.findByKey(SettingKey.NOTIFY_ON_EMPTY_QUEUE)
+                .orElseGet(() -> new ApplicationSetting(
+                        SettingKey.NOTIFY_ON_EMPTY_QUEUE,
+                        "false",
+                        "When enabled, sends an email to all users when someone joins the queue and no other users are online"
+                ));
+        setting.setValueAsBoolean(enabled);
+        settingRepository.save(setting);
+        log.info("Notify on empty queue updated: enabled={}", enabled);
+        return enabled;
+    }
+
+    /**
      * Get a setting by key.
      */
     public Optional<ApplicationSettingResponse> getSetting(String key) {

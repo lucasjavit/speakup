@@ -49,6 +49,21 @@ public class AdminSettingsController {
         return ResponseEntity.ok(ApiResponse.success(status));
     }
 
+    @GetMapping("/notify-on-empty-queue")
+    @Operation(summary = "Get notify on empty queue status")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> getNotifyOnEmptyQueue() {
+        boolean enabled = settingsService.isNotifyOnEmptyQueueEnabled();
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
+    @PutMapping("/notify-on-empty-queue")
+    @Operation(summary = "Toggle notify on empty queue", description = "Enable or disable email notifications when a user joins an empty queue")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> updateNotifyOnEmptyQueue(
+            @RequestBody java.util.Map<String, Boolean> request) {
+        boolean enabled = settingsService.updateNotifyOnEmptyQueue(request.getOrDefault("enabled", false));
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
     @PutMapping("/{key}")
     @Operation(summary = "Update a setting", description = "Update a specific setting value")
     public ResponseEntity<ApiResponse<ApplicationSettingResponse>> updateSetting(

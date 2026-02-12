@@ -18,4 +18,9 @@ public final class SettingKey {
      * Message displayed to users when free mode is active.
      */
     public static final String FREE_MODE_MESSAGE = "FREE_MODE_MESSAGE";
+
+    /**
+     * When enabled, sends an email to all users when someone joins the queue and no other users are online.
+     */
+    public static final String NOTIFY_ON_EMPTY_QUEUE = "NOTIFY_ON_EMPTY_QUEUE";
 }
