@@ -8,6 +8,7 @@
       "mainClass": "com.speakup.SpeakUpApplication",
       "projectName": "speakup-backend",
       "cwd": "${workspaceFolder}/backend",
+      "envFile": "${workspaceFolder}/backend/.env",
       "env": {
         "SPRING_PROFILES_ACTIVE": "dev"
       },

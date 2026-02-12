@@ -6,10 +6,12 @@ import com.speakup.domain.shared.DomainException;
 import com.speakup.domain.shared.ForbiddenOperationException;
 import com.speakup.domain.user.exception.DuplicateEmailException;
 import com.speakup.domain.user.exception.UserNotFoundException;
+import com.speakup.infrastructure.email.EmailSendException;
 import com.speakup.presentation.api.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -89,6 +91,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(ApiResponse.error("DOMAIN_ERROR", ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmailSendException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEmailSend(EmailSendException ex) {
+        log.warn("Email send failed: {}", ex.getMessage());
+        String message = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        if (message == null) message = ex.getMessage();
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("EMAIL_SEND_FAILED", "Falha ao enviar e-mail. Verifique MAIL_USERNAME e MAIL_PASSWORD no .env do backend. " + message));
+    }
+
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMailException(MailException ex) {
+        log.warn("Mail error: {}", ex.getMessage());
+        String msg = ex.getMessage() != null ? ex.getMessage() : "Erro de configuração de e-mail.";
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("EMAIL_CONFIG_ERROR", "Falha ao enviar e-mail. Verifique MAIL_USERNAME e MAIL_PASSWORD no .env do backend. " + msg));
     }
 
     @ExceptionHandler(Exception.class)

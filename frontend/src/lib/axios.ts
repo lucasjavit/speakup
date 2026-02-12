@@ -29,6 +29,11 @@ api.interceptors.response.use(
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }
+    // Use API error message when present (e.g. email send failure)
+    const apiMessage = error.response?.data?.error?.message;
+    if (apiMessage && typeof apiMessage === 'string') {
+      return Promise.reject(new Error(apiMessage));
+    }
     return Promise.reject(error);
   }
 );

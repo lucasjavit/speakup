@@ -22,6 +22,21 @@ interface PaginatedResponse<T> {
   number: number;
 }
 
+export interface ScheduledEmailResponse {
+  id: string;
+  subject: string;
+  body: string;
+  status: 'PENDING' | 'SENDING' | 'SENT' | 'FAILED' | 'CANCELLED';
+  scheduledAt: string;
+  sentAt: string | null;
+  recipientType: string;
+  userIds: string | null;
+  recipientCount: number;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const adminService = {
   // Dashboard
   getDashboardStats: async (): Promise<DashboardStats> => {
@@ -88,6 +103,38 @@ export const adminService = {
 
   updateUserStatus: async (id: string, active: boolean): Promise<AdminUser> => {
     return apiCall<AdminUser>(api.patch<ApiResult<AdminUser>>(`/admin/users/${id}/status`, { active }));
+  },
+
+  // Email
+  sendEmail: async (subject: string, body: string, userIds?: string[]): Promise<{ message: string; recipientCount: number }> => {
+    return apiCall<{ message: string; recipientCount: number }>(
+      api.post<ApiResult<{ message: string; recipientCount: number }>>('/admin/email/send', {
+        subject,
+        body,
+        userIds: userIds || null,
+      })
+    );
+  },
+
+  scheduleEmail: async (subject: string, body: string, scheduledAt: string, userIds?: string[]): Promise<ScheduledEmailResponse> => {
+    return apiCall<ScheduledEmailResponse>(
+      api.post<ApiResult<ScheduledEmailResponse>>('/admin/email/schedule', {
+        subject,
+        body,
+        scheduledAt,
+        userIds: userIds || null,
+      })
+    );
+  },
+
+  getScheduledEmails: async (): Promise<ScheduledEmailResponse[]> => {
+    return apiCall<ScheduledEmailResponse[]>(
+      api.get<ApiResult<ScheduledEmailResponse[]>>('/admin/email/scheduled')
+    );
+  },
+
+  cancelScheduledEmail: async (id: string): Promise<void> => {
+    await apiCall<void>(api.delete<ApiResult<void>>(`/admin/email/scheduled/${id}`));
   },
 
   // Payments

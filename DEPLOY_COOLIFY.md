@@ -76,7 +76,12 @@
    STRIPE_SUCCESS_URL=<url-do-frontend>/credits/success
    STRIPE_CANCEL_URL=<url-do-frontend>/credits/buy
    CLAUDE_API_KEY=<sua-api-key-openai-ou-anthropic>
+   MAIL_USERNAME=<seu-email@gmail.com>
+   MAIL_PASSWORD=<app-password-16-caracteres>
+   MAIL_FROM=<seu-email@gmail.com>
+   MAIL_FROM_NAME=SpeakYou
    ```
+   > **Gmail SMTP:** Para gerar o App Password, ative a verificação em 2 etapas na conta Google e crie um App Password em https://myaccount.google.com/apppasswords
 4. **Domain:** `api.speakup.com.br` (ou subdomínio que preferir)
 5. **Deploy**
 6. Verifique: `https://api.speakup.com.br/actuator/health` deve retornar `{"status":"UP"}`
@@ -161,6 +166,12 @@ No Stripe Dashboard:
 | STRIPE_SUCCESS_URL | URL do frontend + /credits/success |
 | STRIPE_CANCEL_URL | URL do frontend + /credits/buy |
 | CLAUDE_API_KEY | API key para AI (opcional) |
+| MAIL_USERNAME | E-mail do Gmail (ou SMTP) |
+| MAIL_PASSWORD | Senha de app do Gmail (16 caracteres) |
+| MAIL_FROM | Remetente (ex: noreply@speakyou.co ou seu Gmail) |
+| MAIL_FROM_NAME | Nome do remetente (ex: SpeakYou) |
+| MAIL_HOST | (opcional) smtp.gmail.com padrão |
+| MAIL_PORT | (opcional) 587 padrão |
 
 ### Frontend (Build Arguments)
 | Variável | Descrição |

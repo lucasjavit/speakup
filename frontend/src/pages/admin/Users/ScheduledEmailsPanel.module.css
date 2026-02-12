@@ -1,0 +1,109 @@
+.card {
+  margin-top: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+  margin: 0;
+}
+
+.loading,
+.empty {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 0.875rem;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.error {
+  color: var(--color-error, #ef4444);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.itemMain {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.subject {
+  font-weight: 500;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status.pending {
+  background: var(--color-bg-tertiary, #f1f5f9);
+  color: var(--color-text-secondary, #64748b);
+}
+
+.status.sending {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--color-primary, #6366f1);
+}
+
+.status.sent {
+  background: var(--color-success-light, #dcfce7);
+  color: var(--color-success, #22c55e);
+}
+
+.status.failed {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error, #ef4444);
+}
+
+.status.cancelled {
+  background: var(--color-bg-tertiary, #f1f5f9);
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.itemMeta {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.errorMsg {
+  color: var(--color-error, #ef4444);
+  flex: 1 1 100%;
+}
