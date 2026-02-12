@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { presenceService } from '@/services/presenceService';
 import type { User } from '@/types';
 
 interface AuthState {
@@ -9,7 +10,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (user: User, token: string, refreshToken: string) => void;
-  logout: () => void;
+  logout: () => void | Promise<void>;
   setUser: (user: User) => void;
   setTokens: (token: string, refreshToken: string) => void;
   setLoading: (loading: boolean) => void;
@@ -26,7 +27,12 @@ export const useAuthStore = create<AuthState>()(
       login: (user, token, refreshToken) => {
         set({ user, token, refreshToken, isAuthenticated: true, isLoading: false });
       },
-      logout: () => {
+      logout: async () => {
+        try {
+          await presenceService.leave();
+        } catch {
+          // ignore
+        }
         set({ user: null, token: null, refreshToken: null, isAuthenticated: false, isLoading: false });
       },
       setUser: (user) => set({ user }),

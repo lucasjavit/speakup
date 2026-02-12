@@ -72,8 +72,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               </div>
               <button
                 className={styles.logoutButton}
-                onClick={() => {
-                  logout();
+                onClick={async () => {
+                  await logout();
                   navigate('/login');
                 }}
                 title="Logout"

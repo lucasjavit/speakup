@@ -157,6 +157,7 @@ export type AdminUser = User;
 export interface DashboardStats {
   totalUsers: number;
   activeUsers: number;
+  onlineUsers: number;
   totalSessions: number;
   activeSessions: number;
   currentlyRunningSessions: number;

@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore, isAdmin } from '@/stores/authStore';
-import { creditService } from '@/services';
+import { creditService, presenceService } from '@/services';
 import { Button } from '@/components/ui';
 import styles from './MainLayout.module.css';
+
+const PRESENCE_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -20,6 +22,16 @@ export function MainLayout({ children }: MainLayoutProps) {
         .then(setIsFreeModeEnabled)
         .catch(console.error);
     }
+  }, [isAuthenticated]);
+
+  // Heartbeat for "usuários logados" count in admin dashboard
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    presenceService.touch().catch(() => {});
+    const id = setInterval(() => {
+      presenceService.touch().catch(() => {});
+    }, PRESENCE_INTERVAL_MS);
+    return () => clearInterval(id);
   }, [isAuthenticated]);
 
   return (
@@ -62,8 +74,8 @@ export function MainLayout({ children }: MainLayoutProps) {
                   />
                   <button
                     className={styles.logoutButton}
-                    onClick={() => {
-                      logout();
+                    onClick={async () => {
+                      await logout();
                       navigate('/login');
                     }}
                     title="Logout"

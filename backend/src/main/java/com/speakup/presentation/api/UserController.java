@@ -3,6 +3,7 @@ package com.speakup.presentation.api;
 import com.speakup.application.consent.ConsentService;
 import com.speakup.application.consent.dto.ConsentRequest;
 import com.speakup.application.consent.dto.ConsentResponse;
+import com.speakup.application.presence.PresenceService;
 import com.speakup.application.user.UserService;
 import com.speakup.application.user.dto.CompleteProfileRequest;
 import com.speakup.application.user.dto.UserDataExport;
@@ -40,6 +41,25 @@ public class UserController {
 
     private final UserService userService;
     private final ConsentService consentService;
+    private final PresenceService presenceService;
+
+    @GetMapping("/me/presence")
+    @Operation(summary = "Heartbeat for online presence", description = "Call periodically to be counted as logged in. TTL 5 minutes.")
+    public ResponseEntity<Void> presence(@AuthenticationPrincipal UserPrincipal principal) {
+        if (principal != null) {
+            presenceService.touch(principal.getId());
+        }
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/me/presence")
+    @Operation(summary = "Remove from online count", description = "Call on logout to be removed from the online users count immediately.")
+    public ResponseEntity<Void> removePresence(@AuthenticationPrincipal UserPrincipal principal) {
+        if (principal != null) {
+            presenceService.remove(principal.getId());
+        }
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID")

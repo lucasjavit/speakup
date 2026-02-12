@@ -6,6 +6,7 @@ package com.speakup.application.admin.dto;
 public record DashboardStatsResponse(
         long totalUsers,
         long activeUsers,
+        long onlineUsers,
         long totalSessions,
         long activeSessions,
         long currentlyRunningSessions

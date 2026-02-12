@@ -108,6 +108,15 @@ export function AdminDashboard() {
         </Card>
 
         <Card className={styles.statCard}>
+          <div className={styles.statLabel}>Users online</div>
+          <div className={styles.statValue}>
+            {stats?.onlineUsers != null && stats.onlineUsers > 1000
+              ? '999+'
+              : stats?.onlineUsers ?? 0}
+          </div>
+        </Card>
+
+        <Card className={styles.statCard}>
           <div className={styles.statLabel}>Total Sessions</div>
           <div className={styles.statValue}>{stats?.totalSessions ?? 0}</div>
         </Card>

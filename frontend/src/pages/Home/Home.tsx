@@ -5,7 +5,7 @@ import { useCallStore } from '@/stores/callStore';
 import { Card, QueueModal, Tooltip, LoginModal } from '@/components/ui';
 import { InsufficientCreditsModal } from '@/components/credits';
 import { LandingPage } from '@/components/LandingPage';
-import { creditService } from '@/services';
+import { creditService, presenceService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
 import type { Session, UserStats, CreditWallet } from '@/types';
@@ -16,6 +16,7 @@ export function Home() {
   const { user, isAuthenticated } = useAuthStore();
   const { joinQueue: joinQueueStore } = useCallStore();
   const [stats, setStats] = useState<UserStats | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<number | null>(null);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
@@ -54,8 +55,9 @@ export function Home() {
         sessionService.getActiveSessions(),
         creditService.getWallet(),
         creditService.isFreeModeEnabled(),
+        presenceService.getOnlineCount(),
       ])
-        .then(([statsData, sessionsData, walletData, freeMode]) => {
+        .then(([statsData, sessionsData, walletData, freeMode, onlineCount]) => {
           console.log('Stats loaded:', statsData);
           setStats(statsData);
           setSessions(sessionsData || []);
@@ -63,6 +65,7 @@ export function Home() {
           setActiveSession(running || null);
           setWallet(walletData);
           setIsFreeModeEnabled(freeMode);
+          setOnlineUsers(onlineCount);
         })
         .catch((error) => {
           console.error('Error loading data:', error);
@@ -500,12 +503,22 @@ export function Home() {
           <div className={styles.practiceRow}>
             {/* Session Schedule - Left */}
             <Card header={
-              <h2 className={styles.statsHeader}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
-                  <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
-                </svg>
-                Session Schedule
-              </h2>
+              <div className={styles.scheduleHeader}>
+                <h2 className={styles.statsHeader}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                    <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm-8 4H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/>
+                  </svg>
+                  Session Schedule
+                </h2>
+                <span className={styles.onlineBadge}>
+                  <span className={styles.onlineDot} />
+                  {onlineUsers != null
+                  ? onlineUsers > 1000
+                    ? '999+ users online'
+                    : `${onlineUsers} users online`
+                  : '–'}
+                </span>
+              </div>
             } className={styles.scheduleCard}>
               {sessions.length === 0 ? (
                 <p className={styles.noSessions}>No sessions scheduled</p>
