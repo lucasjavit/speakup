@@ -510,14 +510,12 @@ export function Home() {
                   </svg>
                   Session Schedule
                 </h2>
-                <span className={styles.onlineBadge}>
-                  <span className={styles.onlineDot} />
-                  {onlineUsers != null
-                  ? onlineUsers > 1000
-                    ? '999+ users online'
-                    : `${onlineUsers} users online`
-                  : '–'}
-                </span>
+                {onlineUsers != null && onlineUsers > 0 && (
+                  <span className={styles.onlineBadge}>
+                    <span className={styles.onlineDot} />
+                    {onlineUsers > 1000 ? '999+ users online' : `${onlineUsers} users online`}
+                  </span>
+                )}
               </div>
             } className={styles.scheduleCard}>
               {sessions.length === 0 ? (
