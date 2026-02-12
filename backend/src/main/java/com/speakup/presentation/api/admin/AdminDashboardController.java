@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * Admin controller for dashboard statistics.
  */
@@ -38,5 +41,11 @@ public class AdminDashboardController {
                 sessionService.findCurrentlyRunningSessions().size()
         );
         return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+
+    @GetMapping("/online-users")
+    @Operation(summary = "Get online user IDs", description = "Returns the set of user IDs currently online")
+    public ResponseEntity<ApiResponse<Set<UUID>>> getOnlineUserIds() {
+        return ResponseEntity.ok(ApiResponse.success(presenceService.getOnlineUserIds()));
     }
 }

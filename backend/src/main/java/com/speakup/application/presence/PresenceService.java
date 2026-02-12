@@ -63,6 +63,22 @@ public class PresenceService {
     }
 
     /**
+     * Get the set of user IDs currently online.
+     */
+    public Set<UUID> getOnlineUserIds() {
+        try {
+            Set<String> keys = redisTemplate.keys(PRESENCE_PREFIX + "*");
+            if (keys == null) return Set.of();
+            return keys.stream()
+                    .map(k -> UUID.fromString(k.substring(PRESENCE_PREFIX.length())))
+                    .collect(java.util.stream.Collectors.toSet());
+        } catch (Exception e) {
+            log.warn("Failed to get online user IDs: {}", e.getMessage());
+            return Set.of();
+        }
+    }
+
+    /**
      * Count online users excluding the given user (e.g. so "others online" does not include self).
      */
     public long countOnlineExcluding(UUID excludeUserId) {

@@ -19,6 +19,9 @@ export function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Online presence
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<string>>(new Set());
+
   // Email state
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -28,6 +31,20 @@ export function AdminUsers() {
   useEffect(() => {
     loadUsers();
   }, [currentPage, search]);
+
+  useEffect(() => {
+    const fetchOnline = async () => {
+      try {
+        const ids = await adminService.getOnlineUserIds();
+        setOnlineUserIds(new Set(ids));
+      } catch {
+        // ignore
+      }
+    };
+    fetchOnline();
+    const interval = setInterval(fetchOnline, 30_000);
+    return () => clearInterval(interval);
+  }, []);
 
   const loadUsers = async () => {
     try {
@@ -175,11 +192,16 @@ export function AdminUsers() {
                     </td>
                     <td>
                       <div className={styles.userCell}>
-                        <img
-                          src={user.avatarUrl || '/default-avatar.png'}
-                          alt={user.name}
-                          className={styles.avatar}
-                        />
+                        <div className={styles.avatarWrapper}>
+                          <img
+                            src={user.avatarUrl || '/default-avatar.png'}
+                            alt={user.name}
+                            className={styles.avatar}
+                          />
+                          {onlineUserIds.has(user.id) && (
+                            <span className={styles.onlineDot} title="Online" />
+                          )}
+                        </div>
                         <span>{user.name}</span>
                       </div>
                     </td>

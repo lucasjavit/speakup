@@ -43,6 +43,10 @@ export const adminService = {
     return apiCall<DashboardStats>(api.get<ApiResult<DashboardStats>>('/admin/dashboard/stats'));
   },
 
+  getOnlineUserIds: async (): Promise<string[]> => {
+    return apiCall<string[]>(api.get<ApiResult<string[]>>('/admin/dashboard/online-users'));
+  },
+
   // Sessions
   getSessions: async (page = 0, size = 10): Promise<PaginatedResponse<Session>> => {
     return apiCall<PaginatedResponse<Session>>(
