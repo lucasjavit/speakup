@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
 import { Button, Card, Input } from '@/components/ui';
 import { UserLevel } from '@/components/ui/UserLevel';
 import { adminService } from '@/services';
-import { useAuthStore, isSuperAdmin } from '@/stores/authStore';
+import { isSuperAdmin, useAuthStore } from '@/stores/authStore';
 import type { AdminUser, Role } from '@/types';
+import { useEffect, useMemo, useState } from 'react';
 import { EmailComposeModal } from './EmailComposeModal';
 import { ScheduledEmailsPanel } from './ScheduledEmailsPanel';
 import styles from './Users.module.css';
@@ -59,6 +59,18 @@ export function AdminUsers() {
       setLoading(false);
     }
   };
+
+  // Online users first, then the rest
+  const sortedUsers = useMemo(
+    () =>
+      [...users].sort((a, b) => {
+        const aOnline = onlineUserIds.has(a.id);
+        const bOnline = onlineUserIds.has(b.id);
+        if (aOnline === bOnline) return 0;
+        return aOnline ? -1 : 1;
+      }),
+    [users, onlineUserIds]
+  );
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -181,7 +193,7 @@ export function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {sortedUsers.map((user) => (
                   <tr key={user.id}>
                     <td className={styles.checkboxCol}>
                       <input
