@@ -24,6 +24,7 @@ public class QueueEntry implements Serializable {
     private UUID sessionId;
     private String userName;
     private String userAvatar;
+    private String userCountry;
     private ProficiencyLevel proficiencyLevel;
     private Instant joinedAt;
 

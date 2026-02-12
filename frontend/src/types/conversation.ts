@@ -51,6 +51,7 @@ export interface CallInfo {
   peerId: string;
   partnerName: string;
   partnerAvatar: string | null;
+  partnerCountry: string | null;
   topic: string;
   isInitiator: boolean;
   startedAt: Date | null;

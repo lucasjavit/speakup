@@ -77,6 +77,7 @@ public class MatchingService {
                 .sessionId(sessionId)
                 .userName(user.getName())
                 .userAvatar(user.getAvatarUrl())
+                .userCountry(user.getCountry())
                 .proficiencyLevel(user.getProficiencyLevel())
                 .joinedAt(Instant.now())
                 .build();
@@ -268,6 +269,8 @@ public class MatchingService {
                 entryB.getUserName(),
                 entryA.getUserAvatar(),
                 entryB.getUserAvatar(),
+                entryA.getUserCountry(),
+                entryB.getUserCountry(),
                 topic,
                 sessionId,
                 callDurationSeconds,

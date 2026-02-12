@@ -23,6 +23,7 @@ export function QueueModal({ isOpen, sessionId, onClose }: QueueModalProps) {
         peerId: payload.peerId,
         partnerName: payload.partnerName,
         partnerAvatar: payload.partnerAvatar || null,
+        partnerCountry: payload.partnerCountry || null,
         topic: payload.topic,
         isInitiator: payload.isInitiator,
         startedAt: null,

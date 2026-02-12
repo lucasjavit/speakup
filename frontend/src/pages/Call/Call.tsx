@@ -7,6 +7,7 @@ import { usePeerConnection, useCallTimer, useMediaRecorder, useWebSocket } from 
 import { conversationService, peerService } from '@/services';
 import { DeviceSelector } from '@/components/video/DeviceSelector';
 import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
+import { getCountryFlag } from '@/utils';
 import styles from './Call.module.css';
 
 interface MediaDeviceOption {
@@ -36,6 +37,11 @@ export function Call() {
   const [showDeviceSelector, setShowDeviceSelector] = useState(true);
   const [devicesSelected, setDevicesSelected] = useState(false);
   const [reconnectionCountdown, setReconnectionCountdown] = useState(0);
+
+  // Country flags
+  const [partnerFlag, setPartnerFlag] = useState<{ flagUrl: string; nativeName: string } | null>(null);
+  const [myFlag, setMyFlag] = useState<{ flagUrl: string; nativeName: string } | null>(null);
+  const { user } = useAuthStore();
 
   // Layout mode state
   type LayoutMode = 'spotlight' | 'side-equal' | 'side-70-30';
@@ -435,6 +441,16 @@ export function Call() {
     setLayoutMode(preferredLayoutMode);
   }, [preferredLayoutMode]);
 
+  // Resolve country flags
+  useEffect(() => {
+    if (callInfo?.partnerCountry) {
+      getCountryFlag(callInfo.partnerCountry).then((info) => info && setPartnerFlag(info));
+    }
+    if (user?.country) {
+      getCountryFlag(user.country).then((info) => info && setMyFlag(info));
+    }
+  }, [callInfo?.partnerCountry, user?.country]);
+
   // Enumerate available devices when call is connected
   useEffect(() => {
     if (callState !== 'connected') return;
@@ -723,6 +739,7 @@ export function Call() {
                   {callState === 'connecting' && <span>Connecting...</span>}
                 </div>
               )}
+              {partnerFlag && <img src={partnerFlag.flagUrl} alt={partnerFlag.nativeName} title={partnerFlag.nativeName} className={styles.countryFlag} />}
               <div className={styles.nameTag}>{callInfo.partnerName}</div>
             </div>
 
@@ -740,6 +757,7 @@ export function Call() {
                   <span>Camera Off</span>
                 </div>
               )}
+              {myFlag && <img src={myFlag.flagUrl} alt={myFlag.nativeName} title={myFlag.nativeName} className={styles.countryFlagLocal} />}
               <div className={styles.nameTagLocal}>You</div>
             </div>
           </>
@@ -767,6 +785,7 @@ export function Call() {
                   <p>{callInfo.partnerName}</p>
                 </div>
               )}
+              {partnerFlag && <img src={partnerFlag.flagUrl} alt={partnerFlag.nativeName} title={partnerFlag.nativeName} className={styles.countryFlag} />}
               <div className={styles.nameTag}>{callInfo.partnerName}</div>
             </div>
 
@@ -783,6 +802,7 @@ export function Call() {
                   <span>Camera Off</span>
                 </div>
               )}
+              {myFlag && <img src={myFlag.flagUrl} alt={myFlag.nativeName} title={myFlag.nativeName} className={styles.countryFlag} />}
               <div className={styles.nameTag}>You</div>
             </div>
           </div>
@@ -820,6 +840,9 @@ export function Call() {
                   </div>
                 )
               )}
+              {(swapVideos ? myFlag : partnerFlag) && (
+                <img src={(swapVideos ? myFlag : partnerFlag)!.flagUrl} alt={(swapVideos ? myFlag : partnerFlag)!.nativeName} title={(swapVideos ? myFlag : partnerFlag)!.nativeName} className={styles.countryFlag} />
+              )}
               <div className={styles.nameTag}>
                 {swapVideos ? 'You' : callInfo.partnerName}
               </div>
@@ -853,6 +876,9 @@ export function Call() {
                     <span>Camera Off</span>
                   </div>
                 )
+              )}
+              {(swapVideos ? partnerFlag : myFlag) && (
+                <img src={(swapVideos ? partnerFlag : myFlag)!.flagUrl} alt={(swapVideos ? partnerFlag : myFlag)!.nativeName} title={(swapVideos ? partnerFlag : myFlag)!.nativeName} className={styles.countryFlag} />
               )}
               <div className={styles.nameTag}>
                 {swapVideos ? callInfo.partnerName : 'You'}

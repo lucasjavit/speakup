@@ -52,6 +52,7 @@ export interface MatchFoundPayload {
   peerId: string;
   partnerName: string;
   partnerAvatar: string;
+  partnerCountry: string;
   topic: string;
   isInitiator: boolean;
   sessionId: string;

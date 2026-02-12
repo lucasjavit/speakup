@@ -46,6 +46,7 @@ export function useActiveCallCheck(): ActiveCallCheckResult {
             peerId: partner.id,
             partnerName: partner.name,
             partnerAvatar: partner.avatarUrl,
+            partnerCountry: null,
             topic: conversation.topic || 'Free conversation',
             isInitiator: false, // On reconnection, we're not initiator
             startedAt: conversation.startedAt ? new Date(conversation.startedAt) : null,

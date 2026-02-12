@@ -83,6 +83,7 @@ public class WebSocketMessage {
             String peerId,
             String partnerName,
             String partnerAvatar,
+            String partnerCountry,
             String topic,
             boolean isInitiator,
             String sessionId,
@@ -90,16 +91,17 @@ public class WebSocketMessage {
             int breakDurationSeconds) {
         return WebSocketMessage.builder()
                 .type(TYPE_MATCH_FOUND)
-                .payload(Map.of(
-                        "conversationId", conversationId,
-                        "peerId", peerId,
-                        "partnerName", partnerName,
-                        "partnerAvatar", partnerAvatar != null ? partnerAvatar : "",
-                        "topic", topic,
-                        "isInitiator", isInitiator,
-                        "sessionId", sessionId,
-                        "callDurationSeconds", callDurationSeconds,
-                        "breakDurationSeconds", breakDurationSeconds
+                .payload(Map.ofEntries(
+                        Map.entry("conversationId", conversationId),
+                        Map.entry("peerId", peerId),
+                        Map.entry("partnerName", partnerName),
+                        Map.entry("partnerAvatar", partnerAvatar != null ? partnerAvatar : ""),
+                        Map.entry("partnerCountry", partnerCountry != null ? partnerCountry : ""),
+                        Map.entry("topic", topic),
+                        Map.entry("isInitiator", isInitiator),
+                        Map.entry("sessionId", sessionId),
+                        Map.entry("callDurationSeconds", callDurationSeconds),
+                        Map.entry("breakDurationSeconds", breakDurationSeconds)
                 ))
                 .build();
     }

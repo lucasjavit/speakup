@@ -57,18 +57,22 @@ public class WebSocketSessionManager {
         UUID userBId;
         String userAName;
         String userBName;
+        String userACountry;
+        String userBCountry;
         String topic;
         int callDurationSeconds;
         int breakDurationSeconds;
         Instant startedAt;
 
-        ActiveConversation(UUID conversationId, UUID sessionId, UUID userAId, UUID userBId, String userAName, String userBName, String topic, int callDurationSeconds, int breakDurationSeconds) {
+        ActiveConversation(UUID conversationId, UUID sessionId, UUID userAId, UUID userBId, String userAName, String userBName, String userACountry, String userBCountry, String topic, int callDurationSeconds, int breakDurationSeconds) {
             this.conversationId = conversationId;
             this.sessionId = sessionId;
             this.userAId = userAId;
             this.userBId = userBId;
             this.userAName = userAName;
             this.userBName = userBName;
+            this.userACountry = userACountry;
+            this.userBCountry = userBCountry;
             this.topic = topic;
             this.callDurationSeconds = callDurationSeconds;
             this.breakDurationSeconds = breakDurationSeconds;
@@ -81,6 +85,10 @@ public class WebSocketSessionManager {
 
         String getPartnerName(UUID userId) {
             return userId.equals(userAId) ? userBName : userAName;
+        }
+
+        String getPartnerCountry(UUID userId) {
+            return userId.equals(userAId) ? userBCountry : userACountry;
         }
 
         String getUserName(UUID userId) {
@@ -172,11 +180,13 @@ public class WebSocketSessionManager {
 
             // The reconnecting user needs the call info again
             String sessionIdStr = conversation.sessionId != null ? conversation.sessionId.toString() : "";
+            String partnerCountry = conversation.getPartnerCountry(userId);
             webSocketHandler.sendMessageToUser(userId, WebSocketMessage.matchFound(
                     info.conversationId.toString(),
                     partnerId.toString(),
                     partnerName,
                     "", // avatar - we don't have it stored, could be added
+                    partnerCountry,
                     conversation.topic,
                     false, // Not initiator on reconnection
                     sessionIdStr,
@@ -351,11 +361,13 @@ public class WebSocketSessionManager {
 
             // Send match info to rejoin
             String sessionIdStr = conversation.sessionId != null ? conversation.sessionId.toString() : "";
+            String partnerCountry = conversation.getPartnerCountry(userId);
             webSocketHandler.sendMessageToUser(userId, WebSocketMessage.matchFound(
                     conversationId.toString(),
                     partnerId.toString(),
                     partnerName,
                     "",
+                    partnerCountry,
                     conversation.topic,
                     false,
                     sessionIdStr,
@@ -377,11 +389,12 @@ public class WebSocketSessionManager {
     public void notifyMatch(UUID userAId, UUID userBId, String conversationId,
                             String userAName, String userBName,
                             String userAAvatar, String userBAvatar,
+                            String userACountry, String userBCountry,
                             String topic, UUID sessionId, int callDurationSeconds, int breakDurationSeconds) {
         UUID convId = UUID.fromString(conversationId);
 
         // Track the active conversation
-        ActiveConversation conversation = new ActiveConversation(convId, sessionId, userAId, userBId, userAName, userBName, topic, callDurationSeconds, breakDurationSeconds);
+        ActiveConversation conversation = new ActiveConversation(convId, sessionId, userAId, userBId, userAName, userBName, userACountry, userBCountry, topic, callDurationSeconds, breakDurationSeconds);
         activeConversations.put(convId, conversation);
         userToConversation.put(userAId, convId);
         userToConversation.put(userBId, convId);
@@ -394,6 +407,7 @@ public class WebSocketSessionManager {
                 userBId.toString(),
                 userBName,
                 userBAvatar,
+                userBCountry,
                 topic,
                 true,  // User A is the initiator
                 sessionIdStr,
@@ -407,6 +421,7 @@ public class WebSocketSessionManager {
                 userAId.toString(),
                 userAName,
                 userAAvatar,
+                userACountry,
                 topic,
                 false,  // User B answers the call
                 sessionIdStr,
