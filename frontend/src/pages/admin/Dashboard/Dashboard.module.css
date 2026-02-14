@@ -225,3 +225,53 @@
   height: 0.625rem;
   animation: pulse 2s infinite;
 }
+
+/* Settings Page Toggle Card */
+.settingsPageCard {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  border: 1px solid #c4b5fd;
+}
+
+.settingsPageTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #3b0764;
+  margin: 0 0 0.5rem 0;
+}
+
+.settingsPageCard .freeModeIcon {
+  color: #7c3aed;
+}
+
+.settingsPageCard .freeModeDescription {
+  color: #5b21b6;
+}
+
+.settingsPageActive {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #c4b5fd;
+}
+
+.settingsPageActiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #ede9fe;
+  color: #4c1d95;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.settingsPageActiveBadge svg {
+  width: 0.625rem;
+  height: 0.625rem;
+  animation: pulse 2s infinite;
+}

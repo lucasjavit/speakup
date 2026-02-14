@@ -4,10 +4,13 @@ import com.speakup.application.consent.ConsentService;
 import com.speakup.application.consent.dto.ConsentRequest;
 import com.speakup.application.consent.dto.ConsentResponse;
 import com.speakup.application.presence.PresenceService;
+import com.speakup.application.settings.SettingsService;
 import com.speakup.application.user.UserService;
 import com.speakup.application.user.dto.CompleteProfileRequest;
+import com.speakup.application.user.dto.UpdateUserSettingsRequest;
 import com.speakup.application.user.dto.UserDataExport;
 import com.speakup.application.user.dto.UserResponse;
+import com.speakup.application.user.dto.UserSettingsResponse;
 import com.speakup.domain.consent.ConsentType;
 import com.speakup.infrastructure.security.UserPrincipal;
 import com.speakup.presentation.api.response.ApiResponse;
@@ -42,6 +45,7 @@ public class UserController {
     private final UserService userService;
     private final ConsentService consentService;
     private final PresenceService presenceService;
+    private final SettingsService settingsService;
 
     @GetMapping("/me/presence")
     @Operation(summary = "Heartbeat for online presence", description = "Call periodically to be counted as logged in. TTL 5 minutes.")
@@ -89,6 +93,39 @@ public class UserController {
         }
         UserResponse user = userService.completeProfile(principal.getId(), request);
         return ResponseEntity.ok(ApiResponse.success(user));
+    }
+
+    // ==================== User Settings Endpoints ====================
+
+    @GetMapping("/settings-page-enabled")
+    @Operation(summary = "Check if settings page is enabled", description = "Returns whether the settings page is accessible to users")
+    public ResponseEntity<ApiResponse<Boolean>> isSettingsPageEnabled() {
+        return ResponseEntity.ok(ApiResponse.success(settingsService.isSettingsPageEnabled()));
+    }
+
+    @GetMapping("/me/settings")
+    @Operation(summary = "Get user settings", description = "Returns user settings with masked API keys")
+    public ResponseEntity<ApiResponse<UserSettingsResponse>> getMySettings(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserSettingsResponse settings = userService.getUserSettings(principal.getId());
+        return ResponseEntity.ok(ApiResponse.success(settings));
+    }
+
+    @PutMapping("/me/settings")
+    @Operation(summary = "Update user settings", description = "Updates user settings like API keys")
+    public ResponseEntity<ApiResponse<UserSettingsResponse>> updateMySettings(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody UpdateUserSettingsRequest request
+    ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserSettingsResponse settings = userService.updateUserSettings(principal.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success(settings));
     }
 
     // ==================== GDPR/LGPD Endpoints ====================

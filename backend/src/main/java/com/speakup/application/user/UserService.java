@@ -3,8 +3,10 @@ package com.speakup.application.user;
 import com.speakup.application.consent.ConsentService;
 import com.speakup.application.consent.dto.ConsentResponse;
 import com.speakup.application.user.dto.CompleteProfileRequest;
+import com.speakup.application.user.dto.UpdateUserSettingsRequest;
 import com.speakup.application.user.dto.UserDataExport;
 import com.speakup.application.user.dto.UserResponse;
+import com.speakup.application.user.dto.UserSettingsResponse;
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationRepository;
 import com.speakup.domain.rating.Rating;
@@ -86,6 +88,27 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
         user.deactivate();
         userRepository.save(user);
+    }
+
+    // ==================== User Settings Methods ====================
+
+    public UserSettingsResponse getUserSettings(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        return UserSettingsResponse.from(user.getOpenaiApiKey());
+    }
+
+    @Transactional
+    public UserSettingsResponse updateUserSettings(UUID userId, UpdateUserSettingsRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (request.openaiApiKey() != null && !request.openaiApiKey().contains("****")) {
+            user.setOpenaiApiKey(request.openaiApiKey().isBlank() ? null : request.openaiApiKey());
+            userRepository.save(user);
+        }
+
+        return UserSettingsResponse.from(user.getOpenaiApiKey());
     }
 
     // ==================== GDPR/LGPD Methods ====================

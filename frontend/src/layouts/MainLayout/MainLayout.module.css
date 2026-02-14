@@ -85,6 +85,25 @@
   color: var(--color-text-primary, #1e293b);
 }
 
+.settingsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--color-text-secondary, #64748b);
+  transition: color 0.2s;
+}
+
+.settingsButton:hover {
+  color: var(--color-primary, #667eea);
+}
+
+.settingsButton svg {
+  width: 20px;
+  height: 20px;
+}
+
 .logoutButton {
   display: flex;
   align-items: center;

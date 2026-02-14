@@ -178,4 +178,16 @@ export const adminService = {
       api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue', { enabled })
     );
   },
+
+  getSettingsPageEnabled: async (): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page')
+    );
+  },
+
+  updateSettingsPageEnabled: async (enabled: boolean): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page', { enabled })
+    );
+  },
 };

@@ -64,6 +64,21 @@ public class AdminSettingsController {
         return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
     }
 
+    @GetMapping("/settings-page")
+    @Operation(summary = "Get settings page status")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> getSettingsPageEnabled() {
+        boolean enabled = settingsService.isSettingsPageEnabled();
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
+    @PutMapping("/settings-page")
+    @Operation(summary = "Toggle settings page", description = "Enable or disable the user Settings page")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> updateSettingsPageEnabled(
+            @RequestBody java.util.Map<String, Boolean> request) {
+        boolean enabled = settingsService.updateSettingsPageEnabled(request.getOrDefault("enabled", false));
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
     @PutMapping("/{key}")
     @Operation(summary = "Update a setting", description = "Update a specific setting value")
     public ResponseEntity<ApiResponse<ApplicationSettingResponse>> updateSetting(

@@ -72,6 +72,9 @@ public class User extends BaseEntity {
 
     private String address;
 
+    @Column(name = "openai_api_key")
+    private String openaiApiKey;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean profileCompleted = false;

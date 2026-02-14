@@ -30,6 +30,24 @@ export const userService = {
     return apiCall<User>(api.patch<ApiResult<User>>(`/users/${id}`, data));
   },
 
+  // ==================== User Settings Methods ====================
+
+  isSettingsPageEnabled: async (): Promise<boolean> => {
+    return apiCall<boolean>(api.get<ApiResult<boolean>>('/users/settings-page-enabled'));
+  },
+
+  getMySettings: async (): Promise<{ openaiApiKey: string }> => {
+    return apiCall<{ openaiApiKey: string }>(
+      api.get<ApiResult<{ openaiApiKey: string }>>('/users/me/settings')
+    );
+  },
+
+  updateMySettings: async (data: { openaiApiKey: string }): Promise<{ openaiApiKey: string }> => {
+    return apiCall<{ openaiApiKey: string }>(
+      api.put<ApiResult<{ openaiApiKey: string }>>('/users/me/settings', data)
+    );
+  },
+
   // ==================== GDPR/LGPD Methods ====================
 
   /**

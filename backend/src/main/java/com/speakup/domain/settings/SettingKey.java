@@ -23,4 +23,9 @@ public final class SettingKey {
      * When enabled, sends an email to all users when someone joins the queue and no other users are online.
      */
     public static final String NOTIFY_ON_EMPTY_QUEUE = "NOTIFY_ON_EMPTY_QUEUE";
+
+    /**
+     * When enabled, users can access the Settings page to configure their API keys.
+     */
+    public static final String SETTINGS_PAGE_ENABLED = "SETTINGS_PAGE_ENABLED";
 }

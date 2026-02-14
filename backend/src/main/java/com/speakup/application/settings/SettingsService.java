@@ -107,6 +107,32 @@ public class SettingsService {
     }
 
     /**
+     * Check if settings page is enabled.
+     */
+    public boolean isSettingsPageEnabled() {
+        return settingRepository.findByKey(SettingKey.SETTINGS_PAGE_ENABLED)
+                .map(ApplicationSetting::getValueAsBoolean)
+                .orElse(false);
+    }
+
+    /**
+     * Update settings page enabled.
+     */
+    @Transactional
+    public boolean updateSettingsPageEnabled(boolean enabled) {
+        ApplicationSetting setting = settingRepository.findByKey(SettingKey.SETTINGS_PAGE_ENABLED)
+                .orElseGet(() -> new ApplicationSetting(
+                        SettingKey.SETTINGS_PAGE_ENABLED,
+                        "false",
+                        "When enabled, users can access the Settings page to configure their API keys"
+                ));
+        setting.setValueAsBoolean(enabled);
+        settingRepository.save(setting);
+        log.info("Settings page updated: enabled={}", enabled);
+        return enabled;
+    }
+
+    /**
      * Get a setting by key.
      */
     public Optional<ApplicationSettingResponse> getSetting(String key) {
