@@ -107,3 +107,27 @@
   color: var(--color-error, #ef4444);
   flex: 1 1 100%;
 }
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.cancelButton {
+  color: var(--color-warning, #f59e0b);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--color-warning, #f59e0b);
+}
+
+.deleteButton {
+  color: var(--color-error, #ef4444);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error, #ef4444);
+}

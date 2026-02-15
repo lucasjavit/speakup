@@ -27,12 +27,14 @@ export function ScheduledEmailsPanel() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {
     try {
       setLoading(true);
       setError('');
       const list = await adminService.getScheduledEmails();
+      // Show all emails (SENT emails are auto-deleted by backend after sending)
       setEmails(list);
     } catch (err) {
       setError('Failed to load scheduled emails');
@@ -46,21 +48,22 @@ export function ScheduledEmailsPanel() {
     load();
   }, []);
 
-  const handleCancel = async (id: string) => {
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this scheduled email?')) {
+      return;
+    }
     try {
-      setCancellingId(id);
+      setDeletingId(id);
       await adminService.cancelScheduledEmail(id);
-      await load();
+      // Remove from list immediately
+      setEmails(prev => prev.filter(email => email.id !== id));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to cancel');
+      setError(err instanceof Error ? err.message : 'Failed to delete');
       console.error(err);
     } finally {
-      setCancellingId(null);
+      setDeletingId(null);
     }
   };
-
-  const canCancel = (status: ScheduledEmailResponse['status']) =>
-    status === 'PENDING' || status === 'SENDING';
 
   if (loading && emails.length === 0) {
     return (
@@ -102,16 +105,17 @@ export function ScheduledEmailsPanel() {
                   <span className={styles.errorMsg}>{email.errorMessage}</span>
                 )}
               </div>
-              {canCancel(email.status) && (
+              <div className={styles.actions}>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleCancel(email.id)}
-                  disabled={cancellingId === email.id}
+                  onClick={() => handleDelete(email.id)}
+                  disabled={deletingId === email.id}
+                  className={styles.deleteButton}
                 >
-                  {cancellingId === email.id ? 'Cancelling...' : 'Cancel'}
+                  {deletingId === email.id ? 'Deleting...' : 'Delete'}
                 </Button>
-              )}
+              </div>
             </li>
           ))}
         </ul>

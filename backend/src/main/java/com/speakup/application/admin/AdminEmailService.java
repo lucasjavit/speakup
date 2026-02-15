@@ -56,17 +56,23 @@ public class AdminEmailService {
                     .collect(Collectors.joining(","));
         }
 
+        // Calculate recipient count at scheduling time
+        List<String> recipients = resolveRecipients(request.userIds());
+        int recipientCount = recipients.size();
+
         ScheduledEmail scheduled = ScheduledEmail.builder()
                 .subject(request.subject())
                 .body(request.body())
                 .scheduledAt(request.scheduledAt())
                 .recipientType(recipientType)
                 .userIds(userIdsStr)
+                .recipientCount(recipientCount)
                 .status(ScheduledEmailStatus.PENDING)
                 .build();
 
         scheduled = scheduledEmailRepository.save(scheduled);
-        log.info("Email scheduled for {} with id {}", request.scheduledAt(), scheduled.getId());
+        log.info("Email scheduled for {} with id {} for {} recipients", 
+                request.scheduledAt(), scheduled.getId(), recipientCount);
         return scheduled;
     }
 
@@ -80,13 +86,9 @@ public class AdminEmailService {
         ScheduledEmail email = scheduledEmailRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Scheduled email not found"));
 
-        if (email.getStatus() != ScheduledEmailStatus.PENDING) {
-            throw new IllegalStateException("Only pending emails can be cancelled");
-        }
-
-        email.setStatus(ScheduledEmailStatus.CANCELLED);
-        scheduledEmailRepository.save(email);
-        log.info("Scheduled email {} cancelled", id);
+        // Always delete from database
+        scheduledEmailRepository.delete(email);
+        log.info("Scheduled email {} deleted from database (status was: {})", id, email.getStatus());
     }
 
     @Scheduled(fixedRate = 60000)

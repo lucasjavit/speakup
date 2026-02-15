@@ -31,6 +31,7 @@ export function AdminUsers() {
   const [emailModalOpen, setEmailModalOpen] = useState(false);
   const [emailTarget, setEmailTarget] = useState<'all' | 'selected'>('all');
   const [emailSuccess, setEmailSuccess] = useState('');
+  const [refreshScheduled, setRefreshScheduled] = useState(0);
 
   useEffect(() => {
     loadUsers();
@@ -125,6 +126,7 @@ export function AdminUsers() {
     if (scheduledAt) {
       await adminService.scheduleEmail(subject, body, scheduledAt, userIds);
       setEmailSuccess('Email scheduled successfully.');
+      setRefreshScheduled(prev => prev + 1); // Trigger refresh of scheduled emails panel
     } else {
       const result = await adminService.sendEmail(subject, body, userIds);
       setEmailSuccess(result.message);
@@ -359,7 +361,7 @@ export function AdminUsers() {
         </>
       )}
 
-      <ScheduledEmailsPanel />
+      <ScheduledEmailsPanel key={refreshScheduled} />
 
       <EmailComposeModal
         isOpen={emailModalOpen}
