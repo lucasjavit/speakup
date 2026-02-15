@@ -15,7 +15,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthStore();
-  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState(false);
+  const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
   const [isSettingsPageEnabled, setIsSettingsPageEnabled] = useState(false);
   const [isTranscriptFeatureEnabled, setIsTranscriptFeatureEnabled] = useState(true);
 
@@ -65,7 +65,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                     Transcripts
                   </Link>
                 )}
-                {!isFreeModeEnabled && (
+                {isFreeModeEnabled === false && (
                   <Link to="/credits" className={styles.navLink}>
                     Credits
                   </Link>
