@@ -296,71 +296,63 @@ export function CompleteProfile() {
         {/* Content */}
         <div className={styles.content}>
           <Card className={styles.card}>
-              <div className={styles.header}>
-                {isEditMode && user && (
-                  <div className={styles.profileHeader}>
-                    <div className={styles.profileInfo}>
+              {isEditMode && user && (
+                <div className={styles.profileBanner}>
+                  <div className={styles.bannerBackground}></div>
+                  <div className={styles.profileHeaderContent}>
+                    <div className={styles.avatarWrapper}>
                       <img
                         src={user.avatarUrl || '/default-avatar.png'}
                         alt={user.name}
                         className={styles.avatarLarge}
                       />
-                      <div className={styles.profileDetails}>
-                        <h2 className={styles.profileName}>{user.name}</h2>
-                        <p className={styles.profileEmail}>{user.email}</p>
-                      </div>
                     </div>
-
-                    <div className={styles.levelsGrid}>
-                      {/* Declared Level Card */}
-                      <div className={styles.levelCard}>
-                        <div className={styles.levelCardHeader}>
-                          <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                          </svg>
-                          <span className={styles.levelCardTitle}>Declared Level</span>
+                    <div className={styles.profileMeta}>
+                      <h1 className={styles.profileName}>{user.name}</h1>
+                      <p className={styles.profileEmail}>{user.email}</p>
+                      <div className={styles.levelsBadges}>
+                        <div className={styles.levelBadge}>
+                          <span className={styles.badgeLabel}>Declared</span>
+                          <div className={styles.badgeValue}>
+                            {user.proficiencyLevel ? (
+                              <>
+                                {getLevelIcon(user.proficiencyLevel)}
+                                <span>{getLevelLabel(user.proficiencyLevel)}</span>
+                              </>
+                            ) : (
+                              <span className={styles.notSet}>Not set</span>
+                            )}
+                          </div>
                         </div>
-                        <div className={styles.levelCardContent}>
-                          {user.proficiencyLevel ? (
-                            <>
-                              {getLevelIcon(user.proficiencyLevel)}
-                              <span className={styles.levelValue}>{getLevelLabel(user.proficiencyLevel)}</span>
-                            </>
-                          ) : (
-                            <span className={styles.levelNotSet}>Not set</span>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Evaluated Level Card */}
-                      <div className={styles.levelCard}>
-                        <div className={styles.levelCardHeader}>
-                          <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
-                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
-                          </svg>
-                          <span className={styles.levelCardTitle}>Evaluated Level</span>
-                        </div>
-                        <div className={styles.levelCardContent}>
-                          {user.evaluatedLevel ? (
-                            <>
-                              {getLevelIcon(user.evaluatedLevel)}
-                              <span className={styles.levelValue}>{getLevelLabel(user.evaluatedLevel)}</span>
-                              <span className={styles.evaluationsCount}>
-                                {user.totalEvaluations} {user.totalEvaluations === 1 ? 'evaluation' : 'evaluations'}
-                              </span>
-                            </>
-                          ) : (
-                            <span className={styles.levelNotSet}>No evaluations yet</span>
+                        <div className={styles.levelBadgeSeparator}></div>
+                        <div className={styles.levelBadge}>
+                          <span className={styles.badgeLabel}>Evaluated</span>
+                          <div className={styles.badgeValue}>
+                            {user.evaluatedLevel ? (
+                              <>
+                                {getLevelIcon(user.evaluatedLevel)}
+                                <span>{getLevelLabel(user.evaluatedLevel)}</span>
+                              </>
+                            ) : (
+                              <span className={styles.notSet}>No evaluations</span>
+                            )}
+                          </div>
+                          {user.evaluatedLevel && user.totalEvaluations && (
+                            <span className={styles.evaluationsNote}>
+                              Based on {user.totalEvaluations} {user.totalEvaluations === 1 ? 'evaluation' : 'evaluations'}
+                            </span>
                           )}
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                <h1 className={styles.title}>{isEditMode ? 'Edit Profile' : 'Complete Your Profile'}</h1>
+              <div className={styles.header}>
+                <h1 className={styles.title}>{isEditMode ? 'Personal Information' : 'Complete Your Profile'}</h1>
                 <p className={styles.subtitle}>
-                  {isEditMode ? 'Update your personal information and preferences' : 'Tell us about your language learning goals'}
+                  {isEditMode ? 'Update your personal information and language preferences' : 'Tell us about your language learning goals'}
                 </p>
               </div>
 
