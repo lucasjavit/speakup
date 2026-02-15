@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { transcriptService, type TranscriptWithAnalysisDTO, type TranscriptEntry } from '@/services/transcriptService';
 import { Card } from '@/components/ui/Card/Card';
+import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import toast from 'react-hot-toast';
 import styles from './TranscriptDetails.module.css';
 
@@ -295,19 +296,21 @@ export function TranscriptDetails() {
           </div>
           
           {transcript.includeAnalysis && transcript.analysis && (
-            <div className={styles.toggleContainer}>
-              <span className={styles.toggleLabel}>Include analysis in download</span>
-              <button
-                className={`${styles.toggle} ${includeAnalysisInDownload ? styles.toggleActive : ''}`}
-                onClick={() => setIncludeAnalysisInDownload(!includeAnalysisInDownload)}
-                role="switch"
-                aria-checked={includeAnalysisInDownload}
-              >
-                <span className={styles.toggleTrack}>
-                  <span className={styles.toggleThumb}></span>
-                </span>
-              </button>
-            </div>
+            <Tooltip content="Include AI analysis in downloaded files">
+              <div className={styles.toggleContainer}>
+                <span className={styles.toggleLabel}>Include analysis in download</span>
+                <button
+                  className={`${styles.toggle} ${includeAnalysisInDownload ? styles.toggleActive : ''}`}
+                  onClick={() => setIncludeAnalysisInDownload(!includeAnalysisInDownload)}
+                  role="switch"
+                  aria-checked={includeAnalysisInDownload}
+                >
+                  <span className={styles.toggleTrack}>
+                    <span className={styles.toggleThumb}></span>
+                  </span>
+                </button>
+              </div>
+            </Tooltip>
           )}
         </div>
 
