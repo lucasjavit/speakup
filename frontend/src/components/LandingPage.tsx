@@ -182,6 +182,91 @@ export function LandingPage({
           naturally—no textbooks, no pressure, just real conversations.
         </p>
       </section>
+
+      {/* Features Section */}
+      <section className={styles.features}>
+        <h2 className={styles.featuresTitle}>Powerful Features to Accelerate Your Learning</h2>
+        
+        <div className={styles.featuresGrid}>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>AI-Powered Analysis</h3>
+            <p className={styles.featureDescription}>
+              Get detailed AI feedback after each conversation. Receive insights on grammar, pronunciation, 
+              vocabulary usage, and fluency to track your progress and identify areas for improvement.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>Download Transcripts</h3>
+            <p className={styles.featureDescription}>
+              Export your conversation transcripts in multiple formats (TXT, SRT, PDF). Keep a record 
+              of your practice sessions and review them anytime to reinforce your learning.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>Peer Level Assessment</h3>
+            <p className={styles.featureDescription}>
+              Your conversation partners evaluate your language level after each session. Build a 
+              comprehensive profile based on real feedback from fellow language learners.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>Personalized Profile</h3>
+            <p className={styles.featureDescription}>
+              Create a detailed profile with your native language, target language, timezone preferences, 
+              and proficiency level. Get matched with the perfect conversation partners for you.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 6h-2v9H6v2c0 .55.45 1 1 1h11l4 4V7c0-.55-.45-1-1-1zm-4 6V3c0-.55-.45-1-1-1H3c-.55 0-1 .45-1 1v14l4-4h10c.55 0 1-.45 1-1z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>Flexible Credit System</h3>
+            <p className={styles.featureDescription}>
+              Purchase conversation credits at your own pace. Choose from various packages and 
+              practice whenever it fits your schedule—no subscriptions, no commitments.
+            </p>
+          </div>
+
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+            </div>
+            <h3 className={styles.featureTitle}>Global Community</h3>
+            <p className={styles.featureDescription}>
+              Connect with language learners from around the world. Share experiences, learn about 
+              different cultures, and make international friends while improving your skills.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
