@@ -79,6 +79,21 @@ public class AdminSettingsController {
         return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
     }
 
+    @GetMapping("/transcript-daily-limit")
+    @Operation(summary = "Get transcript daily limit")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Integer>>> getTranscriptDailyLimit() {
+        int limit = settingsService.getTranscriptDailyLimit();
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("value", limit)));
+    }
+
+    @PutMapping("/transcript-daily-limit")
+    @Operation(summary = "Update transcript daily limit", description = "Set the number of transcripts users can request per day")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Integer>>> updateTranscriptDailyLimit(
+            @RequestBody java.util.Map<String, Integer> request) {
+        int limit = settingsService.updateTranscriptDailyLimit(request.getOrDefault("value", 2));
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("value", limit)));
+    }
+
     @PutMapping("/{key}")
     @Operation(summary = "Update a setting", description = "Update a specific setting value")
     public ResponseEntity<ApiResponse<ApplicationSettingResponse>> updateSetting(

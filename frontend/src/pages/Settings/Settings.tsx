@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card, Input } from '@/components/ui';
 import { userService } from '@/services';
+import { useAuthStore } from '@/stores/authStore';
 import styles from './Settings.module.css';
 
 export function Settings() {
@@ -41,6 +42,8 @@ export function Settings() {
     }
   };
 
+  const { setUser } = useAuthStore();
+
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -52,6 +55,11 @@ export function Settings() {
       setShowKey(false);
       setSuccess('Settings saved successfully');
       setTimeout(() => setSuccess(''), 3000);
+      
+      // Update authStore with new user data including API key
+      const updatedUser = await userService.getCurrentUser();
+      setUser(updatedUser);
+      console.log('✅ Auth store updated with API key');
     } catch {
       setError('Failed to save settings');
     } finally {
@@ -70,6 +78,11 @@ export function Settings() {
       setShowKey(false);
       setSuccess('API key removed');
       setTimeout(() => setSuccess(''), 3000);
+      
+      // Update authStore with new user data without API key
+      const updatedUser = await userService.getCurrentUser();
+      setUser(updatedUser);
+      console.log('✅ Auth store updated - API key removed');
     } catch {
       setError('Failed to remove API key');
     } finally {
@@ -106,8 +119,47 @@ export function Settings() {
           AI Integration
         </h2>
         <p className={styles.sectionDescription}>
-          Configure your OpenAI API key to enable AI-powered features in the future.
+          Configure your OpenAI API key to enable AI-powered conversation analysis.
         </p>
+
+        {/* Tutorial Section */}
+        <div className={styles.tutorial}>
+          <h3 className={styles.tutorialTitle}>
+            <svg viewBox="0 0 24 24" fill="currentColor" className={styles.tutorialIcon}>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            How to get your OpenAI API Key
+          </h3>
+          <ol className={styles.tutorialSteps}>
+            <li>
+              <strong>Go to OpenAI Platform:</strong> Visit{' '}
+              <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
+                platform.openai.com/api-keys
+              </a>
+            </li>
+            <li>
+              <strong>Sign in or create an account:</strong> Log in with your OpenAI account or create a new one
+            </li>
+            <li>
+              <strong>Create a new API key:</strong> Click on "Create new secret key" button
+            </li>
+            <li>
+              <strong>Name your key:</strong> Give it a recognizable name like "SpeakYou App"
+            </li>
+            <li>
+              <strong>Copy the key:</strong> Copy the generated key (it starts with <code>sk-proj-...</code>)
+            </li>
+            <li>
+              <strong>Paste here:</strong> Paste the key in the field below and click Save
+            </li>
+          </ol>
+          <div className={styles.tutorialNote}>
+            <svg viewBox="0 0 24 24" fill="currentColor" className={styles.noteIcon}>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <span>Your API key is stored securely and only used for AI analysis of your conversations.</span>
+          </div>
+        </div>
 
         <div className={styles.field}>
           <label className={styles.label}>OpenAI API Key</label>

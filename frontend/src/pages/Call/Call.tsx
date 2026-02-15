@@ -1,13 +1,16 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCallStore } from '@/stores/callStore';
-import { useAuthStore } from '@/stores/authStore';
-import { usePreferenceStore } from '@/stores/preferenceStore';
-import { usePeerConnection, useCallTimer, useMediaRecorder, useWebSocket } from '@/hooks';
-import { conversationService, peerService } from '@/services';
-import { DeviceSelector } from '@/components/video/DeviceSelector';
 import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
+import { DeviceSelector } from '@/components/video/DeviceSelector';
+import { useCallTimer, useMediaRecorder, usePeerConnection, useWebSocket } from '@/hooks';
+import { conversationService, peerService } from '@/services';
+import { speechRecognitionService } from '@/services/speechRecognitionService';
+import { transcriptService, type TranscriptEntry } from '@/services/transcriptService';
+import { useAuthStore } from '@/stores/authStore';
+import { useCallStore } from '@/stores/callStore';
+import { usePreferenceStore } from '@/stores/preferenceStore';
 import { getCountryFlag } from '@/utils';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 import styles from './Call.module.css';
 
 interface MediaDeviceOption {
@@ -43,6 +46,13 @@ export function Call() {
   const [myFlag, setMyFlag] = useState<{ flagUrl: string; nativeName: string } | null>(null);
   const { user } = useAuthStore();
 
+  // Transcript states
+  const [isRecording, setIsRecording] = useState(false);
+  const [partnerRecording, setPartnerRecording] = useState(false);
+  const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
+  const [quotaAvailable, setQuotaAvailable] = useState(2);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false);
+
   // Layout mode state
   type LayoutMode = 'spotlight' | 'side-equal' | 'side-70-30';
   const [layoutMode, setLayoutMode] = useState<LayoutMode>('spotlight');
@@ -61,6 +71,14 @@ export function Call() {
   const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleCallEndRef = useRef<((reason: 'timer' | 'user_left' | 'partner_left' | 'peer_closed' | 'error') => void) | null>(null);
   const notifyCallEndedRef = useRef<((conversationId: string, reason: 'TIMER' | 'USER_LEFT' | 'ERROR') => void) | null>(null);
+  // Refs so transcript save always uses latest values (handleCallEnd can run twice: peer_closed + timer)
+  const transcriptRef = useRef<TranscriptEntry[]>([]);
+  const callInfoRef = useRef<typeof callInfo>(null);
+  const isRecordingRef = useRef(false);
+  const hasRecordedRef = useRef(false); // true once user started recording (stays true even after stop)
+  const includeAnalysisRef = useRef(false);
+  const transcriptSavedRef = useRef(false);
+  const conversationIdRef = useRef<string | null>(null);
 
   // Handle partner reconnection
   const handlePartnerReconnected = useCallback(() => {
@@ -287,6 +305,114 @@ export function Call() {
   // Recording
   const recorder = useMediaRecorder();
 
+  // Check speech recognition support on mount
+  useEffect(() => {
+    const supported = speechRecognitionService.isSupported();
+    setIsSpeechSupported(supported);
+    
+    if (!supported) {
+      toast('Speech recognition is not supported in this browser. Please use Chrome or Edge for transcription feature.', {
+        duration: 5000,
+        icon: '⚠️',
+      });
+    }
+  }, []);
+
+  // Fetch quota on mount and when recording state changes
+  useEffect(() => {
+    const fetchQuota = async () => {
+      try {
+        const quota = await transcriptService.getQuota();
+        setQuotaAvailable(quota.available);
+        console.log('Transcript quota:', quota);
+      } catch (error) {
+        console.error('Failed to fetch transcript quota:', error);
+      }
+    };
+    fetchQuota();
+  }, [isRecording]); // Refetch when recording state changes
+
+  // Setup speech recognition when recording starts
+  useEffect(() => {
+    if (!isRecording || !localStream || !isSpeechSupported) {
+      return;
+    }
+
+    console.log('Starting speech recognition...');
+    const initialized = speechRecognitionService.initialize('en-US');
+    
+    if (!initialized) {
+      toast.error('Failed to initialize speech recognition');
+      setIsRecording(false);
+      return;
+    }
+
+    speechRecognitionService.onResult((result) => {
+      if (result.isFinal) {
+        const entry: TranscriptEntry = {
+          speaker: 'You',
+          text: result.text,
+          timestamp: result.timestamp,
+        };
+        
+        setTranscript(prev => [...prev, entry]);
+        
+        // Send to partner via DataChannel
+        peerService.sendDataMessage({
+          type: 'transcript-chunk',
+          text: result.text,
+          timestamp: result.timestamp,
+        });
+      }
+    });
+
+    speechRecognitionService.onError((error) => {
+      console.error('Speech recognition error:', error);
+    });
+
+    speechRecognitionService.start();
+
+    return () => {
+      speechRecognitionService.stop();
+      speechRecognitionService.destroy();
+    };
+  }, [isRecording, localStream, isSpeechSupported]);
+
+  // Setup DataChannel message handler
+  useEffect(() => {
+    peerService.onDataMessage((message) => {
+      if (message.type === 'recording-started') {
+        setPartnerRecording(true);
+        toast(`${callInfo?.partnerName || 'Partner'} started recording`, {
+          icon: '🎙️',
+          duration: 3000,
+        });
+      } else if (message.type === 'recording-stopped') {
+        setPartnerRecording(false);
+      } else if (message.type === 'transcript-chunk') {
+        const entry: TranscriptEntry = {
+          speaker: callInfo?.partnerName || 'Partner',
+          text: message.text,
+          timestamp: message.timestamp,
+        };
+        setTranscript(prev => [...prev, entry]);
+      }
+    });
+  }, [callInfo?.partnerName]);
+
+  // Keep refs in sync so transcript save works even when handleCallEnd runs twice (peer_closed + timer)
+  transcriptRef.current = transcript;
+  callInfoRef.current = callInfo ?? null;
+  isRecordingRef.current = isRecording;
+  includeAnalysisRef.current = false; // analysis is requested later from Conversations page
+
+  // Reset "already saved" flag when starting a new conversation
+  if (callInfo?.conversationId !== conversationIdRef.current) {
+    conversationIdRef.current = callInfo?.conversationId ?? null;
+    transcriptSavedRef.current = false;
+    hasRecordedRef.current = false;
+  }
+
   // Track if we've started setup to avoid duplicate initialization
   const setupStartedRef = useRef(false);
   const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -510,8 +636,51 @@ export function Call() {
     }
   };
 
+  // Handle transcript activation (one-click, no toggle - records until call ends)
+  const handleTranscriptToggle = () => {
+    setIsRecording(true);
+    hasRecordedRef.current = true;
+    setTranscript([]);
+    peerService.sendDataMessage({ type: 'recording-started' });
+    toast.success('Transcript will be saved at end of call');
+  };
+
   const handleCallEnd = async (reason: 'timer' | 'user_left' | 'partner_left' | 'peer_closed' | 'error') => {
     console.log('handleCallEnd called with reason:', reason);
+
+    // Save transcript once using refs (handleCallEnd can run twice: peer_closed then timer)
+    // Use hasRecordedRef (not isRecordingRef) because user may have stopped recording before call ended
+    const info = callInfoRef.current;
+    const shouldSave =
+      !transcriptSavedRef.current &&
+      hasRecordedRef.current &&
+      transcriptRef.current.length > 0 &&
+      info;
+    if (shouldSave && info) {
+      transcriptSavedRef.current = true;
+      try {
+        await transcriptService.saveTranscript({
+          conversationId: info.conversationId,
+          transcriptData: JSON.stringify(transcriptRef.current),
+          includeAnalysis: false,
+        });
+        toast.success('Transcript saved successfully!');
+      } catch (error: any) {
+        transcriptSavedRef.current = false; // allow retry if another handleCallEnd runs
+        if (error.response?.status === 429) {
+          toast.error('Daily transcript limit reached');
+        } else {
+          console.error('Failed to save transcript:', error);
+          toast.error('Failed to save transcript');
+        }
+      }
+    }
+
+    // Stop recording
+    if (isRecordingRef.current) {
+      setIsRecording(false);
+      speechRecognitionService.stop();
+    }
 
     // Clear reconnection timer if active
     if (reconnectionTimerRef.current) {
@@ -556,15 +725,13 @@ export function Call() {
       return;
     }
 
-    // Stop recording and upload
-    if (recorder.isRecording && callInfo) {
+    // Stop recording (upload disabled - feature not implemented in backend)
+    if (recorder.isRecording) {
       try {
-        const blob = await recorder.stopRecording();
-        if (blob && blob.size > 0) {
-          await recorder.uploadRecording(callInfo.conversationId, blob);
-        }
+        await recorder.stopRecording();
+        // Upload is disabled - backend endpoint doesn't exist
       } catch (error) {
-        console.error('Failed to upload recording:', error);
+        console.warn('Failed to stop recording:', error);
       }
     }
 
@@ -1022,6 +1189,32 @@ export function Call() {
             </button>
           )}
 
+          {/* Transcript Button */}
+          {isSpeechSupported && callState === 'connected' && (
+            <button
+              onClick={handleTranscriptToggle}
+              className={`${styles.controlButton} ${isRecording ? styles.recording : ''} ${(quotaAvailable === 0 || isRecording) ? styles.disabled : ''}`}
+              title={
+                quotaAvailable === 0
+                  ? 'Daily limit reached'
+                  : isRecording
+                    ? 'Transcript will be saved at end of call'
+                    : 'Save transcript'
+              }
+              disabled={quotaAvailable === 0 || isRecording}
+            >
+              {isRecording ? (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="12" r="8" fill="red" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+              )}
+            </button>
+          )}
+
           <button
             onClick={handleLeaveClick}
             className={`${styles.controlButton} ${styles.endCall}`}
@@ -1034,12 +1227,26 @@ export function Call() {
         </div>
       </div>
 
+      {/* Recording Badges */}
+      {isRecording && (
+        <div className={styles.recordingBadge}>
+          <span className={styles.recordingDot}></span>
+          Recording
+        </div>
+      )}
+      {partnerRecording && (
+        <div className={styles.partnerRecordingBadge}>
+          {callInfo?.partnerName || 'Partner'} is recording
+        </div>
+      )}
+
       {/* Error Display */}
       {peerError && (
         <div className={styles.errorBanner}>
           Connection error: {(peerError as Error).message}
         </div>
       )}
+
 
       {/* End Call Confirmation */}
       {showEndConfirm && (

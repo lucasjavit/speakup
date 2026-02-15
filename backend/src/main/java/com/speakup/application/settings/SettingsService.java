@@ -150,6 +150,47 @@ public class SettingsService {
     }
 
     /**
+     * Get transcript daily limit.
+     */
+    public int getTranscriptDailyLimit() {
+        return settingRepository.findByKey("transcript.daily_limit")
+                .map(setting -> {
+                    try {
+                        return Integer.parseInt(setting.getValue());
+                    } catch (NumberFormatException e) {
+                        log.warn("Invalid transcript limit value: {}, using default", setting.getValue());
+                        return 2;
+                    }
+                })
+                .orElse(2);
+    }
+
+    /**
+     * Update transcript daily limit.
+     */
+    @Transactional
+    public int updateTranscriptDailyLimit(int limit) {
+        if (limit < 0) {
+            throw new IllegalArgumentException("Limit must be non-negative");
+        }
+
+        ApplicationSetting setting = settingRepository.findByKey("transcript.daily_limit")
+                .orElse(new ApplicationSetting(
+                        "transcript.daily_limit",
+                        String.valueOf(limit),
+                        "Daily limit of transcripts per user"));
+
+        String oldValue = setting.getValue();
+        setting.setValue(String.valueOf(limit));
+        ApplicationSetting saved = settingRepository.save(setting);
+
+        log.info("Transcript daily limit updated from {} to: {} (saved value: {})", 
+                oldValue, limit, saved.getValue());
+
+        return limit;
+    }
+
+    /**
      * Update a setting value.
      */
     @Transactional

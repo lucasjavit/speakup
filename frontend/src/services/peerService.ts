@@ -4,14 +4,17 @@ import type { MediaConnection } from 'peerjs';
 type StreamHandler = (stream: MediaStream) => void;
 type ErrorHandler = (error: Error) => void;
 type CloseHandler = () => void;
+type DataMessageHandler = (message: any) => void;
 
 class PeerService {
   private peer: Peer | null = null;
   private currentCall: MediaConnection | null = null;
+  private dataChannel: RTCDataChannel | null = null;
   private localStream: MediaStream | null = null;
   private remoteStreamHandler: StreamHandler | null = null;
   private errorHandler: ErrorHandler | null = null;
   private closeHandler: CloseHandler | null = null;
+  private dataMessageHandler: DataMessageHandler | null = null;
 
   // Initialize PeerJS with user ID
   async initialize(userId: string): Promise<string> {
@@ -188,6 +191,7 @@ class PeerService {
     console.log('Calling peer:', remotePeerId);
     this.currentCall = this.peer.call(remotePeerId, this.localStream!);
     this.setupCallHandlers(this.currentCall);
+    this.setupDataChannel(this.currentCall.peerConnection, true);
   }
 
   // Handle incoming call
@@ -221,10 +225,15 @@ class PeerService {
       if (this.remoteStreamHandler) {
         this.remoteStreamHandler(remoteStream);
       }
+      // Setup data channel for receiver (if not already set up)
+      if (!this.dataChannel && call.peerConnection) {
+        this.setupDataChannel(call.peerConnection, false);
+      }
     });
 
     call.on('close', () => {
       console.log('Call closed');
+      this.closeDataChannel();
       if (this.closeHandler) {
         this.closeHandler();
       }
@@ -236,6 +245,87 @@ class PeerService {
         this.errorHandler(error);
       }
     });
+  }
+
+  // Setup data channel for text messaging
+  private setupDataChannel(peerConnection: RTCPeerConnection, isInitiator: boolean): void {
+    if (isInitiator) {
+      // Create data channel (initiator)
+      console.log('Creating data channel as initiator');
+      this.dataChannel = peerConnection.createDataChannel('transcript-channel', {
+        ordered: true,
+      });
+      this.setupDataChannelHandlers(this.dataChannel);
+    } else {
+      // Listen for data channel (receiver)
+      console.log('Waiting for data channel as receiver');
+      peerConnection.ondatachannel = (event) => {
+        console.log('Data channel received');
+        this.dataChannel = event.channel;
+        this.setupDataChannelHandlers(this.dataChannel);
+      };
+    }
+  }
+
+  // Setup data channel event handlers
+  private setupDataChannelHandlers(channel: RTCDataChannel): void {
+    channel.onopen = () => {
+      console.log('Data channel opened');
+    };
+
+    channel.onclose = () => {
+      console.log('Data channel closed');
+    };
+
+    channel.onerror = (error: RTCErrorEvent) => {
+      // "User-Initiated Abort" / "Close called" is normal when call ends - don't log
+      const msg = String((error as unknown as { error?: { message?: string }; reason?: string })?.error?.message ?? (error as unknown as { reason?: string })?.reason ?? '');
+      const isNormalClose = /close|abort/i.test(msg);
+      if (!isNormalClose) {
+        console.warn('Data channel error:', error);
+      }
+    };
+
+    channel.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        console.log('Data channel message received:', message);
+        if (this.dataMessageHandler) {
+          this.dataMessageHandler(message);
+        }
+      } catch (error) {
+        console.error('Failed to parse data channel message:', error);
+      }
+    };
+  }
+
+  // Send data message through data channel
+  sendDataMessage(message: any): void {
+    if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+      console.warn('Data channel not ready, cannot send message');
+      return;
+    }
+
+    try {
+      const messageStr = JSON.stringify(message);
+      this.dataChannel.send(messageStr);
+      console.log('Data message sent:', message);
+    } catch (error) {
+      console.error('Failed to send data message:', error);
+    }
+  }
+
+  // Set handler for data messages
+  onDataMessage(handler: DataMessageHandler): void {
+    this.dataMessageHandler = handler;
+  }
+
+  // Close data channel
+  private closeDataChannel(): void {
+    if (this.dataChannel) {
+      this.dataChannel.close();
+      this.dataChannel = null;
+    }
   }
 
   // Set handler for remote stream
@@ -392,6 +482,7 @@ class PeerService {
       this.currentCall.close();
       this.currentCall = null;
     }
+    this.closeDataChannel();
   }
 
   // Stop local stream

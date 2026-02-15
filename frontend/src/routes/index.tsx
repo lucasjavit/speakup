@@ -12,6 +12,7 @@ import { Break } from '@/pages/Break';
 import { Credits } from '@/pages/Credits';
 import { BuyCredits } from '@/pages/BuyCredits';
 import { PaymentSuccess } from '@/pages/PaymentSuccess';
+import { Conversations, TranscriptDetails } from '@/pages/Conversations';
 import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
@@ -35,6 +36,14 @@ export const router = createBrowserRouter([
       {
         path: 'lobby',
         element: <Lobby />,
+      },
+      {
+        path: 'conversations',
+        element: <Conversations />,
+      },
+      {
+        path: 'conversations/:id',
+        element: <TranscriptDetails />,
       },
       {
         path: 'credits',

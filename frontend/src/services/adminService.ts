@@ -190,4 +190,16 @@ export const adminService = {
       api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page', { enabled })
     );
   },
+
+  getTranscriptDailyLimit: async (): Promise<{ value: number }> => {
+    return apiCall<{ value: number }>(
+      api.get<ApiResult<{ value: number }>>('/admin/settings/transcript-daily-limit')
+    );
+  },
+
+  updateTranscriptDailyLimit: async (limit: number): Promise<{ value: number }> => {
+    return apiCall<{ value: number }>(
+      api.put<ApiResult<{ value: number }>>('/admin/settings/transcript-daily-limit', { value: limit })
+    );
+  },
 };

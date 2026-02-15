@@ -74,8 +74,8 @@ public class EmptyQueueNotifier {
                 return;
             }
 
-            String subject = "[SPEAKYOU] " + triggerUserName + " is online on SpeakYou!";
-            String body = triggerUserName + " just came online and is available to chat.\nLog in now and practice your English!\n\nhttps://speakyou.co\n\nBest,\nSpeakYou";
+            String subject = "[SPEAKYOU] " + triggerUserName + " está online no SpeakYou!";
+            String body = triggerUserName + " acabou de entrar e está disponível para conversar. \nEntre agora e pratique seu inglês!\n\nhttps://speakyou.co\n\nAtt,\nSpeakYou";
 
             log.info("[EmptyQueueNotifier] SENDING email to {} recipients...", recipientIds.size());
             adminEmailService.sendEmail(new SendEmailRequest(subject, body, recipientIds));

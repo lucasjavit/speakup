@@ -415,6 +415,79 @@
   height: 28px;
 }
 
+.controlButton.recording {
+  background-color: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.recordingBadge {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: rgba(239, 68, 68, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 100;
+}
+
+.recordingDot {
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.partnerRecordingBadge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: rgba(59, 130, 246, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 100;
+}
+
+.dialogNote {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+.dialogWarning {
+  font-size: 14px;
+  color: #f59e0b;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
 /* Error Banner */
 .errorBanner {
   position: absolute;

@@ -123,22 +123,34 @@ class RecordingService {
 
   // Upload recording to server
   async uploadRecording(conversationId: string, blob: Blob): Promise<string> {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    // Generate filename with timestamp
-    const extension = this.getExtensionFromMimeType(blob.type);
-    const filename = `${conversationId}_${Date.now()}.${extension}`;
+      // Generate filename with timestamp
+      const extension = this.getExtensionFromMimeType(blob.type);
+      const filename = `${conversationId}_${Date.now()}.${extension}`;
 
-    formData.append('audio', blob, filename);
-    formData.append('conversationId', conversationId);
+      formData.append('audio', blob, filename);
+      formData.append('conversationId', conversationId);
 
-    const response = await api.post<{ url: string }>('/recordings/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+      const response = await api.post<{ url: string }>('/recordings/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        // Don't throw on errors - recording upload is optional/deprecated
+        validateStatus: () => true,
+      });
 
-    return response.data.url;
+      if (response.status === 200 || response.status === 201) {
+        return response.data.url;
+      } else {
+        console.warn('Recording upload not available (feature disabled)');
+        return '';
+      }
+    } catch (error) {
+      console.warn('Recording upload failed (non-critical):', error);
+      return '';
+    }
   }
 
   // Create blob from recorded chunks

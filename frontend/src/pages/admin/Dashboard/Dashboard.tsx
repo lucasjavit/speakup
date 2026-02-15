@@ -14,6 +14,8 @@ export function AdminDashboard() {
   const [isTogglingNotify, setIsTogglingNotify] = useState(false);
   const [settingsPageEnabled, setSettingsPageEnabled] = useState(false);
   const [isTogglingSettingsPage, setIsTogglingSettingsPage] = useState(false);
+  const [transcriptLimit, setTranscriptLimit] = useState('2');
+  const [isUpdatingLimit, setIsUpdatingLimit] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -22,16 +24,18 @@ export function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [statsData, freeModeData, notifyData, settingsPageData] = await Promise.all([
+      const [statsData, freeModeData, notifyData, settingsPageData, limitData] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getFreeModeStatus(),
         adminService.getNotifyOnEmptyQueue(),
         adminService.getSettingsPageEnabled(),
+        adminService.getTranscriptDailyLimit(),
       ]);
       setStats(statsData);
       setFreeMode(freeModeData);
       setNotifyOnEmptyQueue(notifyData.enabled);
       setSettingsPageEnabled(settingsPageData.enabled);
+      setTranscriptLimit(limitData.value.toString());
     } catch (err) {
       setError('Failed to load dashboard data');
       console.error(err);
@@ -78,6 +82,26 @@ export function AdminDashboard() {
       setError('Failed to update settings page');
     } finally {
       setIsTogglingSettingsPage(false);
+    }
+  };
+
+  const handleUpdateTranscriptLimit = async () => {
+    const limitValue = parseInt(transcriptLimit);
+    if (isNaN(limitValue) || limitValue < 0) {
+      setError('Invalid limit value');
+      return;
+    }
+
+    try {
+      setIsUpdatingLimit(true);
+      setError('');
+      await adminService.updateTranscriptDailyLimit(limitValue);
+      setError('');
+    } catch (err) {
+      console.error('Failed to update transcript limit:', err);
+      setError('Failed to update transcript limit');
+    } finally {
+      setIsUpdatingLimit(false);
     }
   };
 
@@ -206,6 +230,41 @@ export function AdminDashboard() {
             </span>
           </div>
         )}
+      </Card>
+
+      {/* Transcript Daily Limit Card */}
+      <Card className={styles.transcriptLimitCard}>
+        <div className={styles.freeModeHeader}>
+          <div className={styles.freeModeInfo}>
+            <h3 className={styles.settingsPageTitle}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className={styles.freeModeIcon}>
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              Limite Diário de Transcrições
+            </h3>
+            <p className={styles.freeModeDescription}>
+              Define quantas transcrições cada usuário pode solicitar por dia.
+            </p>
+          </div>
+        </div>
+        <div className={styles.transcriptLimitInput}>
+          <label className={styles.limitLabel}>Transcrições por dia:</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            value={transcriptLimit}
+            onChange={(e) => setTranscriptLimit(e.target.value)}
+            className={styles.limitField}
+          />
+          <button
+            onClick={handleUpdateTranscriptLimit}
+            disabled={isUpdatingLimit}
+            className={styles.limitButton}
+          >
+            {isUpdatingLimit ? 'Salvando...' : 'Salvar'}
+          </button>
+        </div>
       </Card>
 
       <div className={styles.statsGrid}>

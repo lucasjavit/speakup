@@ -75,6 +75,13 @@ public class User extends BaseEntity {
     @Column(name = "openai_api_key")
     private String openaiApiKey;
 
+    @Column(name = "transcripts_today")
+    @Builder.Default
+    private Integer transcriptsToday = 0;
+
+    @Column(name = "transcripts_day_reset_at")
+    private java.time.Instant transcriptsDayResetAt;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean profileCompleted = false;

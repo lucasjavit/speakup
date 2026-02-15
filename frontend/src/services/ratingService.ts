@@ -12,14 +12,17 @@ export const ratingService = {
 
   /**
    * Get rating for a specific conversation.
+   * Backend returns 200 with no body when no rating exists.
    */
   getRatingForConversation: async (conversationId: string): Promise<Rating | null> => {
     try {
-      const response = await api.get<Rating>(`/ratings/conversation/${conversationId}`);
-      return response.data;
-    } catch (error) {
-      // 404 means no rating exists
-      return null;
+      const response = await api.get<Rating | null>(`/ratings/conversation/${conversationId}`);
+      return response.data ?? null;
+    } catch (error: any) {
+      if (error?.response?.status === 404) {
+        return null;
+      }
+      throw error;
     }
   },
 

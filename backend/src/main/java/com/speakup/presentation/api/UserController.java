@@ -65,6 +65,18 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get current user", description = "Returns the authenticated user's profile")
+    public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        if (principal == null) {
+            return ResponseEntity.status(401).build();
+        }
+        UserResponse user = userService.getUser(principal.getId());
+        return ResponseEntity.ok(ApiResponse.success(user));
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID")
     public ResponseEntity<ApiResponse<UserResponse>> getUser(@PathVariable UUID id) {

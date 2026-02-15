@@ -31,6 +31,7 @@ export interface User {
   evaluatedLevel?: ProficiencyLevel;
   totalEvaluations?: number;
   timezone?: string;
+  openaiApiKey?: string;
   profileCompleted: boolean;
   active: boolean;
   role: Role;

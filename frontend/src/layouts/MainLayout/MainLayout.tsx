@@ -55,8 +55,8 @@ export function MainLayout({ children }: MainLayoutProps) {
           <nav className={styles.nav}>
             {isAuthenticated ? (
               <>
-                <Link to="/" className={styles.navLink}>
-                  Home
+                <Link to="/conversations" className={styles.navLink}>
+                  Conversations
                 </Link>
                 {!isFreeModeEnabled && (
                   <Link to="/credits" className={styles.navLink}>

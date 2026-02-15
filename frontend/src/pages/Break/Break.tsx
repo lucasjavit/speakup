@@ -53,23 +53,20 @@ export function Break() {
     }
 
     if (state?.conversationId) {
+      // Check if rating exists (404 is normal when it doesn't)
       ratingService.getRatingForConversation(state.conversationId)
         .then(rating => {
           if (rating) {
-            // Rating already exists, don't show modal
             setRatingCompleted(true);
           } else {
-            // No rating yet, show modal
             setShowRatingModal(true);
           }
         })
-        .catch(err => {
-          console.warn('Could not check existing rating:', err);
-          // Show modal anyway if we can't check
+        .catch(() => {
+          // Show modal on any error (including 404)
           setShowRatingModal(true);
         });
     } else {
-      // No conversation ID, skip rating
       setRatingCompleted(true);
     }
   }, [state?.conversationId, state?.skipEvaluation]);

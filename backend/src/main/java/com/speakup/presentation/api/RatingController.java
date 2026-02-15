@@ -48,14 +48,14 @@ public class RatingController {
     }
 
     @GetMapping("/conversation/{conversationId}")
-    @Operation(summary = "Get rating for conversation", description = "Get the user's rating for a specific conversation")
+    @Operation(summary = "Get rating for conversation", description = "Get the user's rating for a specific conversation. Returns 200 with null body when no rating exists.")
     public ResponseEntity<RatingResponse> getRatingForConversation(
             @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable UUID conversationId) {
 
         return ratingService.getRatingForConversation(conversationId, principal.getId())
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.ok().build()); // 200 with no body - avoids 404 in browser console
     }
 
     @GetMapping("/conversation/{conversationId}/exists")

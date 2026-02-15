@@ -275,3 +275,68 @@
   height: 0.625rem;
   animation: pulse 2s infinite;
 }
+
+/* Transcript Limit Card */
+.transcriptLimitCard {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 1px solid #fcd34d;
+}
+
+.transcriptLimitInput {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.limitLabel {
+  font-size: 0.875rem;
+  color: #78350f;
+  font-weight: 500;
+}
+
+.limitField {
+  width: 100px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #fbbf24;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: white;
+  color: #78350f;
+}
+
+.limitField:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.limitButton {
+  padding: 0.5rem 1.5rem;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.limitButton:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.limitButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.limitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
