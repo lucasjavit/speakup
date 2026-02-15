@@ -1,5 +1,7 @@
 import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
 import { DeviceSelector } from '@/components/video/DeviceSelector';
+import { Select } from '@/components/ui/Select';
+import type { SelectOption } from '@/components/ui/Select';
 import { useCallTimer, useMediaRecorder, usePeerConnection, useWebSocket } from '@/hooks';
 import { conversationService, peerService } from '@/services';
 import { speechRecognitionService } from '@/services/speechRecognitionService';
@@ -1111,18 +1113,14 @@ export function Call() {
                 <svg viewBox="0 0 24 24" fill="currentColor" className={styles.deviceIcon}>
                   <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
                 </svg>
-                <select
+                <Select
                   value={selectedAudioDevice}
-                  onChange={(e) => handleAudioDeviceChange(e.target.value)}
-                  className={styles.select}
-                  title="Select microphone"
-                >
-                  {audioDevices.map(device => (
-                    <option key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={handleAudioDeviceChange}
+                  options={audioDevices.map((device): SelectOption => ({
+                    value: device.deviceId,
+                    label: device.label,
+                  }))}
+                />
               </div>
             )}
             {videoDevices.length > 1 && (
@@ -1130,18 +1128,14 @@ export function Call() {
                 <svg viewBox="0 0 24 24" fill="currentColor" className={styles.deviceIcon}>
                   <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
                 </svg>
-                <select
+                <Select
                   value={selectedVideoDevice}
-                  onChange={(e) => handleVideoDeviceChange(e.target.value)}
-                  className={styles.select}
-                  title="Select camera"
-                >
-                  {videoDevices.map(device => (
-                    <option key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={handleVideoDeviceChange}
+                  options={videoDevices.map((device): SelectOption => ({
+                    value: device.deviceId,
+                    label: device.label,
+                  }))}
+                />
               </div>
             )}
             {audioOutputDevices.length > 1 && (
@@ -1149,18 +1143,14 @@ export function Call() {
                 <svg viewBox="0 0 24 24" fill="currentColor" className={styles.deviceIcon}>
                   <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
                 </svg>
-                <select
+                <Select
                   value={selectedAudioOutputDevice}
-                  onChange={(e) => handleAudioOutputDeviceChange(e.target.value)}
-                  className={styles.select}
-                  title="Select speaker"
-                >
-                  {audioOutputDevices.map(device => (
-                    <option key={device.deviceId} value={device.deviceId}>
-                      {device.label}
-                    </option>
-                  ))}
-                </select>
+                  onChange={handleAudioOutputDeviceChange}
+                  options={audioOutputDevices.map((device): SelectOption => ({
+                    value: device.deviceId,
+                    label: device.label,
+                  }))}
+                />
               </div>
             )}
           </div>

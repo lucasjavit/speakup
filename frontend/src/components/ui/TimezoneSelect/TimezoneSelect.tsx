@@ -1,12 +1,14 @@
-import styles from './TimezoneSelect.module.css';
+import { Select } from '../Select';
+import type { SelectOption } from '../Select';
 
 export interface TimezoneSelectProps {
   value: string;
   onChange: (value: string) => void;
   id?: string;
+  label?: string;
 }
 
-const TIMEZONES = [
+const TIMEZONES: SelectOption[] = [
   { value: 'Pacific/Midway', label: '(UTC-11:00) Midway Island' },
   { value: 'Pacific/Honolulu', label: '(UTC-10:00) Hawaii' },
   { value: 'America/Anchorage', label: '(UTC-09:00) Alaska' },
@@ -67,19 +69,14 @@ const TIMEZONES = [
   { value: 'Pacific/Tongatapu', label: '(UTC+13:00) Tongatapu' },
 ];
 
-export function TimezoneSelect({ value, onChange, id }: TimezoneSelectProps) {
+export function TimezoneSelect({ value, onChange, id, label }: TimezoneSelectProps) {
   return (
-    <select
+    <Select
       id={id}
-      className={styles.select}
+      label={label}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {TIMEZONES.map((tz) => (
-        <option key={tz.value} value={tz.value}>
-          {tz.label}
-        </option>
-      ))}
-    </select>
+      onChange={onChange}
+      options={TIMEZONES}
+    />
   );
 }

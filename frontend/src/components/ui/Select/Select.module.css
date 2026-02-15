@@ -80,13 +80,53 @@
   color: var(--color-text-secondary, #64748b);
 }
 
+/* Style for dropdown - Browser-specific attempts */
+/* Note: Native select dropdowns have limited styling capabilities */
+.select::-webkit-scrollbar {
+  width: 8px;
+}
+
+.select::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary, #f8fafc);
+  border-radius: 4px;
+}
+
+.select::-webkit-scrollbar-thumb {
+  background: var(--color-text-muted, #94a3b8);
+  border-radius: 4px;
+}
+
+.select::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary, #64748b);
+}
+
 /* Style for options in modern browsers */
 .select option {
-  padding: 0.5rem;
+  padding: 0.625rem 0.875rem;
   background: var(--color-bg-primary, white);
   color: var(--color-text-primary, #1e293b);
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.select option:hover {
+  background: var(--color-bg-secondary, #f8fafc);
+}
+
+.select option:checked {
+  background: var(--color-primary, #667eea);
+  color: white;
+  font-weight: 500;
 }
 
 .select option:disabled {
   color: var(--color-text-muted, #94a3b8);
+  cursor: not-allowed;
+}
+
+/* Firefox-specific styles */
+@-moz-document url-prefix() {
+  .select option {
+    padding: 0.625rem 0.875rem;
+  }
 }

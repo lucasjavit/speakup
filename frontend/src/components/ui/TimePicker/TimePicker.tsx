@@ -1,3 +1,5 @@
+import { Select } from '../Select';
+import type { SelectOption } from '../Select';
 import styles from './TimePicker.module.css';
 
 export interface TimePickerProps {
@@ -49,46 +51,46 @@ export function TimePicker({ value, onChange, id }: TimePickerProps) {
     onChange(to24hTime(hour, minute, newPeriod));
   };
 
-  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
-  const minutes = Array.from({ length: 12 }, (_, i) => i * 5);
+  const hourOptions: SelectOption[] = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i + 1),
+    label: String(i + 1),
+  }));
+
+  const minuteOptions: SelectOption[] = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i * 5),
+    label: (i * 5).toString().padStart(2, '0'),
+  }));
+
+  const periodOptions: SelectOption[] = [
+    { value: 'AM', label: 'AM' },
+    { value: 'PM', label: 'PM' },
+  ];
 
   return (
     <div className={styles.container}>
-      <select
+      <Select
         id={id}
-        className={`${styles.select} ${styles.hourSelect}`}
-        value={hour}
-        onChange={(e) => handleHourChange(Number(e.target.value))}
-      >
-        {hours.map((h) => (
-          <option key={h} value={h}>
-            {h}
-          </option>
-        ))}
-      </select>
+        value={String(hour)}
+        onChange={(value) => handleHourChange(Number(value))}
+        options={hourOptions}
+        className={styles.hourSelect}
+      />
 
       <span className={styles.separator}>:</span>
 
-      <select
-        className={`${styles.select} ${styles.minuteSelect}`}
-        value={minute}
-        onChange={(e) => handleMinuteChange(Number(e.target.value))}
-      >
-        {minutes.map((m) => (
-          <option key={m} value={m}>
-            {m.toString().padStart(2, '0')}
-          </option>
-        ))}
-      </select>
+      <Select
+        value={String(minute)}
+        onChange={(value) => handleMinuteChange(Number(value))}
+        options={minuteOptions}
+        className={styles.minuteSelect}
+      />
 
-      <select
-        className={`${styles.select} ${styles.periodSelect}`}
+      <Select
         value={period}
-        onChange={(e) => handlePeriodChange(e.target.value as 'AM' | 'PM')}
-      >
-        <option value="AM">AM</option>
-        <option value="PM">PM</option>
-      </select>
+        onChange={(value) => handlePeriodChange(value as 'AM' | 'PM')}
+        options={periodOptions}
+        className={styles.periodSelect}
+      />
     </div>
   );
 }
