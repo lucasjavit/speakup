@@ -16,7 +16,9 @@ export function AdminUsers() {
   const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -32,7 +34,7 @@ export function AdminUsers() {
 
   useEffect(() => {
     loadUsers();
-  }, [currentPage, search]);
+  }, [currentPage, pageSize, search]);
 
   useEffect(() => {
     const fetchOnline = async () => {
@@ -51,9 +53,10 @@ export function AdminUsers() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const data = await adminService.getUsers(currentPage, 10, search || undefined);
+      const data = await adminService.getUsers(currentPage, pageSize, search || undefined);
       setUsers(data.content);
       setTotalPages(data.totalPages);
+      setTotalElements(data.totalElements);
     } catch (err) {
       setError('Failed to load users');
       console.error(err);
@@ -65,7 +68,17 @@ export function AdminUsers() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setCurrentPage(0);
-    loadUsers();
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(0);
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const handleRoleChange = async (userId: string, role: Role) => {
@@ -259,29 +272,90 @@ export function AdminUsers() {
             </table>
           </Card>
 
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                Previous
-              </Button>
-              <span className={styles.pageInfo}>
-                Page {currentPage + 1} of {totalPages}
+          <div className={styles.paginationContainer}>
+            <div className={styles.paginationInfo}>
+              <span>
+                Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} users
               </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={currentPage === totalPages - 1}
-              >
-                Next
-              </Button>
+              <div className={styles.pageSizeSelector}>
+                <label>Rows per page:</label>
+                <select 
+                  value={pageSize} 
+                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                  className={styles.pageSizeSelect}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
             </div>
-          )}
+            
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(0)}
+                  disabled={currentPage === 0}
+                  title="First page"
+                >
+                  ««
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage - 1)}
+                  disabled={currentPage === 0}
+                >
+                  Previous
+                </Button>
+                
+                <div className={styles.pageNumbers}>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum: number;
+                    if (totalPages <= 5) {
+                      pageNum = i;
+                    } else if (currentPage < 3) {
+                      pageNum = i;
+                    } else if (currentPage >= totalPages - 3) {
+                      pageNum = totalPages - 5 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        className={`${styles.pageButton} ${currentPage === pageNum ? styles.active : ''}`}
+                      >
+                        {pageNum + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(currentPage + 1)}
+                  disabled={currentPage === totalPages - 1}
+                >
+                  Next
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => goToPage(totalPages - 1)}
+                  disabled={currentPage === totalPages - 1}
+                  title="Last page"
+                >
+                  »»
+                </Button>
+              </div>
+            )}
+          </div>
         </>
       )}
 
