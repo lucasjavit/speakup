@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMediaDevices } from '@/hooks/useMediaDevices';
+import { Select } from '@/components/ui/Select';
+import type { SelectOption } from '@/components/ui/Select';
 import styles from './DeviceSelector.module.css';
 
 interface DeviceSelectorProps {
@@ -130,55 +132,49 @@ export function DeviceSelector({ onDevicesSelected, onCancel }: DeviceSelectorPr
         {/* Device Selection */}
         <div className={styles.selectorsSection}>
           {/* Camera Selection */}
-          <div className={styles.selector}>
-            <label htmlFor="camera-select">Camera</label>
-            <select
-              id="camera-select"
-              value={selectedVideoInput || ''}
-              onChange={(e) => setSelectedVideoInput(e.target.value || null)}
-            >
-              <option value="">No camera</option>
-              {videoInputs.map((device) => (
-                <option key={device.deviceId} value={device.deviceId}>
-                  {device.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="camera-select"
+            label="Camera"
+            value={selectedVideoInput || ''}
+            onChange={(value) => setSelectedVideoInput(value || null)}
+            options={[
+              { value: '', label: 'No camera' },
+              ...videoInputs.map((device): SelectOption => ({
+                value: device.deviceId,
+                label: device.label,
+              })),
+            ]}
+          />
 
           {/* Microphone Selection */}
-          <div className={styles.selector}>
-            <label htmlFor="mic-select">Microphone</label>
-            <select
-              id="mic-select"
-              value={selectedAudioInput || ''}
-              onChange={(e) => setSelectedAudioInput(e.target.value || null)}
-            >
-              <option value="">No microphone</option>
-              {audioInputs.map((device) => (
-                <option key={device.deviceId} value={device.deviceId}>
-                  {device.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="mic-select"
+            label="Microphone"
+            value={selectedAudioInput || ''}
+            onChange={(value) => setSelectedAudioInput(value || null)}
+            options={[
+              { value: '', label: 'No microphone' },
+              ...audioInputs.map((device): SelectOption => ({
+                value: device.deviceId,
+                label: device.label,
+              })),
+            ]}
+          />
 
           {/* Speaker Selection */}
-          <div className={styles.selector}>
-            <label htmlFor="speaker-select">Speaker</label>
-            <select
-              id="speaker-select"
-              value={selectedAudioOutput || ''}
-              onChange={(e) => setSelectedAudioOutput(e.target.value || null)}
-            >
-              <option value="">Default speaker</option>
-              {audioOutputs.map((device) => (
-                <option key={device.deviceId} value={device.deviceId}>
-                  {device.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            id="speaker-select"
+            label="Speaker"
+            value={selectedAudioOutput || ''}
+            onChange={(value) => setSelectedAudioOutput(value || null)}
+            options={[
+              { value: '', label: 'Default speaker' },
+              ...audioOutputs.map((device): SelectOption => ({
+                value: device.deviceId,
+                label: device.label,
+              })),
+            ]}
+          />
 
           <button
             type="button"
