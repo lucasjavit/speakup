@@ -121,32 +121,144 @@
   margin-bottom: var(--spacing-xl);
 }
 
-/* Avatar Section */
-.avatarSection {
+/* Profile Header */
+.profileHeader {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  margin-bottom: var(--spacing-xl);
+}
+
+.profileInfo {
+  display: flex;
   align-items: center;
-  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-lg);
 }
 
 .avatarLarge {
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid var(--color-primary-light, rgba(102, 126, 234, 0.2));
-  margin-bottom: var(--spacing-sm);
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }
 
-.avatarName {
-  font-size: 1.125rem;
+.profileDetails {
+  flex: 1;
+  text-align: left;
+}
+
+.profileName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.profileEmail {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Levels Grid */
+.levelsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.levelCard {
+  background: white;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-lg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.levelCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.levelCardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-background-secondary, #f1f5f9);
+}
+
+.levelCardIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary);
+}
+
+.levelCardTitle {
+  font-size: 0.8125rem;
   font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.levelCardContent {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.levelValue {
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--color-text-primary);
 }
 
-.avatarEmail {
+.levelNotSet {
+  font-size: 1rem;
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
+.evaluationsCount {
   font-size: 0.875rem;
   color: var(--color-text-tertiary);
+  padding: 0.25rem 0.75rem;
+  background: var(--color-background-secondary, #f1f5f9);
+  border-radius: 999px;
+}
+
+@media (max-width: 600px) {
+  .profileInfo {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profileDetails {
+    text-align: center;
+  }
+
+  .avatarLarge {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profileName {
+    font-size: 1.5rem;
+  }
+
+  .levelsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .title {
@@ -165,6 +277,47 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+}
+
+/* Progress Section */
+.progressSection {
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-radius: var(--radius-lg, 12px);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.progressValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.progressBar {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary) 0%, #764ba2 100%);
+  border-radius: 999px;
+  transition: width 0.3s ease;
 }
 
 /* Section Styles */
@@ -209,7 +362,7 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: 0;
 }
 
 .label {

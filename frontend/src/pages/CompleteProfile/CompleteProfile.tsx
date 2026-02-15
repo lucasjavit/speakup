@@ -1,12 +1,48 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Card } from '@/components/ui';
-import { UserLevel } from '@/components/ui/UserLevel';
+import { Button, Card, Input } from '@/components/ui';
+import { Select } from '@/components/ui/Select';
 import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
 type Language = 'ENGLISH' | 'PORTUGUESE' | 'SPANISH' | 'FRENCH' | 'GERMAN' | 'ITALIAN' | 'JAPANESE' | 'KOREAN' | 'MANDARIN';
 type ProficiencyLevel = 'BASIC' | 'ELEMENTARY' | 'LEVEL_UP' | 'EXPERT';
+
+const getLevelIcon = (level: ProficiencyLevel) => {
+  const icons: Record<ProficiencyLevel, React.ReactElement> = {
+    BASIC: (
+      <svg viewBox="0 0 24 24" fill="#22c55e" style={{ width: '1.5em', height: '1.5em' }}>
+        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+      </svg>
+    ),
+    ELEMENTARY: (
+      <svg viewBox="0 0 24 24" fill="#0ea5e9" style={{ width: '1.5em', height: '1.5em' }}>
+        <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+      </svg>
+    ),
+    LEVEL_UP: (
+      <svg viewBox="0 0 24 24" fill="#f97316" style={{ width: '1.5em', height: '1.5em' }}>
+        <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
+      </svg>
+    ),
+    EXPERT: (
+      <svg viewBox="0 0 24 24" fill="#eab308" style={{ width: '1.5em', height: '1.5em' }}>
+        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+      </svg>
+    ),
+  };
+  return icons[level];
+};
+
+const getLevelLabel = (level: ProficiencyLevel): string => {
+  const labels: Record<ProficiencyLevel, string> = {
+    BASIC: 'Basic',
+    ELEMENTARY: 'Elementary',
+    LEVEL_UP: 'Level Up',
+    EXPERT: 'Expert',
+  };
+  return labels[level];
+};
 
 interface Country {
   name: string;
@@ -57,6 +93,20 @@ export function CompleteProfile() {
   const [pendingCity, setPendingCity] = useState<string | null>(null);
 
   const isEditMode = user?.profileCompleted ?? false;
+
+  // Calculate profile completion progress
+  const profileProgress = useMemo(() => {
+    const fields = [
+      idNumber,
+      country,
+      city,
+      nativeLanguage,
+      targetLanguage,
+      proficiencyLevel,
+    ];
+    const filled = fields.filter(Boolean).length;
+    return Math.round((filled / fields.length) * 100);
+  }, [idNumber, country, city, nativeLanguage, targetLanguage, proficiencyLevel]);
 
   // Fetch fresh user data from API when editing - runs on every navigation to this page
   useEffect(() => {
@@ -247,25 +297,89 @@ export function CompleteProfile() {
         <div className={styles.content}>
           <Card className={styles.card}>
               <div className={styles.header}>
-                {isEditMode && (
-                  <div className={styles.avatarSection}>
-                    <img
-                      src={user?.avatarUrl || '/default-avatar.png'}
-                      alt={user?.name}
-                      className={styles.avatarLarge}
-                    />
-                    <span className={styles.avatarName}>{user?.name}</span>
-                    <span className={styles.avatarEmail}>{user?.email}</span>
+                {isEditMode && user && (
+                  <div className={styles.profileHeader}>
+                    <div className={styles.profileInfo}>
+                      <img
+                        src={user.avatarUrl || '/default-avatar.png'}
+                        alt={user.name}
+                        className={styles.avatarLarge}
+                      />
+                      <div className={styles.profileDetails}>
+                        <h2 className={styles.profileName}>{user.name}</h2>
+                        <p className={styles.profileEmail}>{user.email}</p>
+                      </div>
+                    </div>
+
+                    <div className={styles.levelsGrid}>
+                      {/* Declared Level Card */}
+                      <div className={styles.levelCard}>
+                        <div className={styles.levelCardHeader}>
+                          <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                          </svg>
+                          <span className={styles.levelCardTitle}>Declared Level</span>
+                        </div>
+                        <div className={styles.levelCardContent}>
+                          {user.proficiencyLevel ? (
+                            <>
+                              {getLevelIcon(user.proficiencyLevel)}
+                              <span className={styles.levelValue}>{getLevelLabel(user.proficiencyLevel)}</span>
+                            </>
+                          ) : (
+                            <span className={styles.levelNotSet}>Not set</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Evaluated Level Card */}
+                      <div className={styles.levelCard}>
+                        <div className={styles.levelCardHeader}>
+                          <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                          </svg>
+                          <span className={styles.levelCardTitle}>Evaluated Level</span>
+                        </div>
+                        <div className={styles.levelCardContent}>
+                          {user.evaluatedLevel ? (
+                            <>
+                              {getLevelIcon(user.evaluatedLevel)}
+                              <span className={styles.levelValue}>{getLevelLabel(user.evaluatedLevel)}</span>
+                              <span className={styles.evaluationsCount}>
+                                {user.totalEvaluations} {user.totalEvaluations === 1 ? 'evaluation' : 'evaluations'}
+                              </span>
+                            </>
+                          ) : (
+                            <span className={styles.levelNotSet}>No evaluations yet</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
+
                 <h1 className={styles.title}>{isEditMode ? 'Edit Profile' : 'Complete Your Profile'}</h1>
                 <p className={styles.subtitle}>
                   {isEditMode ? 'Update your personal information and preferences' : 'Tell us about your language learning goals'}
                 </p>
-                {isEditMode && user && <UserLevel user={user} variant="profile" />}
               </div>
 
               <form onSubmit={handleSubmit} className={styles.form}>
+                {!isEditMode && profileProgress < 100 && (
+                  <div className={styles.progressSection}>
+                    <div className={styles.progressHeader}>
+                      <span className={styles.progressLabel}>Profile Completion</span>
+                      <span className={styles.progressValue}>{profileProgress}%</span>
+                    </div>
+                    <div className={styles.progressBar}>
+                      <div 
+                        className={styles.progressFill} 
+                        style={{ width: `${profileProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {error && <p className={styles.error}>{error}</p>}
 
                 {/* Personal Information Section */}
@@ -278,12 +392,8 @@ export function CompleteProfile() {
                   </h2>
 
                   <div className={styles.field}>
-                    <label htmlFor="idNumber" className={styles.label}>
-                      ID Number <span className={styles.required}>*</span>
-                    </label>
-                    <input
-                      id="idNumber"
-                      type="text"
+                    <Input
+                      label="ID Number"
                       value={idNumber}
                       onChange={(e) => setIdNumber(e.target.value)}
                       onFocus={() => {
@@ -292,76 +402,43 @@ export function CompleteProfile() {
                           setIdNumber('');
                         }
                       }}
-                      className={styles.input}
                       placeholder={isEditMode ? 'Enter new ID or leave current' : 'Your identification document number'}
+                      hint={isEditMode ? 'Your current ID is masked for security. Enter a new ID to change it, or leave as is.' : undefined}
+                      error={error && !idNumber ? 'ID number is required' : undefined}
                     />
-                    {isEditMode && (
-                      <span className={styles.fieldHint}>
-                        Your current ID is masked for security. Enter a new ID to change it, or leave as is.
-                      </span>
-                    )}
                   </div>
 
                   <div className={styles.fieldRow}>
                     <div className={styles.field}>
-                      <label htmlFor="country" className={styles.label}>
-                        Country <span className={styles.required}>*</span>
-                      </label>
-                      <select
-                        id="country"
+                      <Select
+                        label="Country"
                         value={country}
-                        onChange={(e) => setCountry(e.target.value)}
-                        className={styles.select}
+                        onChange={setCountry}
+                        options={countries.map(c => ({ value: c.name, label: c.name }))}
+                        placeholder={isLoadingCountries ? 'Loading...' : 'Select country'}
                         disabled={isLoadingCountries}
-                      >
-                        <option value="">
-                          {isLoadingCountries ? 'Loading...' : 'Select country'}
-                        </option>
-                        {countries.map((c) => (
-                          <option key={c.code} value={c.name}>
-                            {c.name}
-                          </option>
-                        ))}
-                      </select>
+                        error={error && !country ? 'Country is required' : undefined}
+                      />
                     </div>
 
                     <div className={styles.field}>
-                      <label htmlFor="city" className={styles.label}>
-                        City <span className={styles.required}>*</span>
-                      </label>
-                      <select
-                        id="city"
+                      <Select
+                        label="City"
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className={styles.select}
+                        onChange={setCity}
+                        options={cities.map(c => ({ value: c, label: c }))}
+                        placeholder={!country ? 'Select country first' : isLoadingCities ? 'Loading...' : 'Select city'}
                         disabled={!country || isLoadingCities}
-                      >
-                        <option value="">
-                          {!country
-                            ? 'Select country first'
-                            : isLoadingCities
-                              ? 'Loading...'
-                              : 'Select city'}
-                        </option>
-                        {cities.map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
+                        error={error && !city ? 'City is required' : undefined}
+                      />
                     </div>
                   </div>
 
                   <div className={styles.field}>
-                    <label htmlFor="address" className={styles.label}>
-                      Address <span className={styles.optional}>(optional)</span>
-                    </label>
-                    <input
-                      id="address"
-                      type="text"
+                    <Input
+                      label="Address (optional)"
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      className={styles.input}
                       placeholder="Your full address"
                     />
                   </div>
@@ -378,57 +455,40 @@ export function CompleteProfile() {
 
                   <div className={styles.fieldRow}>
                     <div className={styles.field}>
-                      <label htmlFor="nativeLanguage" className={styles.label}>
-                        Native Language <span className={styles.required}>*</span>
-                      </label>
-                      <select
-                        id="nativeLanguage"
+                      <Select
+                        label="Native Language"
                         value={nativeLanguage}
-                        onChange={(e) => setNativeLanguage(e.target.value as Language)}
-                        className={styles.select}
-                      >
-                        <option value="">Select language</option>
-                        {languages.map((lang) => (
-                          <option key={lang.value} value={lang.value}>
-                            {lang.label}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(value) => setNativeLanguage(value as Language)}
+                        options={languages.map(lang => ({ value: lang.value, label: lang.label }))}
+                        placeholder="Select language"
+                        error={error && !nativeLanguage ? 'Native language is required' : undefined}
+                      />
                     </div>
 
                     <div className={styles.field}>
-                      <label htmlFor="targetLanguage" className={styles.label}>
-                        Target Language <span className={styles.required}>*</span>
-                      </label>
-                      <select
-                        id="targetLanguage"
+                      <Select
+                        label="Target Language"
                         value={targetLanguage}
-                        onChange={(e) => setTargetLanguage(e.target.value as Language)}
-                        className={styles.select}
-                      >
-                        <option value="">Select language</option>
-                        <option value="ENGLISH">English</option>
-                      </select>
+                        onChange={(value) => setTargetLanguage(value as Language)}
+                        options={[{ value: 'ENGLISH', label: 'English' }]}
+                        placeholder="Select language"
+                        error={error && !targetLanguage ? 'Target language is required' : undefined}
+                      />
                     </div>
                   </div>
 
                   <div className={styles.field}>
-                    <label htmlFor="proficiencyLevel" className={styles.label}>
-                      Your Level in {targetLanguage ? languages.find(l => l.value === targetLanguage)?.label : 'Target Language'} <span className={styles.required}>*</span>
-                    </label>
-                    <select
-                      id="proficiencyLevel"
+                    <Select
+                      label={`Your Level in ${targetLanguage ? languages.find(l => l.value === targetLanguage)?.label : 'Target Language'}`}
                       value={proficiencyLevel}
-                      onChange={(e) => setProficiencyLevel(e.target.value as ProficiencyLevel)}
-                      className={styles.select}
-                    >
-                      <option value="">Select your level</option>
-                      {proficiencyLevels.map((level) => (
-                        <option key={level.value} value={level.value}>
-                          {level.label} - {level.description}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(value) => setProficiencyLevel(value as ProficiencyLevel)}
+                      options={proficiencyLevels.map(level => ({ 
+                        value: level.value, 
+                        label: `${level.label} - ${level.description}` 
+                      }))}
+                      placeholder="Select your level"
+                      error={error && !proficiencyLevel ? 'Proficiency level is required' : undefined}
+                    />
                   </div>
 
                   <div className={styles.timezoneField}>
