@@ -248,65 +248,69 @@ export function TranscriptDetails() {
           Back to Conversations
         </button>
         
-        <div className={styles.titleSection}>
-          <div className={styles.partnerInfo}>
-            {transcript.partnerAvatarUrl ? (
-              <img
-                src={transcript.partnerAvatarUrl}
-                alt={transcript.partnerName}
-                className={styles.avatar}
-              />
-            ) : (
-              <div className={styles.avatarPlaceholder}>
-                {transcript.partnerName.charAt(0).toUpperCase()}
-              </div>
-            )}
-            <div>
-              <h1 className={styles.title}>
-                Conversation with {transcript.partnerName}
-              </h1>
-              <p className={styles.date}>
-                {formatDate(transcript.conversationDate)}
-              </p>
+        <div className={styles.partnerInfo}>
+          {transcript.partnerAvatarUrl ? (
+            <img
+              src={transcript.partnerAvatarUrl}
+              alt={transcript.partnerName}
+              className={styles.avatar}
+            />
+          ) : (
+            <div className={styles.avatarPlaceholder}>
+              {transcript.partnerName.charAt(0).toUpperCase()}
             </div>
-          </div>
-
-          <div className={styles.downloadSection}>
-            {transcript.includeAnalysis && transcript.analysis && (
-              <label className={styles.checkbox}>
-                <input
-                  type="checkbox"
-                  checked={includeAnalysisInDownload}
-                  onChange={(e) => setIncludeAnalysisInDownload(e.target.checked)}
-                />
-                Include analysis in download
-              </label>
-            )}
-            <div className={styles.downloadButtons}>
-              <button onClick={() => handleDownload('txt')} className={styles.downloadButton}>
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                TXT
-              </button>
-              <button onClick={() => handleDownload('srt')} className={styles.downloadButton}>
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                SRT
-              </button>
-              <button onClick={() => handleDownload('pdf')} className={styles.downloadButton}>
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                PDF
-              </button>
-            </div>
+          )}
+          <div>
+            <h1 className={styles.title}>
+              Conversation with {transcript.partnerName}
+            </h1>
+            <p className={styles.date}>
+              {formatDate(transcript.conversationDate)}
+            </p>
           </div>
         </div>
       </div>
 
       <Card>
+        <div className={styles.downloadSection}>
+          <div className={styles.downloadButtons}>
+            <button onClick={() => handleDownload('txt')} className={styles.downloadButton}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+              TXT
+            </button>
+            <button onClick={() => handleDownload('srt')} className={styles.downloadButton}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+              SRT
+            </button>
+            <button onClick={() => handleDownload('pdf')} className={styles.downloadButton}>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
+              PDF
+            </button>
+          </div>
+          
+          {transcript.includeAnalysis && transcript.analysis && (
+            <div className={styles.toggleContainer}>
+              <span className={styles.toggleLabel}>Include analysis in download</span>
+              <button
+                className={`${styles.toggle} ${includeAnalysisInDownload ? styles.toggleActive : ''}`}
+                onClick={() => setIncludeAnalysisInDownload(!includeAnalysisInDownload)}
+                role="switch"
+                aria-checked={includeAnalysisInDownload}
+              >
+                <span className={styles.toggleTrack}>
+                  <span className={styles.toggleThumb}></span>
+                </span>
+              </button>
+            </div>
+          )}
+        </div>
+
         {showAnalysisTab && (
           <div className={styles.tabs}>
             <button
