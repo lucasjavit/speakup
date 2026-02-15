@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { transcriptService, type TranscriptSummaryDTO } from '@/services/transcriptService';
 import { userService } from '@/services';
 import { useAuthStore } from '@/stores/authStore';
+import { Card } from '@/components/ui/Card/Card';
 import toast from 'react-hot-toast';
 import styles from './Conversations.module.css';
 
@@ -201,7 +202,7 @@ export function Conversations() {
           <p>Start recording your conversations to see them here</p>
         </div>
       ) : (
-        <>
+        <Card>
           <div className={styles.list}>
             {transcripts.map((transcript) => (
               <div
@@ -284,7 +285,7 @@ export function Conversations() {
               </button>
             </div>
           )}
-        </>
+        </Card>
       )}
     </div>
   );
