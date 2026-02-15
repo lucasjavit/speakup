@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { transcriptService, type TranscriptWithAnalysisDTO, type TranscriptEntry } from '@/services/transcriptService';
 import { Card } from '@/components/ui/Card/Card';
-import { Tooltip } from '@/components/ui/Tooltip/Tooltip';
 import toast from 'react-hot-toast';
 import styles from './TranscriptDetails.module.css';
 
@@ -11,7 +10,7 @@ export function TranscriptDetails() {
   const navigate = useNavigate();
   const [transcript, setTranscript] = useState<TranscriptWithAnalysisDTO | null>(null);
   const [loading, setLoading] = useState(true);
-  const [includeAnalysisInDownload, setIncludeAnalysisInDownload] = useState(true);
+  const [requestingAnalysis, setRequestingAnalysis] = useState(false);
   const [activeTab, setActiveTab] = useState<'transcript' | 'analysis'>('transcript');
 
   useEffect(() => {
@@ -47,22 +46,38 @@ export function TranscriptDetails() {
     )
   );
 
+  const handleRequestAnalysis = async () => {
+    if (!id || !transcript) return;
+    
+    setRequestingAnalysis(true);
+    try {
+      await transcriptService.requestAnalysis(id);
+      toast.success('Analysis requested! Please wait while we analyze your conversation.');
+      // Reload to get updated status
+      await loadTranscript();
+    } catch (error: any) {
+      console.error('Failed to request analysis:', error);
+      toast.error(error.message || 'Failed to request analysis');
+    } finally {
+      setRequestingAnalysis(false);
+    }
+  };
+
   const handleDownload = async (format: 'txt' | 'srt' | 'pdf') => {
     if (!transcript) return;
     
     try {
       if (format === 'txt') {
-        transcriptService.downloadTxt(transcript, includeAnalysisInDownload);
+        transcriptService.downloadTxt(transcript, false);
       } else if (format === 'srt') {
         transcriptService.downloadSrt(transcript);
       } else if (format === 'pdf') {
-        // Capture the current view as PDF
-        const contentId = activeTab === 'analysis' && includeAnalysisInDownload 
-          ? 'transcript-content-full' 
-          : 'transcript-content';
+        // Capture what's currently visible on screen
+        const contentId = activeTab === 'transcript' ? 'transcript-content' : 'analysis-content';
+        const tabName = activeTab === 'transcript' ? 'transcript' : 'analysis';
         await transcriptService.downloadPdf(
           contentId,
-          `conversation-${transcript.partnerName}-${new Date(transcript.conversationDate).toISOString().split('T')[0]}.pdf`
+          `conversation-${transcript.partnerName}-${tabName}-${new Date(transcript.conversationDate).toISOString().split('T')[0]}.pdf`
         );
       }
       toast.success(`Downloaded as ${format.toUpperCase()}`);
@@ -282,42 +297,47 @@ export function TranscriptDetails() {
       <Card>
         <div className={styles.downloadSection}>
           <div className={styles.downloadButtons}>
-            <button onClick={() => handleDownload('txt')} className={styles.downloadButton}>
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-              TXT
-            </button>
-            <button onClick={() => handleDownload('srt')} className={styles.downloadButton}>
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-              SRT
-            </button>
-            <button onClick={() => handleDownload('pdf')} className={styles.downloadButton}>
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-              PDF
-            </button>
+            <div className={styles.downloadGroup}>
+              <button onClick={() => handleDownload('txt')} className={styles.downloadButton}>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                TXT
+              </button>
+              <button onClick={() => handleDownload('srt')} className={styles.downloadButton}>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                SRT
+              </button>
+              <button onClick={() => handleDownload('pdf')} className={styles.downloadButton}>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                PDF
+              </button>
+            </div>
+            
+            {!showAnalysisTab && transcript.analysisStatus !== 'PENDING' && (
+              <button 
+                onClick={handleRequestAnalysis}
+                disabled={requestingAnalysis}
+                className={styles.analyzeButton}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                </svg>
+                {requestingAnalysis ? 'Requesting...' : 'AI Analysis'}
+              </button>
+            )}
           </div>
-          
-          {transcript.includeAnalysis && transcript.analysis && (
-            <Tooltip content="Include AI analysis in downloaded files">
-              <div className={styles.toggleContainer}>
-                <span className={styles.toggleLabel}>Include analysis in download</span>
-                <button
-                  className={`${styles.toggle} ${includeAnalysisInDownload ? styles.toggleActive : ''}`}
-                  onClick={() => setIncludeAnalysisInDownload(!includeAnalysisInDownload)}
-                  role="switch"
-                  aria-checked={includeAnalysisInDownload}
-                >
-                  <span className={styles.toggleTrack}>
-                    <span className={styles.toggleThumb}></span>
-                  </span>
-                </button>
-              </div>
-            </Tooltip>
+          {showAnalysisTab && (
+            <p className={styles.downloadHint}>
+              <svg viewBox="0 0 24 24" fill="currentColor" className={styles.infoIcon}>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+              </svg>
+              Only PDF downloads include AI Analysis when viewing the analysis tab
+            </p>
           )}
         </div>
 
@@ -338,9 +358,9 @@ export function TranscriptDetails() {
           </div>
         )}
 
-        <div className={styles.content} id="transcript-content">
+        <div className={styles.content}>
           {activeTab === 'transcript' && (
-            <div className={styles.transcriptContainer}>
+            <div className={styles.transcriptContainer} id="transcript-content">
               {entries.map((entry, idx) => (
                 <div key={idx} className={styles.entry}>
                   <div className={styles.entryLine}>
@@ -355,7 +375,7 @@ export function TranscriptDetails() {
           )}
 
           {activeTab === 'analysis' && (
-            <div id="transcript-content-full">
+            <div id="analysis-content">
               {renderAnalysisSection()}
             </div>
           )}

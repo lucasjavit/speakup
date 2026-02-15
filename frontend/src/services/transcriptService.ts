@@ -208,8 +208,8 @@ class TranscriptService {
   }
 
   /**
-   * Download transcript as PDF file using screen capture.
-   * This creates a visual "print" of the currently displayed content.
+   * Download visible content as PDF file using screen capture.
+   * Captures exactly what's on screen at the moment of download.
    */
   async downloadPdf(
     elementId: string,

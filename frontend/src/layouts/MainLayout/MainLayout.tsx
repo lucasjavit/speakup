@@ -62,7 +62,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               <>
                 {isTranscriptFeatureEnabled && (
                   <Link to="/conversations" className={styles.navLink}>
-                    Conversations
+                    Transcripts
                   </Link>
                 )}
                 {!isFreeModeEnabled && (
