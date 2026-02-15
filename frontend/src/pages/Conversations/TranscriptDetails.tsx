@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { transcriptService, type TranscriptWithAnalysisDTO, type TranscriptEntry } from '@/services/transcriptService';
+import { Card } from '@/components/ui/Card/Card';
 import toast from 'react-hot-toast';
 import styles from './TranscriptDetails.module.css';
 
@@ -305,41 +306,43 @@ export function TranscriptDetails() {
         </div>
       </div>
 
-      {showAnalysisTab && (
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tab} ${activeTab === 'transcript' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('transcript')}
-          >
-            Transcript
-          </button>
-          <button
-            className={`${styles.tab} ${activeTab === 'analysis' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('analysis')}
-          >
-            AI Analysis
-          </button>
-        </div>
-      )}
-
-      <div className={styles.content}>
-        {activeTab === 'transcript' && (
-          <div className={styles.transcriptContainer}>
-            {entries.map((entry, idx) => (
-              <div key={idx} className={styles.entry}>
-                <div className={styles.entryLine}>
-                  <div className={styles.entryContent}>
-                    <span className={styles.speaker}>{entry.speaker}:</span> {entry.text}
-                  </div>
-                  <span className={styles.timestamp}>{formatTime(entry.timestamp)}</span>
-                </div>
-              </div>
-            ))}
+      <Card>
+        {showAnalysisTab && (
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === 'transcript' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('transcript')}
+            >
+              Transcript
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'analysis' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('analysis')}
+            >
+              AI Analysis
+            </button>
           </div>
         )}
 
-        {activeTab === 'analysis' && renderAnalysisSection()}
-      </div>
+        <div className={styles.content}>
+          {activeTab === 'transcript' && (
+            <div className={styles.transcriptContainer}>
+              {entries.map((entry, idx) => (
+                <div key={idx} className={styles.entry}>
+                  <div className={styles.entryLine}>
+                    <div className={styles.entryContent}>
+                      <span className={styles.speaker}>{entry.speaker}:</span> {entry.text}
+                    </div>
+                    <span className={styles.timestamp}>{formatTime(entry.timestamp)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === 'analysis' && renderAnalysisSection()}
+        </div>
+      </Card>
     </div>
   );
 }
