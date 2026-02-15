@@ -3,7 +3,7 @@ import { useMediaDevices } from '@/hooks/useMediaDevices';
 import styles from './DeviceSelector.module.css';
 
 interface DeviceSelectorProps {
-  onDevicesSelected: (audioDeviceId: string | null, videoDeviceId: string | null) => void;
+  onDevicesSelected: (audioDeviceId: string | null, videoDeviceId: string | null, audioOutputDeviceId: string | null) => void;
   onCancel: () => void;
 }
 
@@ -11,10 +11,13 @@ export function DeviceSelector({ onDevicesSelected, onCancel }: DeviceSelectorPr
   const {
     audioInputs,
     videoInputs,
+    audioOutputs,
     selectedAudioInput,
     selectedVideoInput,
+    selectedAudioOutput,
     setSelectedAudioInput,
     setSelectedVideoInput,
+    setSelectedAudioOutput,
     refreshDevices,
     isLoading,
     error,
@@ -79,7 +82,7 @@ export function DeviceSelector({ onDevicesSelected, onCancel }: DeviceSelectorPr
     if (previewStream) {
       previewStream.getTracks().forEach(track => track.stop());
     }
-    onDevicesSelected(selectedAudioInput, selectedVideoInput);
+    onDevicesSelected(selectedAudioInput, selectedVideoInput, selectedAudioOutput);
   };
 
   const handleCancel = () => {
@@ -153,6 +156,23 @@ export function DeviceSelector({ onDevicesSelected, onCancel }: DeviceSelectorPr
             >
               <option value="">No microphone</option>
               {audioInputs.map((device) => (
+                <option key={device.deviceId} value={device.deviceId}>
+                  {device.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Speaker Selection */}
+          <div className={styles.selector}>
+            <label htmlFor="speaker-select">Speaker</label>
+            <select
+              id="speaker-select"
+              value={selectedAudioOutput || ''}
+              onChange={(e) => setSelectedAudioOutput(e.target.value || null)}
+            >
+              <option value="">Default speaker</option>
+              {audioOutputs.map((device) => (
                 <option key={device.deviceId} value={device.deviceId}>
                   {device.label}
                 </option>

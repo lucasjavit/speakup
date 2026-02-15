@@ -26,7 +26,6 @@ export function ScheduledEmailsPanel() {
   const [emails, setEmails] = useState<ScheduledEmailResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {

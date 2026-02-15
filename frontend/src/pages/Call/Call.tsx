@@ -64,8 +64,10 @@ export function Call() {
   // Device selector state
   const [audioDevices, setAudioDevices] = useState<MediaDeviceOption[]>([]);
   const [videoDevices, setVideoDevices] = useState<MediaDeviceOption[]>([]);
+  const [audioOutputDevices, setAudioOutputDevices] = useState<MediaDeviceOption[]>([]);
   const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
   const [selectedVideoDevice, setSelectedVideoDevice] = useState<string>('');
+  const [selectedAudioOutputDevice, setSelectedAudioOutputDevice] = useState<string>('');
 
   const reconnectionTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const deviceSelectorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -418,9 +420,24 @@ export function Call() {
   const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Handle device selection
-  const handleDevicesSelected = (audioDeviceId: string | null, videoDeviceId: string | null) => {
-    console.log('Devices selected - audio:', audioDeviceId, 'video:', videoDeviceId);
+  const handleDevicesSelected = async (audioDeviceId: string | null, videoDeviceId: string | null, audioOutputDeviceId: string | null) => {
+    console.log('Devices selected - audio:', audioDeviceId, 'video:', videoDeviceId, 'audioOutput:', audioOutputDeviceId);
     peerService.setSelectedDevices(audioDeviceId, videoDeviceId);
+    
+    // Set audio output device if selected
+    if (audioOutputDeviceId) {
+      setSelectedAudioOutputDevice(audioOutputDeviceId);
+      // If remote video already exists, apply the audio output device
+      if (remoteVideoRef.current && 'setSinkId' in remoteVideoRef.current) {
+        try {
+          await (remoteVideoRef.current as any).setSinkId(audioOutputDeviceId);
+          console.log('Audio output device set on device selection:', audioOutputDeviceId);
+        } catch (err) {
+          console.error('Failed to set audio output device:', err);
+        }
+      }
+    }
+    
     setShowDeviceSelector(false);
     setDevicesSelected(true);
   };
@@ -593,8 +610,13 @@ export function Call() {
           .filter(d => d.kind === 'videoinput' && d.deviceId)
           .map(d => ({ deviceId: d.deviceId, label: d.label || `Camera ${d.deviceId.slice(0, 5)}` }));
 
+        const audioOutputs = devices
+          .filter(d => d.kind === 'audiooutput' && d.deviceId)
+          .map(d => ({ deviceId: d.deviceId, label: d.label || `Speaker ${d.deviceId.slice(0, 5)}` }));
+
         setAudioDevices(audioInputs);
         setVideoDevices(videoInputs);
+        setAudioOutputDevices(audioOutputs);
 
         // Set initial selected devices
         const { audioDeviceId, videoDeviceId } = peerService.getSelectedDevices();
@@ -607,6 +629,9 @@ export function Call() {
           setSelectedVideoDevice(videoDeviceId);
         } else if (videoInputs.length > 0) {
           setSelectedVideoDevice(videoInputs[0].deviceId);
+        }
+        if (audioOutputs.length > 0) {
+          setSelectedAudioOutputDevice(audioOutputs[0].deviceId);
         }
       } catch (err) {
         console.error('Failed to enumerate devices:', err);
@@ -633,6 +658,20 @@ export function Call() {
       await changeVideoDevice(deviceId);
     } catch (err) {
       console.error('Failed to change video device:', err);
+    }
+  };
+
+  // Handle audio output device change
+  const handleAudioOutputDeviceChange = async (deviceId: string) => {
+    setSelectedAudioOutputDevice(deviceId);
+    try {
+      // Apply to remote video element (partner's audio)
+      if (remoteVideoRef.current && 'setSinkId' in remoteVideoRef.current) {
+        await (remoteVideoRef.current as any).setSinkId(deviceId);
+        console.log('Audio output device changed to:', deviceId);
+      }
+    } catch (err) {
+      console.error('Failed to change audio output device:', err);
     }
   };
 
@@ -1065,7 +1104,7 @@ export function Call() {
       {/* Controls */}
       <div className={styles.controls}>
         {/* Device Selectors */}
-        {callState === 'connected' && (audioDevices.length > 1 || videoDevices.length > 1) && (
+        {callState === 'connected' && (audioDevices.length > 1 || videoDevices.length > 1 || audioOutputDevices.length > 1) && (
           <div className={styles.deviceSelectors}>
             {audioDevices.length > 1 && (
               <div className={styles.deviceSelect}>
@@ -1098,6 +1137,25 @@ export function Call() {
                   title="Select camera"
                 >
                   {videoDevices.map(device => (
+                    <option key={device.deviceId} value={device.deviceId}>
+                      {device.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {audioOutputDevices.length > 1 && (
+              <div className={styles.deviceSelect}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className={styles.deviceIcon}>
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                </svg>
+                <select
+                  value={selectedAudioOutputDevice}
+                  onChange={(e) => handleAudioOutputDeviceChange(e.target.value)}
+                  className={styles.select}
+                  title="Select speaker"
+                >
+                  {audioOutputDevices.map(device => (
                     <option key={device.deviceId} value={device.deviceId}>
                       {device.label}
                     </option>
