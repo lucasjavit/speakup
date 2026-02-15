@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card } from '@/components/ui';
 import { adminService } from '@/services';
 import type { AdminPurchase, PaymentStatus } from '@/types';
@@ -7,6 +8,7 @@ import styles from './Payments.module.css';
 const STATUS_OPTIONS: PaymentStatus[] = ['COMPLETED', 'PENDING', 'FAILED', 'REFUNDED'];
 
 export function AdminPayments() {
+  const navigate = useNavigate();
   const [purchases, setPurchases] = useState<AdminPurchase[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
@@ -77,6 +79,13 @@ export function AdminPayments() {
 
   return (
     <div className={styles.container}>
+      <button className={styles.backButton} onClick={() => navigate('/')}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Home
+      </button>
+
       <div className={styles.header}>
         <h2 className={styles.title}>Payments</h2>
         <div className={styles.filters}>

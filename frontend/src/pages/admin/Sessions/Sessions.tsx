@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Card, ConfirmDialog } from '@/components/ui';
 import { useConfirm } from '@/hooks';
 import { adminService } from '@/services';
@@ -17,6 +17,7 @@ const DAY_NAMES: Record<string, string> = {
 };
 
 export function AdminSessions() {
+  const navigate = useNavigate();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -79,6 +80,13 @@ export function AdminSessions() {
     <>
       <ConfirmDialog {...confirmState} />
       <div className={styles.container}>
+        <button className={styles.backButton} onClick={() => navigate('/')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Home
+        </button>
+
         <div className={styles.header}>
           <h2 className={styles.title}>Practice Sessions</h2>
           <Link to="/admin/sessions/new">
