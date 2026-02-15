@@ -56,7 +56,14 @@ export function TranscriptDetails() {
       } else if (format === 'srt') {
         transcriptService.downloadSrt(transcript);
       } else if (format === 'pdf') {
-        await transcriptService.downloadPdf(transcript, includeAnalysisInDownload);
+        // Capture the current view as PDF
+        const contentId = activeTab === 'analysis' && includeAnalysisInDownload 
+          ? 'transcript-content-full' 
+          : 'transcript-content';
+        await transcriptService.downloadPdf(
+          contentId,
+          `conversation-${transcript.partnerName}-${new Date(transcript.conversationDate).toISOString().split('T')[0]}.pdf`
+        );
       }
       toast.success(`Downloaded as ${format.toUpperCase()}`);
     } catch (error) {
@@ -331,7 +338,7 @@ export function TranscriptDetails() {
           </div>
         )}
 
-        <div className={styles.content}>
+        <div className={styles.content} id="transcript-content">
           {activeTab === 'transcript' && (
             <div className={styles.transcriptContainer}>
               {entries.map((entry, idx) => (
@@ -347,7 +354,11 @@ export function TranscriptDetails() {
             </div>
           )}
 
-          {activeTab === 'analysis' && renderAnalysisSection()}
+          {activeTab === 'analysis' && (
+            <div id="transcript-content-full">
+              {renderAnalysisSection()}
+            </div>
+          )}
         </div>
       </Card>
     </div>

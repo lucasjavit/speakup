@@ -208,90 +208,58 @@ class TranscriptService {
   }
 
   /**
-   * Download transcript as PDF file.
-   * Note: This requires jspdf library to be installed.
+   * Download transcript as PDF file using screen capture.
+   * This creates a visual "print" of the currently displayed content.
    */
   async downloadPdf(
-    transcript: TranscriptWithAnalysisDTO,
-    includeAnalysis: boolean
+    elementId: string,
+    filename: string
   ): Promise<void> {
-    // Dynamic import to avoid loading jspdf if not needed
+    // Dynamic imports
+    const html2canvas = (await import('html2canvas')).default;
     const { jsPDF } = await import('jspdf');
 
-    const doc = new jsPDF();
-    const entries: TranscriptEntry[] = JSON.parse(transcript.transcriptData);
-    const date = new Date(transcript.conversationDate).toLocaleString();
-
-    let y = 20;
-    const lineHeight = 7;
-    const marginLeft = 15;
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const maxWidth = pageWidth - 30;
-
-    // Title
-    doc.setFontSize(16);
-    doc.text(`Conversation with ${transcript.partnerName}`, marginLeft, y);
-    y += lineHeight + 3;
-
-    // Date
-    doc.setFontSize(10);
-    doc.text(`Date: ${date}`, marginLeft, y);
-    y += lineHeight + 5;
-
-    // Transcript section
-    doc.setFontSize(14);
-    doc.text('Transcript', marginLeft, y);
-    y += lineHeight + 2;
-
-    doc.setFontSize(10);
-    entries.forEach(entry => {
-      const timestamp = new Date(entry.timestamp).toLocaleTimeString();
-      const text = `[${timestamp}] ${entry.speaker}: ${entry.text}`;
-      
-      // Split text if too long
-      const lines = doc.splitTextToSize(text, maxWidth);
-      lines.forEach((line: string) => {
-        if (y > 280) {
-          doc.addPage();
-          y = 20;
-        }
-        doc.text(line, marginLeft, y);
-        y += lineHeight;
-      });
-    });
-
-    // Analysis section
-    if (includeAnalysis && transcript.analysis) {
-      y += 10;
-      if (y > 260) {
-        doc.addPage();
-        y = 20;
-      }
-
-      doc.setFontSize(14);
-      doc.text('AI Analysis', marginLeft, y);
-      y += lineHeight + 2;
-
-      doc.setFontSize(10);
-      doc.text(`Estimated Level: ${transcript.analysis.estimatedLevel}`, marginLeft, y);
-      y += lineHeight + 5;
-
-      // Overall feedback
-      const feedbackLines = doc.splitTextToSize(
-        `Overall Feedback: ${transcript.analysis.overallFeedback}`,
-        maxWidth
-      );
-      feedbackLines.forEach((line: string) => {
-        if (y > 280) {
-          doc.addPage();
-          y = 20;
-        }
-        doc.text(line, marginLeft, y);
-        y += lineHeight;
-      });
+    // Get the element to capture
+    const element = document.getElementById(elementId);
+    if (!element) {
+      throw new Error('Element not found for PDF generation');
     }
 
-    doc.save(`transcript-${transcript.id}.pdf`);
+    // Capture the element as canvas
+    const canvas = await html2canvas(element, {
+      scale: 2, // Higher quality
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    // Calculate PDF dimensions
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // Create PDF
+    const pdf = new jsPDF({
+      orientation: imgHeight > imgWidth ? 'portrait' : 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    // Add image to PDF
+    const imgData = canvas.toDataURL('image/png');
+    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+    // If content is too tall, split into multiple pages
+    if (imgHeight > 297) { // A4 height
+      let position = -297;
+      while (position > -imgHeight) {
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        position -= 297;
+      }
+    }
+
+    // Save PDF
+    pdf.save(filename);
   }
 
   /**
