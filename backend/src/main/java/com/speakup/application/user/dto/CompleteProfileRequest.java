@@ -29,6 +29,7 @@ public record CompleteProfileRequest(
         @NotNull(message = "Proficiency level is required")
         ProficiencyLevel proficiencyLevel,
 
+        @NotBlank(message = "Timezone is required")
         String timezone
 ) {
 }

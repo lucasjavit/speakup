@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card, Input } from '@/components/ui';
 import { Select } from '@/components/ui/Select';
+import { TimezoneSelect } from '@/components/ui/TimezoneSelect';
 import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
 import styles from './CompleteProfile.module.css';
@@ -81,7 +82,7 @@ export function CompleteProfile() {
   const [nativeLanguage, setNativeLanguage] = useState<Language | ''>('');
   const [targetLanguage, setTargetLanguage] = useState<Language | ''>('');
   const [proficiencyLevel, setProficiencyLevel] = useState<ProficiencyLevel | ''>('');
-  const [timezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [dataConsent, setDataConsent] = useState(false);
@@ -103,10 +104,11 @@ export function CompleteProfile() {
       nativeLanguage,
       targetLanguage,
       proficiencyLevel,
+      timezone,
     ];
     const filled = fields.filter(Boolean).length;
     return Math.round((filled / fields.length) * 100);
-  }, [idNumber, country, city, nativeLanguage, targetLanguage, proficiencyLevel]);
+  }, [idNumber, country, city, nativeLanguage, targetLanguage, proficiencyLevel, timezone]);
 
   // Fetch fresh user data from API when editing - runs on every navigation to this page
   useEffect(() => {
@@ -123,6 +125,7 @@ export function CompleteProfile() {
           setNativeLanguage((userData.nativeLanguage as Language) || '');
           setTargetLanguage((userData.targetLanguage as Language) || '');
           setProficiencyLevel((userData.proficiencyLevel as ProficiencyLevel) || '');
+          setTimezone(userData.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone);
           // Store the city to be set after cities are loaded
           setPendingCity(userData.city || null);
         }
@@ -139,6 +142,7 @@ export function CompleteProfile() {
     setNativeLanguage('');
     setTargetLanguage('');
     setProficiencyLevel('');
+    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone);
     setPendingCity(null);
     setCities([]);
     // In edit mode, user has already given consent previously
@@ -212,13 +216,18 @@ export function CompleteProfile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!idNumber || !country || !city) {
+    if (!idNumber || !country || !city || !timezone) {
       setError('Please fill in all required fields');
       return;
     }
 
     if (!nativeLanguage || !targetLanguage || !proficiencyLevel) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    if (!timezone) {
+      setError('Please select a timezone');
       return;
     }
 
@@ -297,56 +306,72 @@ export function CompleteProfile() {
         <div className={styles.content}>
           <Card className={styles.card}>
               {isEditMode && user && (
-                <div className={styles.profileBanner}>
-                  <div className={styles.bannerBackground}></div>
-                  <div className={styles.profileHeaderContent}>
-                    <div className={styles.avatarWrapper}>
-                      <img
-                        src={user.avatarUrl || '/default-avatar.png'}
-                        alt={user.name}
-                        className={styles.avatarLarge}
-                      />
-                    </div>
-                    <div className={styles.profileMeta}>
-                      <h1 className={styles.profileName}>{user.name}</h1>
-                      <p className={styles.profileEmail}>{user.email}</p>
-                      <div className={styles.levelsBadges}>
-                        <div className={styles.levelBadge}>
-                          <span className={styles.badgeLabel}>Declared</span>
-                          <div className={styles.badgeValue}>
-                            {user.proficiencyLevel ? (
-                              <>
-                                {getLevelIcon(user.proficiencyLevel)}
-                                <span>{getLevelLabel(user.proficiencyLevel)}</span>
-                              </>
-                            ) : (
-                              <span className={styles.notSet}>Not set</span>
-                            )}
-                          </div>
+                <>
+                  <div className={styles.profileBanner}>
+                    <div className={styles.bannerBackground}>
+                      <div className={styles.bannerContent}>
+                        <div className={styles.avatarWrapper}>
+                          <img
+                            src={user.avatarUrl || '/default-avatar.png'}
+                            alt={user.name}
+                            className={styles.avatarLarge}
+                          />
                         </div>
-                        <div className={styles.levelBadgeSeparator}></div>
-                        <div className={styles.levelBadge}>
-                          <span className={styles.badgeLabel}>Evaluated</span>
-                          <div className={styles.badgeValue}>
-                            {user.evaluatedLevel ? (
-                              <>
-                                {getLevelIcon(user.evaluatedLevel)}
-                                <span>{getLevelLabel(user.evaluatedLevel)}</span>
-                              </>
-                            ) : (
-                              <span className={styles.notSet}>No evaluations</span>
-                            )}
-                          </div>
-                          {user.evaluatedLevel && user.totalEvaluations && (
-                            <span className={styles.evaluationsNote}>
-                              Based on {user.totalEvaluations} {user.totalEvaluations === 1 ? 'evaluation' : 'evaluations'}
-                            </span>
-                          )}
+                        <div className={styles.profileInfo}>
+                          <h1 className={styles.profileName}>{user.name}</h1>
+                          <p className={styles.profileEmail}>{user.email}</p>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+
+                  <div className={styles.levelsGrid}>
+                    {/* Declared Level Card */}
+                    <div className={styles.levelCard}>
+                      <div className={styles.levelCardHeader}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
+                          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        <span className={styles.levelCardTitle}>Declared</span>
+                      </div>
+                      <div className={styles.levelCardContent}>
+                        {user.proficiencyLevel ? (
+                          <>
+                            {getLevelIcon(user.proficiencyLevel)}
+                            <span className={styles.levelValue}>{getLevelLabel(user.proficiencyLevel)}</span>
+                          </>
+                        ) : (
+                          <span className={styles.levelNotSet}>Not set</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Evaluated Level Card */}
+                    <div className={styles.levelCard}>
+                      <div className={styles.levelCardHeader}>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className={styles.levelCardIcon}>
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                        <span className={styles.levelCardTitle}>Evaluated</span>
+                      </div>
+                      <div className={styles.levelCardContent}>
+                        {user.evaluatedLevel ? (
+                          <>
+                            {getLevelIcon(user.evaluatedLevel)}
+                            <span className={styles.levelValue}>{getLevelLabel(user.evaluatedLevel)}</span>
+                          </>
+                        ) : (
+                          <span className={styles.levelNotSet}>No evaluations yet</span>
+                        )}
+                      </div>
+                      {user.evaluatedLevel && user.totalEvaluations && (
+                        <div className={styles.evaluationsCount}>
+                          Based on {user.totalEvaluations} {user.totalEvaluations === 1 ? 'evaluation' : 'evaluations'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className={styles.header}>
@@ -384,8 +409,10 @@ export function CompleteProfile() {
                   </h2>
 
                   <div className={styles.field}>
+                    <label className={styles.fieldLabel}>
+                      <span className={styles.required}>*</span> ID Number
+                    </label>
                     <Input
-                      label="ID Number"
                       value={idNumber}
                       onChange={(e) => setIdNumber(e.target.value)}
                       onFocus={() => {
@@ -402,8 +429,10 @@ export function CompleteProfile() {
 
                   <div className={styles.fieldRow}>
                     <div className={styles.field}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> Country
+                      </label>
                       <Select
-                        label="Country"
                         value={country}
                         onChange={setCountry}
                         options={countries.map(c => ({ value: c.name, label: c.name }))}
@@ -414,8 +443,10 @@ export function CompleteProfile() {
                     </div>
 
                     <div className={styles.field}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> City
+                      </label>
                       <Select
-                        label="City"
                         value={city}
                         onChange={setCity}
                         options={cities.map(c => ({ value: c, label: c }))}
@@ -447,8 +478,10 @@ export function CompleteProfile() {
 
                   <div className={styles.fieldRow}>
                     <div className={styles.field}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> Native Language
+                      </label>
                       <Select
-                        label="Native Language"
                         value={nativeLanguage}
                         onChange={(value) => setNativeLanguage(value as Language)}
                         options={languages.map(lang => ({ value: lang.value, label: lang.label }))}
@@ -458,8 +491,10 @@ export function CompleteProfile() {
                     </div>
 
                     <div className={styles.field}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> Target Language
+                      </label>
                       <Select
-                        label="Target Language"
                         value={targetLanguage}
                         onChange={(value) => setTargetLanguage(value as Language)}
                         options={[{ value: 'ENGLISH', label: 'English' }]}
@@ -470,8 +505,10 @@ export function CompleteProfile() {
                   </div>
 
                   <div className={styles.field}>
+                    <label className={styles.fieldLabel}>
+                      <span className={styles.required}>*</span> Your Level in {targetLanguage ? languages.find(l => l.value === targetLanguage)?.label : 'Target Language'}
+                    </label>
                     <Select
-                      label={`Your Level in ${targetLanguage ? languages.find(l => l.value === targetLanguage)?.label : 'Target Language'}`}
                       value={proficiencyLevel}
                       onChange={(value) => setProficiencyLevel(value as ProficiencyLevel)}
                       options={proficiencyLevels.map(level => ({ 
@@ -483,14 +520,14 @@ export function CompleteProfile() {
                     />
                   </div>
 
-                  <div className={styles.timezoneField}>
-                    <svg viewBox="0 0 24 24" fill="currentColor" className={styles.timezoneIcon}>
-                      <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
-                    <div>
-                      <span className={styles.timezoneLabel}>Timezone</span>
-                      <span className={styles.timezoneValue}>{timezone}</span>
-                    </div>
+                  <div className={styles.field}>
+                    <label className={styles.fieldLabel}>
+                      <span className={styles.required}>*</span> Timezone
+                    </label>
+                    <TimezoneSelect
+                      value={timezone}
+                      onChange={setTimezone}
+                    />
                   </div>
                 </div>
 
