@@ -233,28 +233,68 @@ class TranscriptService {
       backgroundColor: '#ffffff',
     });
 
-    // Calculate PDF dimensions
-    const imgWidth = 210; // A4 width in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // A4 dimensions in mm
+    const pdfWidth = 210;
+    const pdfHeight = 297;
+    const margin = 10; // 10mm margin on all sides
+    const contentWidth = pdfWidth - (margin * 2); // 190mm
+    
+    // Calculate scaled dimensions to fit with margins
+    const imgWidth = contentWidth;
+    const imgHeight = (canvas.height * contentWidth) / canvas.width;
     
     // Create PDF
     const pdf = new jsPDF({
-      orientation: imgHeight > imgWidth ? 'portrait' : 'portrait',
+      orientation: 'portrait',
       unit: 'mm',
       format: 'a4',
     });
 
-    // Add image to PDF
+    // Add image to PDF with margins
     const imgData = canvas.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-    // If content is too tall, split into multiple pages
-    if (imgHeight > 297) { // A4 height
-      let position = -297;
-      while (position > -imgHeight) {
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        position -= 297;
+    
+    if (imgHeight <= (pdfHeight - (margin * 2))) {
+      // Fits in one page
+      pdf.addImage(imgData, 'PNG', margin, margin, imgWidth, imgHeight);
+    } else {
+      // Multiple pages needed
+      const pageContentHeight = pdfHeight - (margin * 2);
+      let srcY = 0;
+      let pageNum = 0;
+      
+      while (srcY < canvas.height) {
+        if (pageNum > 0) {
+          pdf.addPage();
+        }
+        
+        // Calculate the portion of canvas to show on this page
+        const srcHeight = Math.min(
+          (pageContentHeight * canvas.width) / contentWidth,
+          canvas.height - srcY
+        );
+        
+        // Create a temporary canvas for this page's content
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = srcHeight;
+        const ctx = pageCanvas.getContext('2d');
+        
+        if (ctx) {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+          ctx.drawImage(
+            canvas,
+            0, srcY, canvas.width, srcHeight,
+            0, 0, pageCanvas.width, pageCanvas.height
+          );
+          
+          const pageImgData = pageCanvas.toDataURL('image/png');
+          const pageImgHeight = (srcHeight * contentWidth) / canvas.width;
+          pdf.addImage(pageImgData, 'PNG', margin, margin, imgWidth, pageImgHeight);
+        }
+        
+        srcY += srcHeight;
+        pageNum++;
       }
     }
 
