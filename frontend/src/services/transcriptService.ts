@@ -79,6 +79,19 @@ class TranscriptService {
   private baseUrl = '/transcripts';
 
   /**
+   * Check if transcript feature is enabled.
+   */
+  async isFeatureEnabled(): Promise<boolean> {
+    try {
+      const response = await axios.get<{ data: { enabled: boolean } }>(`${this.baseUrl}/feature-status`);
+      return response.data.data.enabled;
+    } catch (error) {
+      console.error('Failed to check transcript feature status:', error);
+      return false;
+    }
+  }
+
+  /**
    * Save a conversation transcript.
    */
   async saveTranscript(request: SaveTranscriptRequest): Promise<TranscriptDTO> {

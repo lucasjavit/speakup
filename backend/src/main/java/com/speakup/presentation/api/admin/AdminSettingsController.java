@@ -94,6 +94,21 @@ public class AdminSettingsController {
         return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("value", limit)));
     }
 
+    @GetMapping("/transcript-feature")
+    @Operation(summary = "Get transcript feature status")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> getTranscriptFeatureEnabled() {
+        boolean enabled = settingsService.isTranscriptFeatureEnabled();
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
+    @PutMapping("/transcript-feature")
+    @Operation(summary = "Toggle transcript feature", description = "Enable or disable the transcript feature for all users")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> updateTranscriptFeatureEnabled(
+            @RequestBody java.util.Map<String, Boolean> request) {
+        boolean enabled = settingsService.updateTranscriptFeatureEnabled(request.getOrDefault("enabled", true));
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
     @PutMapping("/{key}")
     @Operation(summary = "Update a setting", description = "Update a specific setting value")
     public ResponseEntity<ApiResponse<ApplicationSettingResponse>> updateSetting(

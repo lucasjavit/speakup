@@ -202,4 +202,16 @@ export const adminService = {
       api.put<ApiResult<{ value: number }>>('/admin/settings/transcript-daily-limit', { value: limit })
     );
   },
+
+  getTranscriptFeatureEnabled: async (): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/transcript-feature')
+    );
+  },
+
+  updateTranscriptFeatureEnabled: async (enabled: boolean): Promise<{ enabled: boolean }> => {
+    return apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/transcript-feature', { enabled })
+    );
+  },
 };

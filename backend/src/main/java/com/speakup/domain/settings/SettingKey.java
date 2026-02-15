@@ -28,4 +28,9 @@ public final class SettingKey {
      * When enabled, users can access the Settings page to configure their API keys.
      */
     public static final String SETTINGS_PAGE_ENABLED = "SETTINGS_PAGE_ENABLED";
+
+    /**
+     * When enabled, users can record and access conversation transcripts.
+     */
+    public static final String TRANSCRIPT_FEATURE_ENABLED = "TRANSCRIPT_FEATURE_ENABLED";
 }

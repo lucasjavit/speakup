@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore, isAdmin } from '@/stores/authStore';
 import { creditService, presenceService, userService } from '@/services';
+import { transcriptService } from '@/services/transcriptService';
 import { Button } from '@/components/ui';
 import styles from './MainLayout.module.css';
 
@@ -16,6 +17,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState(false);
   const [isSettingsPageEnabled, setIsSettingsPageEnabled] = useState(false);
+  const [isTranscriptFeatureEnabled, setIsTranscriptFeatureEnabled] = useState(true);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,6 +26,9 @@ export function MainLayout({ children }: MainLayoutProps) {
         .catch(console.error);
       userService.isSettingsPageEnabled()
         .then(setIsSettingsPageEnabled)
+        .catch(console.error);
+      transcriptService.isFeatureEnabled()
+        .then(setIsTranscriptFeatureEnabled)
         .catch(console.error);
     }
   }, [isAuthenticated]);
@@ -55,9 +60,11 @@ export function MainLayout({ children }: MainLayoutProps) {
           <nav className={styles.nav}>
             {isAuthenticated ? (
               <>
-                <Link to="/conversations" className={styles.navLink}>
-                  Conversations
-                </Link>
+                {isTranscriptFeatureEnabled && (
+                  <Link to="/conversations" className={styles.navLink}>
+                    Conversations
+                  </Link>
+                )}
                 {!isFreeModeEnabled && (
                   <Link to="/credits" className={styles.navLink}>
                     Credits

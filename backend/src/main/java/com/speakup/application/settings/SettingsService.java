@@ -191,6 +191,32 @@ public class SettingsService {
     }
 
     /**
+     * Check if transcript feature is enabled.
+     */
+    public boolean isTranscriptFeatureEnabled() {
+        return settingRepository.findByKey(SettingKey.TRANSCRIPT_FEATURE_ENABLED)
+                .map(ApplicationSetting::getValueAsBoolean)
+                .orElse(true); // Default to enabled for backward compatibility
+    }
+
+    /**
+     * Update transcript feature enabled.
+     */
+    @Transactional
+    public boolean updateTranscriptFeatureEnabled(boolean enabled) {
+        ApplicationSetting setting = settingRepository.findByKey(SettingKey.TRANSCRIPT_FEATURE_ENABLED)
+                .orElseGet(() -> new ApplicationSetting(
+                        SettingKey.TRANSCRIPT_FEATURE_ENABLED,
+                        "true",
+                        "When enabled, users can record and access conversation transcripts"
+                ));
+        setting.setValueAsBoolean(enabled);
+        settingRepository.save(setting);
+        log.info("Transcript feature updated: enabled={}", enabled);
+        return enabled;
+    }
+
+    /**
      * Update a setting value.
      */
     @Transactional
