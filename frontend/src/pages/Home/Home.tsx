@@ -8,7 +8,7 @@ import { LandingPage } from '@/components/LandingPage';
 import { creditService, presenceService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
-import type { Session, UserStats, CreditWallet } from '@/types';
+import type { Session, UserStats, CreditWallet, Conversation } from '@/types';
 import styles from './Home.module.css';
 
 export function Home() {
@@ -21,6 +21,7 @@ export function Home() {
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
+  const [recentConversations, setRecentConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
@@ -56,8 +57,9 @@ export function Home() {
         creditService.getWallet(),
         creditService.isFreeModeEnabled(),
         presenceService.getOnlineCount(),
+        conversationService.getConversations(0, 10),
       ])
-        .then(([statsData, sessionsData, walletData, freeMode, onlineCount]) => {
+        .then(([statsData, sessionsData, walletData, freeMode, onlineCount, conversationsData]) => {
           console.log('Stats loaded:', statsData);
           setStats(statsData);
           setSessions(sessionsData || []);
@@ -66,6 +68,7 @@ export function Home() {
           setWallet(walletData);
           setIsFreeModeEnabled(freeMode);
           setOnlineUsers(onlineCount);
+          setRecentConversations(conversationsData.content || []);
         })
         .catch((error) => {
           console.error('Error loading data:', error);
@@ -498,6 +501,41 @@ export function Home() {
               </div>
             </div>
           </Card>
+
+          {/* Recent Conversations - Partners Avatars */}
+          {recentConversations.length > 0 && (
+            <Card
+              header={
+                <h2 className={styles.statsHeader}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.statsHeaderIcon}>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                  Recent Conversations
+                </h2>
+              }
+              className={styles.recentConversationsCard}
+            >
+              <div className={styles.avatarsGrid}>
+                {recentConversations.map((conversation) => {
+                  const partner = conversation.userA.id === user.id ? conversation.userB : conversation.userA;
+                  return (
+                    <Tooltip key={conversation.id} content={partner.name} position="top">
+                      <div 
+                        className={styles.partnerAvatar}
+                        onClick={() => navigate(`/conversations/${conversation.id}`)}
+                      >
+                        <img
+                          src={partner.avatarUrl || '/default-avatar.png'}
+                          alt={partner.name}
+                          className={styles.avatarImage}
+                        />
+                      </div>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
 
           {/* Schedule and Practice Now Side by Side */}
           <div className={styles.practiceRow}>

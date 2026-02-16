@@ -627,3 +627,57 @@
   width: 14px;
   height: 14px;
 }
+
+/* Recent Conversations Card */
+.recentConversationsCard {
+  width: 100%;
+}
+
+.avatarsGrid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+
+.partnerAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 3px solid white;
+}
+
+.partnerAvatar:hover {
+  transform: scale(1.1) translateY(-4px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  border-color: var(--color-primary, #667eea);
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Responsive avatars */
+@media (max-width: 768px) {
+  .partnerAvatar {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatarsGrid {
+    gap: 0.75rem;
+  }
+  
+  .partnerAvatar {
+    width: 48px;
+    height: 48px;
+  }
+}
