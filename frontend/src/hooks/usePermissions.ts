@@ -7,6 +7,7 @@ export interface Permissions {
   canManageSessions: boolean;
   canManageUsers: boolean;
   canManagePayments: boolean;
+  canManageFeedbacks: boolean;
   canCreateAdmins: boolean;
 }
 
@@ -30,6 +31,10 @@ function checkCanManagePayments(role?: Role): boolean {
   return role === 'PAYMENT_ADMIN' || role === 'SUPER_ADMIN';
 }
 
+function checkCanManageFeedbacks(role?: Role): boolean {
+  return role === 'MODERATOR' || role === 'PAYMENT_ADMIN' || role === 'SUPER_ADMIN';
+}
+
 function checkCanCreateAdmins(role?: Role): boolean {
   return role === 'SUPER_ADMIN';
 }
@@ -43,6 +48,7 @@ export function usePermissions(): Permissions {
     canManageSessions: checkCanManageSessions(role),
     canManageUsers: checkCanManageUsers(role),
     canManagePayments: checkCanManagePayments(role),
+    canManageFeedbacks: checkCanManageFeedbacks(role),
     canCreateAdmins: checkCanCreateAdmins(role),
   };
 }
@@ -54,5 +60,6 @@ export {
   checkCanManageSessions as canManageSessions,
   checkCanManageUsers as canManageUsers,
   checkCanManagePayments as canManagePayments,
+  checkCanManageFeedbacks as canManageFeedbacks,
   checkCanCreateAdmins as canCreateAdmins,
 };

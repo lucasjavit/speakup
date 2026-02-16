@@ -58,4 +58,5 @@ export {
   canManageSessions,
   canManageUsers,
   canManagePayments,
+  canManageFeedbacks,
 } from '@/hooks/usePermissions';

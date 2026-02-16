@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
-import { useAuthStore, isAdmin, canManageSessions, canManageUsers, canManagePayments } from '@/stores/authStore';
+import { useAuthStore, isAdmin, canManageSessions, canManageUsers, canManagePayments, canManageFeedbacks } from '@/stores/authStore';
 import { BackButton } from '@/components/ui';
 import styles from './AdminLayout.module.css';
 
@@ -23,6 +23,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/sessions', label: 'Sessions', show: canManageSessions(user.role) },
     { path: '/admin/users', label: 'Users', show: canManageUsers(user.role) },
     { path: '/admin/payments', label: 'Payments', show: canManagePayments(user.role) },
+    { path: '/admin/feedbacks', label: 'Feedbacks', show: canManageFeedbacks(user.role) },
   ].filter(item => item.show);
 
   return (

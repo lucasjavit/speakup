@@ -17,6 +17,8 @@ import { AdminDashboard } from '@/pages/admin/Dashboard';
 import { AdminSessions, SessionForm } from '@/pages/admin/Sessions';
 import { AdminUsers } from '@/pages/admin/Users';
 import { AdminPayments } from '@/pages/admin/Payments';
+import { AdminFeedbacks } from '@/pages/admin/Feedbacks';
+import { Feedback } from '@/pages/Feedback';
 import { Settings } from '@/pages/Settings';
 import { Error } from '@/pages/Error';
 
@@ -64,6 +66,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <Settings />,
+      },
+      {
+        path: 'feedback',
+        element: <Feedback />,
       },
       {
         path: '*',
@@ -122,6 +128,10 @@ export const router = createBrowserRouter([
       {
         path: 'payments',
         element: <AdminPayments />,
+      },
+      {
+        path: 'feedbacks',
+        element: <AdminFeedbacks />,
       },
     ],
   },

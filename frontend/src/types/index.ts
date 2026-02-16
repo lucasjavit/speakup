@@ -4,3 +4,4 @@ export * from './matching';
 export * from './conversation';
 export * from './rating';
 export * from './credit';
+export * from './feedback';

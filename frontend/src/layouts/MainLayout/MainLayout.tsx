@@ -1,9 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore, isAdmin } from '@/stores/authStore';
 import { creditService, presenceService, userService } from '@/services';
 import { transcriptService } from '@/services/transcriptService';
 import { Button } from '@/components/ui';
+import { FeedbackButton } from '@/components/FeedbackButton';
 import styles from './MainLayout.module.css';
 
 const PRESENCE_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
@@ -14,10 +15,14 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
   const [isSettingsPageEnabled, setIsSettingsPageEnabled] = useState(false);
   const [isTranscriptFeatureEnabled, setIsTranscriptFeatureEnabled] = useState(true);
+  
+  // Don't show feedback button on admin pages
+  const showFeedbackButton = isAuthenticated && !location.pathname.startsWith('/admin');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -65,6 +70,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                     Transcripts
                   </Link>
                 )}
+                <Link to="/feedback" className={styles.navLink}>
+                  Feedback
+                </Link>
                 {isFreeModeEnabled === false && (
                   <Link to="/credits" className={styles.navLink}>
                     Credits
@@ -119,6 +127,8 @@ export function MainLayout({ children }: MainLayoutProps) {
       <footer className={styles.footer}>
         <p>&copy; {new Date().getFullYear()} SpeakYou. All rights reserved.</p>
       </footer>
+
+      {showFeedbackButton && <FeedbackButton />}
     </div>
   );
 }

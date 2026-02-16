@@ -11,3 +11,4 @@ export { creditService } from './creditService';
 export { paymentService } from './paymentService';
 export { topicService } from './topicService';
 export { presenceService } from './presenceService';
+export { feedbackService } from './feedbackService';
