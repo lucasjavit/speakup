@@ -1,8 +1,9 @@
 import { NetworkQualityIndicator } from '@/components/ui/NetworkQualityIndicator/NetworkQualityIndicator';
 import { DeviceSelector } from '@/components/video/DeviceSelector';
 import { DeviceSettingsModal } from '@/components/ui/DeviceSettingsModal';
+import { FeedbackButton } from '@/components/FeedbackButton';
 import { useCallTimer, useMediaRecorder, usePeerConnection, useWebSocket } from '@/hooks';
-import { conversationService, peerService } from '@/services';
+import { conversationService, peerService, userService } from '@/services';
 import { speechRecognitionService } from '@/services/speechRecognitionService';
 import { transcriptService, type TranscriptEntry } from '@/services/transcriptService';
 import { useAuthStore } from '@/stores/authStore';
@@ -62,6 +63,9 @@ export function Call() {
 
   // Preferences
   const { backgroundTheme, setBackgroundTheme, showNetworkIndicator, layoutMode: preferredLayoutMode, setLayoutMode: setPreferredLayoutMode } = usePreferenceStore();
+
+  // Feedback feature flag
+  const [isFeedbackFeatureEnabled, setIsFeedbackFeatureEnabled] = useState(false);
 
   // Device selector state
   const [audioDevices, setAudioDevices] = useState<MediaDeviceOption[]>([]);
@@ -585,6 +589,13 @@ export function Call() {
   useEffect(() => {
     setLayoutMode(preferredLayoutMode);
   }, [preferredLayoutMode]);
+
+  // Check if feedback feature is enabled
+  useEffect(() => {
+    userService.isFeedbackFeatureEnabled()
+      .then(setIsFeedbackFeatureEnabled)
+      .catch(console.error);
+  }, []);
 
   // Resolve country flags
   useEffect(() => {
@@ -1290,6 +1301,9 @@ export function Call() {
         onVideoDeviceChange={handleVideoDeviceChange}
         onAudioOutputDeviceChange={handleAudioOutputDeviceChange}
       />
+
+      {/* Feedback Button */}
+      {isFeedbackFeatureEnabled && <FeedbackButton />}
     </div>
   );
 }
