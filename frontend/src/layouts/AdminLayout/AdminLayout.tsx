@@ -24,6 +24,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/users', label: 'Users', show: canManageUsers(user.role) },
     { path: '/admin/payments', label: 'Payments', show: canManagePayments(user.role) },
     { path: '/admin/feedbacks', label: 'Feedbacks', show: canManageFeedbacks(user.role) },
+    { path: '/admin/settings', label: 'Settings', show: true },
   ].filter(item => item.show);
 
   return (

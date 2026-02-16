@@ -20,9 +20,10 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
   const [isSettingsPageEnabled, setIsSettingsPageEnabled] = useState(false);
   const [isTranscriptFeatureEnabled, setIsTranscriptFeatureEnabled] = useState(true);
+  const [isFeedbackFeatureEnabled, setIsFeedbackFeatureEnabled] = useState(true);
   
   // Don't show feedback button on admin pages
-  const showFeedbackButton = isAuthenticated && !location.pathname.startsWith('/admin');
+  const showFeedbackButton = isAuthenticated && isFeedbackFeatureEnabled && !location.pathname.startsWith('/admin');
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -34,6 +35,9 @@ export function MainLayout({ children }: MainLayoutProps) {
         .catch(console.error);
       transcriptService.isFeatureEnabled()
         .then(setIsTranscriptFeatureEnabled)
+        .catch(console.error);
+      userService.isFeedbackFeatureEnabled()
+        .then(setIsFeedbackFeatureEnabled)
         .catch(console.error);
     }
   }, [isAuthenticated]);
@@ -70,9 +74,11 @@ export function MainLayout({ children }: MainLayoutProps) {
                     Transcripts
                   </Link>
                 )}
-                <Link to="/feedback" className={styles.navLink}>
-                  Feedback
-                </Link>
+                {isFeedbackFeatureEnabled && (
+                  <Link to="/feedback" className={styles.navLink}>
+                    Feedback
+                  </Link>
+                )}
                 {isFreeModeEnabled === false && (
                   <Link to="/credits" className={styles.navLink}>
                     Credits

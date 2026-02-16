@@ -20,6 +20,8 @@ export function AdminDashboard() {
   const [isUpdatingLimit, setIsUpdatingLimit] = useState(false);
   const [transcriptFeatureEnabled, setTranscriptFeatureEnabled] = useState(true);
   const [isTogglingTranscriptFeature, setIsTogglingTranscriptFeature] = useState(false);
+  const [feedbackFeatureEnabled, setFeedbackFeatureEnabled] = useState(true);
+  const [isTogglingFeedbackFeature, setIsTogglingFeedbackFeature] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -28,20 +30,22 @@ export function AdminDashboard() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [statsData, freeModeData, notifyData, settingsPageData, limitData, transcriptFeatureData] = await Promise.all([
+      const [statsData, freeModeData, notifyData, settingsPageData, limitData, transcriptFeatureData, feedbackFeatureData] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getFreeModeStatus(),
-        adminService.getNotifyOnEmptyQueue(),
+        adminService.getNotifyOnEmptyQueueEnabled(),
         adminService.getSettingsPageEnabled(),
         adminService.getTranscriptDailyLimit(),
         adminService.getTranscriptFeatureEnabled(),
+        adminService.getFeedbackFeatureEnabled(),
       ]);
       setStats(statsData);
       setFreeMode(freeModeData);
-      setNotifyOnEmptyQueue(notifyData.enabled);
-      setSettingsPageEnabled(settingsPageData.enabled);
+      setNotifyOnEmptyQueue(notifyData);
+      setSettingsPageEnabled(settingsPageData);
       setTranscriptLimit(limitData.value.toString());
-      setTranscriptFeatureEnabled(transcriptFeatureData.enabled);
+      setTranscriptFeatureEnabled(transcriptFeatureData);
+      setFeedbackFeatureEnabled(feedbackFeatureData);
     } catch (err) {
       setError('Failed to load dashboard data');
       console.error(err);
@@ -68,8 +72,8 @@ export function AdminDashboard() {
   const handleToggleNotify = async () => {
     try {
       setIsTogglingNotify(true);
-      const result = await adminService.updateNotifyOnEmptyQueue(!notifyOnEmptyQueue);
-      setNotifyOnEmptyQueue(result.enabled);
+      const result = await adminService.updateNotifyOnEmptyQueueEnabled(!notifyOnEmptyQueue);
+      setNotifyOnEmptyQueue(result);
     } catch (err) {
       console.error('Failed to toggle notify on empty queue:', err);
       setError('Failed to update notification setting');
@@ -82,7 +86,7 @@ export function AdminDashboard() {
     try {
       setIsTogglingSettingsPage(true);
       const result = await adminService.updateSettingsPageEnabled(!settingsPageEnabled);
-      setSettingsPageEnabled(result.enabled);
+      setSettingsPageEnabled(result);
     } catch (err) {
       console.error('Failed to toggle settings page:', err);
       setError('Failed to update settings page');
@@ -115,12 +119,25 @@ export function AdminDashboard() {
     try {
       setIsTogglingTranscriptFeature(true);
       const result = await adminService.updateTranscriptFeatureEnabled(!transcriptFeatureEnabled);
-      setTranscriptFeatureEnabled(result.enabled);
+      setTranscriptFeatureEnabled(result);
     } catch (err) {
       console.error('Failed to toggle transcript feature:', err);
       setError('Failed to update transcript feature');
     } finally {
       setIsTogglingTranscriptFeature(false);
+    }
+  };
+
+  const handleToggleFeedbackFeature = async () => {
+    try {
+      setIsTogglingFeedbackFeature(true);
+      const result = await adminService.updateFeedbackFeatureEnabled(!feedbackFeatureEnabled);
+      setFeedbackFeatureEnabled(result);
+    } catch (err) {
+      console.error('Failed to toggle feedback feature:', err);
+      setError('Failed to update feedback feature');
+    } finally {
+      setIsTogglingFeedbackFeature(false);
     }
   };
 
@@ -318,6 +335,30 @@ export function AdminDashboard() {
                   </span>
                 </button>
                 <h3 className={styles.settingTitle}>Feature de Transcrição</h3>
+              </div>
+            </Card>
+          </Tooltip>
+
+          {/* Feedback Feature Toggle Card */}
+          <Tooltip content="Quando ativado, os usuários podem reportar bugs e enviar sugestões através do sistema de feedback." position="top">
+            <Card className={styles.feedbackFeatureCard}>
+              <div className={styles.settingCardContent}>
+                <div className={styles.settingIconWrapper}>
+                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.settingIcon}>
+                    <path d="M20 8h-2.81c-.45-.78-1.07-1.45-1.82-1.96L17 4.41 15.59 3l-2.17 2.17C12.96 5.06 12.49 5 12 5c-.49 0-.96.06-1.41.17L8.41 3 7 4.41l1.62 1.63C7.88 6.55 7.26 7.22 6.81 8H4v2h2.09c-.05.33-.09.66-.09 1v1H4v2h2v1c0 .34.04.67.09 1H4v2h2.81c1.04 1.79 2.97 3 5.19 3s4.15-1.21 5.19-3H20v-2h-2.09c.05-.33.09-.66.09-1v-1h2v-2h-2v-1c0-.34-.04-.67-.09-1H20V8zm-6 8h-4v-2h4v2zm0-4h-4v-2h4v2z" />
+                  </svg>
+                </div>
+                <button
+                  className={`${styles.settingToggle} ${feedbackFeatureEnabled ? styles.enabled : styles.disabled}`}
+                  onClick={handleToggleFeedbackFeature}
+                  disabled={isTogglingFeedbackFeature}
+                  title={isTogglingFeedbackFeature ? 'Atualizando...' : feedbackFeatureEnabled ? 'Ativado' : 'Desativado'}
+                >
+                  <span className={styles.toggleTrack}>
+                    <span className={styles.toggleThumb} />
+                  </span>
+                </button>
+                <h3 className={styles.settingTitle}>Feedback & Bug Reports</h3>
               </div>
             </Card>
           </Tooltip>

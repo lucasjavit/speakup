@@ -167,30 +167,6 @@ export const adminService = {
     return apiCall<ApplicationSetting[]>(api.get<ApiResult<ApplicationSetting[]>>('/admin/settings'));
   },
 
-  getNotifyOnEmptyQueue: async (): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
-      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue')
-    );
-  },
-
-  updateNotifyOnEmptyQueue: async (enabled: boolean): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
-      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue', { enabled })
-    );
-  },
-
-  getSettingsPageEnabled: async (): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
-      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page')
-    );
-  },
-
-  updateSettingsPageEnabled: async (enabled: boolean): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
-      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page', { enabled })
-    );
-  },
-
   getTranscriptDailyLimit: async (): Promise<{ value: number }> => {
     return apiCall<{ value: number }>(
       api.get<ApiResult<{ value: number }>>('/admin/settings/transcript-daily-limit')
@@ -203,15 +179,59 @@ export const adminService = {
     );
   },
 
-  getTranscriptFeatureEnabled: async (): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
-      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/transcript-feature')
+  getFeedbackFeatureEnabled: async (): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/feedback-feature')
     );
+    return response.enabled;
   },
 
-  updateTranscriptFeatureEnabled: async (enabled: boolean): Promise<{ enabled: boolean }> => {
-    return apiCall<{ enabled: boolean }>(
+  updateFeedbackFeatureEnabled: async (enabled: boolean): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/feedback-feature', { enabled })
+    );
+    return response.enabled;
+  },
+
+  getNotifyOnEmptyQueueEnabled: async (): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue')
+    );
+    return response.enabled;
+  },
+
+  updateNotifyOnEmptyQueueEnabled: async (enabled: boolean): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/notify-on-empty-queue', { enabled })
+    );
+    return response.enabled;
+  },
+
+  getSettingsPageEnabled: async (): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page')
+    );
+    return response.enabled;
+  },
+
+  updateSettingsPageEnabled: async (enabled: boolean): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/settings-page', { enabled })
+    );
+    return response.enabled;
+  },
+
+  getTranscriptFeatureEnabled: async (): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
+      api.get<ApiResult<{ enabled: boolean }>>('/admin/settings/transcript-feature')
+    );
+    return response.enabled;
+  },
+
+  updateTranscriptFeatureEnabled: async (enabled: boolean): Promise<boolean> => {
+    const response = await apiCall<{ enabled: boolean }>(
       api.put<ApiResult<{ enabled: boolean }>>('/admin/settings/transcript-feature', { enabled })
     );
+    return response.enabled;
   },
 };

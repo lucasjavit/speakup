@@ -36,6 +36,10 @@ export const userService = {
     return apiCall<boolean>(api.get<ApiResult<boolean>>('/users/settings-page-enabled'));
   },
 
+  isFeedbackFeatureEnabled: async (): Promise<boolean> => {
+    return apiCall<boolean>(api.get<ApiResult<boolean>>('/users/feedback-feature-enabled'));
+  },
+
   getMySettings: async (): Promise<{ openaiApiKey: string }> => {
     return apiCall<{ openaiApiKey: string }>(
       api.get<ApiResult<{ openaiApiKey: string }>>('/users/me/settings')

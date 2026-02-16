@@ -217,6 +217,32 @@ public class SettingsService {
     }
 
     /**
+     * Check if feedback feature is enabled.
+     */
+    public boolean isFeedbackFeatureEnabled() {
+        return settingRepository.findByKey(SettingKey.FEEDBACK_FEATURE_ENABLED)
+                .map(ApplicationSetting::getValueAsBoolean)
+                .orElse(true); // Default to enabled
+    }
+
+    /**
+     * Update feedback feature enabled.
+     */
+    @Transactional
+    public boolean updateFeedbackFeatureEnabled(boolean enabled) {
+        ApplicationSetting setting = settingRepository.findByKey(SettingKey.FEEDBACK_FEATURE_ENABLED)
+                .orElseGet(() -> new ApplicationSetting(
+                        SettingKey.FEEDBACK_FEATURE_ENABLED,
+                        "true",
+                        "When enabled, users can report bugs and send feedback through the feedback system"
+                ));
+        setting.setValueAsBoolean(enabled);
+        settingRepository.save(setting);
+        log.info("Feedback feature updated: enabled={}", enabled);
+        return enabled;
+    }
+
+    /**
      * Update a setting value.
      */
     @Transactional

@@ -109,6 +109,21 @@ public class AdminSettingsController {
         return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
     }
 
+    @GetMapping("/feedback-feature")
+    @Operation(summary = "Get feedback feature status")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> getFeedbackFeatureEnabled() {
+        boolean enabled = settingsService.isFeedbackFeatureEnabled();
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
+    @PutMapping("/feedback-feature")
+    @Operation(summary = "Toggle feedback feature", description = "Enable or disable the feedback/bug report feature for all users")
+    public ResponseEntity<ApiResponse<java.util.Map<String, Boolean>>> updateFeedbackFeatureEnabled(
+            @RequestBody java.util.Map<String, Boolean> request) {
+        boolean enabled = settingsService.updateFeedbackFeatureEnabled(request.getOrDefault("enabled", true));
+        return ResponseEntity.ok(ApiResponse.success(java.util.Map.of("enabled", enabled)));
+    }
+
     @PutMapping("/{key}")
     @Operation(summary = "Update a setting", description = "Update a specific setting value")
     public ResponseEntity<ApiResponse<ApplicationSettingResponse>> updateSetting(

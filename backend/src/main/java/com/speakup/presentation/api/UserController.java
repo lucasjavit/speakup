@@ -115,6 +115,12 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(settingsService.isSettingsPageEnabled()));
     }
 
+    @GetMapping("/feedback-feature-enabled")
+    @Operation(summary = "Check if feedback feature is enabled", description = "Returns whether the feedback/bug report feature is accessible to users")
+    public ResponseEntity<ApiResponse<Boolean>> isFeedbackFeatureEnabled() {
+        return ResponseEntity.ok(ApiResponse.success(settingsService.isFeedbackFeatureEnabled()));
+    }
+
     @GetMapping("/me/settings")
     @Operation(summary = "Get user settings", description = "Returns user settings with masked API keys")
     public ResponseEntity<ApiResponse<UserSettingsResponse>> getMySettings(

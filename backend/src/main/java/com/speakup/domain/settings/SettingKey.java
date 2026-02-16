@@ -33,4 +33,9 @@ public final class SettingKey {
      * When enabled, users can record and access conversation transcripts.
      */
     public static final String TRANSCRIPT_FEATURE_ENABLED = "TRANSCRIPT_FEATURE_ENABLED";
+
+    /**
+     * When enabled, users can report bugs and send feedback through the feedback system.
+     */
+    public static final String FEEDBACK_FEATURE_ENABLED = "FEEDBACK_FEATURE_ENABLED";
 }
