@@ -1,12 +1,13 @@
 package com.speakup.application.conversation.dto;
 
+import java.time.Instant;
+import java.util.UUID;
+
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationStatus;
 import com.speakup.domain.conversation.ConversationTranscript;
-import lombok.Builder;
 
-import java.time.Instant;
-import java.util.UUID;
+import lombok.Builder;
 
 /**
  * Response DTO for conversation data.

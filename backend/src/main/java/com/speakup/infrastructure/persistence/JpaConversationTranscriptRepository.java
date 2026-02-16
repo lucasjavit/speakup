@@ -1,6 +1,5 @@
 package com.speakup.infrastructure.persistence;
 
-import com.speakup.domain.conversation.AnalysisStatus;
 import com.speakup.domain.conversation.ConversationTranscript;
 import com.speakup.domain.conversation.ConversationTranscriptRepository;
 import org.springframework.data.domain.Page;
@@ -46,6 +45,14 @@ public interface JpaConversationTranscriptRepository extends JpaRepository<Conve
     Page<ConversationTranscript> findVisibleByRequesterId(@Param("requesterId") UUID requesterId, Pageable pageable);
 
     @Override
-    @Query("SELECT ct FROM ConversationTranscript ct WHERE ct.conversation.id IN :conversationIds")
-    List<ConversationTranscript> findByConversationIds(@Param("conversationIds") List<UUID> conversationIds);
+    @Query("""
+        SELECT ct FROM ConversationTranscript ct 
+        WHERE ct.conversation.id IN :conversationIds
+        AND ct.requester.id = :requesterId
+        AND (ct.analysisStatus = 'COMPLETED' OR ct.analysisStatus = 'NOT_REQUESTED')
+        """)
+    List<ConversationTranscript> findByConversationIdsAndRequesterId(
+        @Param("conversationIds") List<UUID> conversationIds,
+        @Param("requesterId") UUID requesterId
+    );
 }

@@ -42,5 +42,5 @@ public interface ConversationTranscriptRepository {
 
     void delete(ConversationTranscript transcript);
 
-    List<ConversationTranscript> findByConversationIds(List<UUID> conversationIds);
+    List<ConversationTranscript> findByConversationIdsAndRequesterId(List<UUID> conversationIds, UUID requesterId);
 }

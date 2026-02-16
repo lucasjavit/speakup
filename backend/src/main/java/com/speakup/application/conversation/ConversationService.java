@@ -57,12 +57,18 @@ public class ConversationService {
                 .toList();
 
         Map<UUID, ConversationTranscript> transcriptMap = transcriptRepository
-                .findByConversationIds(conversationIds).stream()
+                .findByConversationIdsAndRequesterId(conversationIds, userId).stream()
                 .collect(Collectors.toMap(
                         t -> t.getConversation().getId(),
                         Function.identity(),
                         (a, b) -> a
                 ));
+
+        log.debug("Found {} transcripts for {} conversations requested by user {}", 
+                  transcriptMap.size(), conversationIds.size(), userId);
+        transcriptMap.forEach((convId, transcript) -> 
+            log.debug("Conversation {} has transcript {}", convId, transcript.getId())
+        );
 
         return conversations.map(c -> ConversationResponse.from(c, transcriptMap.get(c.getId())));
     }

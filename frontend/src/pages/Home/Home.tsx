@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
-import { useCallStore } from '@/stores/callStore';
-import { Card, QueueModal, Tooltip, LoginModal } from '@/components/ui';
 import { InsufficientCreditsModal } from '@/components/credits';
 import { LandingPage } from '@/components/LandingPage';
-import { creditService, presenceService } from '@/services';
+import { Card, LoginModal, QueueModal, Tooltip } from '@/components/ui';
+import { conversationService, creditService, presenceService } from '@/services';
 import { sessionService } from '@/services/sessionService';
-import { conversationService } from '@/services';
-import type { Session, UserStats, CreditWallet, Conversation } from '@/types';
+import { useAuthStore } from '@/stores/authStore';
+import { useCallStore } from '@/stores/callStore';
+import type { Conversation, CreditWallet, Session, UserStats } from '@/types';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 
 export function Home() {
