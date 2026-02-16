@@ -40,3 +40,6 @@ export { UserLevel } from './UserLevel';
 
 export { LoginModal } from './LoginModal/LoginModal';
 export type { LoginModalProps } from './LoginModal/LoginModal';
+
+export { DataTable } from './DataTable';
+export type { DataTableProps, Column } from './DataTable';
