@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Card } from '@/components/ui';
+import { DataTable } from '@/components/ui';
+import type { Column } from '@/components/ui';
 import { feedbackService } from '@/services';
 import type { FeedbackSummary, FeedbackStats, FeedbackStatus, FeedbackType } from '@/types';
 import { FeedbackDetailsModal } from './FeedbackDetailsModal';
@@ -44,17 +45,6 @@ export function Feedbacks() {
       toast.error('Failed to load feedbacks');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setPage(0);
-  };
-
-  const goToPage = (newPage: number) => {
-    if (newPage >= 0 && newPage < totalPages) {
-      setPage(newPage);
     }
   };
 
@@ -115,6 +105,67 @@ export function Feedbacks() {
   const formatStatusLabel = (status: FeedbackStatus) => {
     return status.replace('_', ' ');
   };
+
+  const columns: Column<FeedbackSummary>[] = [
+    {
+      key: 'type',
+      label: 'Type',
+      render: (feedback) => (
+        <span className={`${styles.typeBadge} ${getTypeBadgeClass(feedback.type)}`}>
+          {feedback.type}
+        </span>
+      ),
+    },
+    {
+      key: 'title',
+      label: 'Title',
+      render: (feedback) => feedback.title,
+    },
+    {
+      key: 'user',
+      label: 'User',
+      render: (feedback) => (
+        <div className={styles.userInfo}>
+          <span className={styles.userName}>{feedback.userName}</span>
+          <span className={styles.userEmail}>{feedback.userEmail}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (feedback) => (
+        <span className={`${styles.statusBadge} ${getStatusBadgeClass(feedback.status)}`}>
+          {formatStatusLabel(feedback.status)}
+        </span>
+      ),
+    },
+    {
+      key: 'date',
+      label: 'Date',
+      render: (feedback) => formatDate(feedback.createdAt),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (feedback) => (
+        <div className={styles.actions}>
+          <button
+            className={styles.actionButton}
+            onClick={() => setSelectedFeedbackId(feedback.id)}
+          >
+            View Details
+          </button>
+          <button
+            className={`${styles.actionButton} ${styles.danger}`}
+            onClick={() => handleDelete(feedback.id)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className={styles.container}>
@@ -188,149 +239,23 @@ export function Feedbacks() {
         </div>
       </div>
 
-      <Card>
-        {loading ? (
-          <div className={styles.loading}>Loading feedbacks...</div>
-        ) : feedbacks.length === 0 ? (
-          <div className={styles.noData}>No feedbacks found</div>
-        ) : (
-          <>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Title</th>
-                  <th>User</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {feedbacks.map((feedback) => (
-                  <tr key={feedback.id}>
-                    <td>
-                      <span className={`${styles.typeBadge} ${getTypeBadgeClass(feedback.type)}`}>
-                        {feedback.type}
-                      </span>
-                    </td>
-                    <td>{feedback.title}</td>
-                    <td>
-                      <div className={styles.userInfo}>
-                        <span className={styles.userName}>{feedback.userName}</span>
-                        <span className={styles.userEmail}>{feedback.userEmail}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${getStatusBadgeClass(feedback.status)}`}>
-                        {formatStatusLabel(feedback.status)}
-                      </span>
-                    </td>
-                    <td>{formatDate(feedback.createdAt)}</td>
-                    <td>
-                      <div className={styles.actions}>
-                        <button
-                          className={styles.actionButton}
-                          onClick={() => setSelectedFeedbackId(feedback.id)}
-                        >
-                          View Details
-                        </button>
-                        <button
-                          className={`${styles.actionButton} ${styles.danger}`}
-                          onClick={() => handleDelete(feedback.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className={styles.paginationContainer}>
-              <div className={styles.paginationInfo}>
-                <span>
-                  Showing {page * pageSize + 1} to {Math.min((page + 1) * pageSize, totalElements)} of {totalElements} feedbacks
-                </span>
-                <div className={styles.pageSizeSelector}>
-                  <label>Rows per page:</label>
-                  <select 
-                    value={pageSize} 
-                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                    className={styles.pageSizeSelect}
-                  >
-                    <option value={10}>10</option>
-                    <option value={20}>20</option>
-                    <option value={50}>50</option>
-                    <option value={100}>100</option>
-                  </select>
-                </div>
-              </div>
-              
-              {totalPages > 1 && (
-                <div className={styles.pagination}>
-                  <button
-                    className={styles.pageButton}
-                    onClick={() => goToPage(0)}
-                    disabled={page === 0}
-                    title="First page"
-                  >
-                    ««
-                  </button>
-                  <button
-                    className={styles.pageButton}
-                    onClick={() => goToPage(page - 1)}
-                    disabled={page === 0}
-                  >
-                    Previous
-                  </button>
-                  
-                  <div className={styles.pageNumbers}>
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum: number;
-                      if (totalPages <= 5) {
-                        pageNum = i;
-                      } else if (page < 3) {
-                        pageNum = i;
-                      } else if (page >= totalPages - 3) {
-                        pageNum = totalPages - 5 + i;
-                      } else {
-                        pageNum = page - 2 + i;
-                      }
-                      return (
-                        <button
-                          key={pageNum}
-                          onClick={() => goToPage(pageNum)}
-                          className={`${styles.pageButton} ${page === pageNum ? styles.active : ''}`}
-                        >
-                          {pageNum + 1}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <button
-                    className={styles.pageButton}
-                    onClick={() => goToPage(page + 1)}
-                    disabled={page === totalPages - 1}
-                  >
-                    Next
-                  </button>
-                  <button
-                    className={styles.pageButton}
-                    onClick={() => goToPage(totalPages - 1)}
-                    disabled={page === totalPages - 1}
-                    title="Last page"
-                  >
-                    »»
-                  </button>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-      </Card>
+      <DataTable
+        data={feedbacks}
+        columns={columns}
+        getRowKey={(feedback) => feedback.id}
+        loading={loading}
+        emptyMessage="No feedbacks found"
+        currentPage={page}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setPage(0);
+        }}
+        paginationLabel="feedbacks"
+      />
 
       {selectedFeedbackId && (
         <FeedbackDetailsModal
