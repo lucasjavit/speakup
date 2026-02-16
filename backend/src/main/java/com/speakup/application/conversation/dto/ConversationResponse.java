@@ -2,6 +2,7 @@ package com.speakup.application.conversation.dto;
 
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationStatus;
+import com.speakup.domain.conversation.ConversationTranscript;
 import lombok.Builder;
 
 import java.time.Instant;
@@ -25,10 +26,16 @@ public record ConversationResponse(
         boolean hasRecordingB,
         Instant createdAt,
         Integer callDurationSeconds,
-        Integer breakDurationSeconds
+        Integer breakDurationSeconds,
+        boolean hasTranscript,
+        UUID transcriptId
 ) {
 
     public static ConversationResponse from(Conversation conversation) {
+        return from(conversation, null);
+    }
+
+    public static ConversationResponse from(Conversation conversation, ConversationTranscript transcript) {
         var session = conversation.getSession();
         return ConversationResponse.builder()
                 .id(conversation.getId())
@@ -45,6 +52,8 @@ public record ConversationResponse(
                 .createdAt(conversation.getCreatedAt())
                 .callDurationSeconds(session != null ? session.getCallDurationSeconds() : 600)
                 .breakDurationSeconds(session != null ? session.getBreakDurationSeconds() : 30)
+                .hasTranscript(transcript != null)
+                .transcriptId(transcript != null ? transcript.getId() : null)
                 .build();
     }
 

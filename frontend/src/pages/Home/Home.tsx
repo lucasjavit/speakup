@@ -8,8 +8,7 @@ import { LandingPage } from '@/components/LandingPage';
 import { creditService, presenceService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
-import { transcriptService, type TranscriptSummaryDTO } from '@/services/transcriptService';
-import type { Session, UserStats, CreditWallet } from '@/types';
+import type { Session, UserStats, CreditWallet, Conversation } from '@/types';
 import styles from './Home.module.css';
 
 export function Home() {
@@ -22,7 +21,7 @@ export function Home() {
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
-  const [recentTranscripts, setRecentTranscripts] = useState<TranscriptSummaryDTO[]>([]);
+  const [recentConversations, setRecentConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
@@ -58,9 +57,9 @@ export function Home() {
         creditService.getWallet(),
         creditService.isFreeModeEnabled(),
         presenceService.getOnlineCount(),
-        transcriptService.getUserTranscripts(0, 16),
+        conversationService.getConversations(0, 16),
       ])
-        .then(([statsData, sessionsData, walletData, freeMode, onlineCount, transcriptsData]) => {
+        .then(([statsData, sessionsData, walletData, freeMode, onlineCount, conversationsData]) => {
           console.log('Stats loaded:', statsData);
           setStats(statsData);
           setSessions(sessionsData || []);
@@ -69,7 +68,7 @@ export function Home() {
           setWallet(walletData);
           setIsFreeModeEnabled(freeMode);
           setOnlineUsers(onlineCount);
-          setRecentTranscripts(transcriptsData.content || []);
+          setRecentConversations(conversationsData.content || []);
         })
         .catch((error) => {
           console.error('Error loading data:', error);
@@ -504,7 +503,7 @@ export function Home() {
           </Card>
 
           {/* Recent Conversations - Partners Avatars */}
-          {recentTranscripts.length > 0 && (
+          {recentConversations.length > 0 && (
             <Card
               header={
                 <h2 className={styles.statsHeader}>
@@ -517,20 +516,23 @@ export function Home() {
               className={styles.recentConversationsCard}
             >
               <div className={styles.avatarsGrid}>
-                {recentTranscripts.map((transcript) => (
-                  <Tooltip key={transcript.id} content={transcript.partnerName} position="top">
-                    <div 
-                      className={styles.partnerAvatar}
-                      onClick={() => navigate(`/conversations/${transcript.id}`)}
-                    >
-                      <img
-                        src={transcript.partnerAvatarUrl || '/default-avatar.png'}
-                        alt={transcript.partnerName}
-                        className={styles.avatarImage}
-                      />
-                    </div>
-                  </Tooltip>
-                ))}
+                {recentConversations.map((conv) => {
+                  const partner = conv.userA.id === user.id ? conv.userB : conv.userA;
+                  return (
+                    <Tooltip key={conv.id} content={partner.name} position="top">
+                      <div
+                        className={conv.hasTranscript ? styles.partnerAvatar : styles.partnerAvatarNoLink}
+                        onClick={conv.hasTranscript && conv.transcriptId ? () => navigate(`/conversations/${conv.transcriptId}`) : undefined}
+                      >
+                        <img
+                          src={partner.avatarUrl || '/default-avatar.png'}
+                          alt={partner.name}
+                          className={styles.avatarImage}
+                        />
+                      </div>
+                    </Tooltip>
+                  );
+                })}
               </div>
             </Card>
           )}

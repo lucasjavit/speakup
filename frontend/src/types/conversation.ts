@@ -23,6 +23,8 @@ export interface Conversation {
   createdAt: string;
   callDurationSeconds: number;
   breakDurationSeconds: number;
+  hasTranscript: boolean;
+  transcriptId: string | null;
 }
 
 export interface UserStats {

@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,4 +44,8 @@ public interface JpaConversationTranscriptRepository extends JpaRepository<Conve
         ORDER BY ct.createdAt DESC
         """)
     Page<ConversationTranscript> findVisibleByRequesterId(@Param("requesterId") UUID requesterId, Pageable pageable);
+
+    @Override
+    @Query("SELECT ct FROM ConversationTranscript ct WHERE ct.conversation.id IN :conversationIds")
+    List<ConversationTranscript> findByConversationIds(@Param("conversationIds") List<UUID> conversationIds);
 }

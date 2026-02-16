@@ -5,6 +5,8 @@ import com.speakup.application.conversation.dto.UserStats;
 import com.speakup.application.credit.CreditService;
 import com.speakup.domain.conversation.Conversation;
 import com.speakup.domain.conversation.ConversationRepository;
+import com.speakup.domain.conversation.ConversationTranscript;
+import com.speakup.domain.conversation.ConversationTranscriptRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,8 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Service for managing conversations.
@@ -27,6 +33,7 @@ import java.util.UUID;
 public class ConversationService {
 
     private final ConversationRepository conversationRepository;
+    private final ConversationTranscriptRepository transcriptRepository;
     private final CreditService creditService;
 
     /**
@@ -43,8 +50,21 @@ public class ConversationService {
      */
     @Transactional(readOnly = true)
     public Page<ConversationResponse> getUserConversations(UUID userId, Pageable pageable) {
-        return conversationRepository.findByUserId(userId, pageable)
-                .map(ConversationResponse::from);
+        Page<Conversation> conversations = conversationRepository.findByUserId(userId, pageable);
+
+        List<UUID> conversationIds = conversations.getContent().stream()
+                .map(Conversation::getId)
+                .toList();
+
+        Map<UUID, ConversationTranscript> transcriptMap = transcriptRepository
+                .findByConversationIds(conversationIds).stream()
+                .collect(Collectors.toMap(
+                        t -> t.getConversation().getId(),
+                        Function.identity(),
+                        (a, b) -> a
+                ));
+
+        return conversations.map(c -> ConversationResponse.from(c, transcriptMap.get(c.getId())));
     }
 
     /**
