@@ -8,7 +8,8 @@ import { LandingPage } from '@/components/LandingPage';
 import { creditService, presenceService } from '@/services';
 import { sessionService } from '@/services/sessionService';
 import { conversationService } from '@/services';
-import type { Session, UserStats, CreditWallet, Conversation } from '@/types';
+import { transcriptService, type TranscriptSummaryDTO } from '@/services/transcriptService';
+import type { Session, UserStats, CreditWallet } from '@/types';
 import styles from './Home.module.css';
 
 export function Home() {
@@ -21,7 +22,7 @@ export function Home() {
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [wallet, setWallet] = useState<CreditWallet | null>(null);
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
-  const [recentConversations, setRecentConversations] = useState<Conversation[]>([]);
+  const [recentTranscripts, setRecentTranscripts] = useState<TranscriptSummaryDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [showInsufficientCredits, setShowInsufficientCredits] = useState(false);
@@ -57,9 +58,9 @@ export function Home() {
         creditService.getWallet(),
         creditService.isFreeModeEnabled(),
         presenceService.getOnlineCount(),
-        conversationService.getConversations(0, 16),
+        transcriptService.getUserTranscripts(0, 16),
       ])
-        .then(([statsData, sessionsData, walletData, freeMode, onlineCount, conversationsData]) => {
+        .then(([statsData, sessionsData, walletData, freeMode, onlineCount, transcriptsData]) => {
           console.log('Stats loaded:', statsData);
           setStats(statsData);
           setSessions(sessionsData || []);
@@ -68,7 +69,7 @@ export function Home() {
           setWallet(walletData);
           setIsFreeModeEnabled(freeMode);
           setOnlineUsers(onlineCount);
-          setRecentConversations(conversationsData.content || []);
+          setRecentTranscripts(transcriptsData.content || []);
         })
         .catch((error) => {
           console.error('Error loading data:', error);
@@ -503,7 +504,7 @@ export function Home() {
           </Card>
 
           {/* Recent Conversations - Partners Avatars */}
-          {recentConversations.length > 0 && (
+          {recentTranscripts.length > 0 && (
             <Card
               header={
                 <h2 className={styles.statsHeader}>
@@ -516,23 +517,20 @@ export function Home() {
               className={styles.recentConversationsCard}
             >
               <div className={styles.avatarsGrid}>
-                {recentConversations.map((conversation) => {
-                  const partner = conversation.userA.id === user.id ? conversation.userB : conversation.userA;
-                  return (
-                    <Tooltip key={conversation.id} content={partner.name} position="top">
-                      <div 
-                        className={styles.partnerAvatar}
-                        onClick={() => navigate(`/conversations/${conversation.id}`)}
-                      >
-                        <img
-                          src={partner.avatarUrl || '/default-avatar.png'}
-                          alt={partner.name}
-                          className={styles.avatarImage}
-                        />
-                      </div>
-                    </Tooltip>
-                  );
-                })}
+                {recentTranscripts.map((transcript) => (
+                  <Tooltip key={transcript.id} content={transcript.partnerName} position="top">
+                    <div 
+                      className={styles.partnerAvatar}
+                      onClick={() => navigate(`/conversations/${transcript.id}`)}
+                    >
+                      <img
+                        src={transcript.partnerAvatarUrl || '/default-avatar.png'}
+                        alt={transcript.partnerName}
+                        className={styles.avatarImage}
+                      />
+                    </div>
+                  </Tooltip>
+                ))}
               </div>
             </Card>
           )}
