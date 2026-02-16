@@ -635,20 +635,20 @@
 
 .avatarsGrid {
   display: flex;
-  gap: 1rem;
+  gap: 0.875rem;
   flex-wrap: wrap;
   padding: 0.5rem 0;
 }
 
 .partnerAvatar {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border: 3px solid white;
+  border: 2px solid white;
 }
 
 .partnerAvatar:hover {
@@ -666,18 +666,18 @@
 /* Responsive avatars */
 @media (max-width: 768px) {
   .partnerAvatar {
-    width: 56px;
-    height: 56px;
+    width: 48px;
+    height: 48px;
   }
 }
 
 @media (max-width: 480px) {
   .avatarsGrid {
-    gap: 0.75rem;
+    gap: 0.625rem;
   }
   
   .partnerAvatar {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
   }
 }
