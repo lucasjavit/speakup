@@ -57,7 +57,7 @@ export function Home() {
         creditService.getWallet(),
         creditService.isFreeModeEnabled(),
         presenceService.getOnlineCount(),
-        conversationService.getConversations(0, 10),
+        conversationService.getConversations(0, 16),
       ])
         .then(([statsData, sessionsData, walletData, freeMode, onlineCount, conversationsData]) => {
           console.log('Stats loaded:', statsData);
