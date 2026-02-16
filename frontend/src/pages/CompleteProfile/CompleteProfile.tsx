@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Button, Card, Input } from '@/components/ui';
 import { Select } from '@/components/ui/Select';
 import { TimezoneSelect } from '@/components/ui/TimezoneSelect';
@@ -124,7 +125,7 @@ export function CompleteProfile() {
         const userData = await authService.getCurrentUser();
         if (userData) {
           setUser(userData);
-          setIdNumber(userData.maskedIdNumber || '');
+          setIdNumber(userData.idNumber || '');
           setCountry(userData.country || '');
           setAddress(userData.address || '');
           setPhoneCountryCode(userData.phoneCountryCode || '');
@@ -288,10 +289,11 @@ export function CompleteProfile() {
         }
       }
 
+      toast.success('Profile saved successfully!');
       navigate('/');
     } catch (err) {
       console.error('Profile update error:', err);
-      setError('Failed to update profile. Please try again.');
+      toast.error('Failed to update profile. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

@@ -21,7 +21,7 @@ export interface User {
   name: string;
   avatarUrl?: string;
   provider?: AuthProvider;
-  maskedIdNumber?: string;  // ID number is now masked for privacy (GDPR)
+  idNumber?: string;
   country?: string;
   city?: string;
   address?: string;
