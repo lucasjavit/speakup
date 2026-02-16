@@ -69,6 +69,8 @@ public class UserService {
                 request.country(),
                 request.city(),
                 request.address(),
+                request.phoneCountryCode(),
+                request.phoneNumber(),
                 request.nativeLanguage(),
                 request.targetLanguage(),
                 request.proficiencyLevel(),

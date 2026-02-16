@@ -30,6 +30,7 @@
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  font-family: system-ui, -apple-system, "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
 }
 
 .select:focus {
@@ -107,6 +108,7 @@
   color: var(--color-text-primary, #1e293b);
   border-radius: 4px;
   margin: 2px 0;
+  font-family: system-ui, -apple-system, "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
 }
 
 .select option:hover {

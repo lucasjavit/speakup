@@ -5,6 +5,7 @@ import { Select } from '@/components/ui/Select';
 import { TimezoneSelect } from '@/components/ui/TimezoneSelect';
 import { useAuthStore } from '@/stores/authStore';
 import { userService, authService } from '@/services';
+import { countryToPhoneCode, getUniquePhoneCodes } from '@/utils/phoneCodeData';
 import styles from './CompleteProfile.module.css';
 type Language = 'ENGLISH' | 'PORTUGUESE' | 'SPANISH' | 'FRENCH' | 'GERMAN' | 'ITALIAN' | 'JAPANESE' | 'KOREAN' | 'MANDARIN';
 type ProficiencyLevel = 'BASIC' | 'ELEMENTARY' | 'LEVEL_UP' | 'EXPERT';
@@ -79,6 +80,8 @@ export function CompleteProfile() {
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [address, setAddress] = useState('');
+  const [phoneCountryCode, setPhoneCountryCode] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [nativeLanguage, setNativeLanguage] = useState<Language | ''>('');
   const [targetLanguage, setTargetLanguage] = useState<Language | ''>('');
   const [proficiencyLevel, setProficiencyLevel] = useState<ProficiencyLevel | ''>('');
@@ -101,6 +104,8 @@ export function CompleteProfile() {
       idNumber,
       country,
       city,
+      phoneCountryCode,
+      phoneNumber,
       nativeLanguage,
       targetLanguage,
       proficiencyLevel,
@@ -108,7 +113,7 @@ export function CompleteProfile() {
     ];
     const filled = fields.filter(Boolean).length;
     return Math.round((filled / fields.length) * 100);
-  }, [idNumber, country, city, nativeLanguage, targetLanguage, proficiencyLevel, timezone]);
+  }, [idNumber, country, city, phoneCountryCode, phoneNumber, nativeLanguage, targetLanguage, proficiencyLevel, timezone]);
 
   // Fetch fresh user data from API when editing - runs on every navigation to this page
   useEffect(() => {
@@ -122,6 +127,8 @@ export function CompleteProfile() {
           setIdNumber(userData.maskedIdNumber || '');
           setCountry(userData.country || '');
           setAddress(userData.address || '');
+          setPhoneCountryCode(userData.phoneCountryCode || '');
+          setPhoneNumber(userData.phoneNumber || '');
           setNativeLanguage((userData.nativeLanguage as Language) || '');
           setTargetLanguage((userData.targetLanguage as Language) || '');
           setProficiencyLevel((userData.proficiencyLevel as ProficiencyLevel) || '');
@@ -139,6 +146,8 @@ export function CompleteProfile() {
     setCountry('');
     setCity('');
     setAddress('');
+    setPhoneCountryCode('');
+    setPhoneNumber('');
     setNativeLanguage('');
     setTargetLanguage('');
     setProficiencyLevel('');
@@ -173,6 +182,13 @@ export function CompleteProfile() {
     };
     fetchCountries();
   }, []);
+
+  // Auto-fill phone country code when country changes
+  useEffect(() => {
+    if (country && countryToPhoneCode[country]) {
+      setPhoneCountryCode(countryToPhoneCode[country]);
+    }
+  }, [country]);
 
   // Load cities when country changes
   useEffect(() => {
@@ -216,7 +232,7 @@ export function CompleteProfile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!idNumber || !country || !city || !timezone) {
+    if (!idNumber || !country || !city || !phoneCountryCode || !phoneNumber || !timezone) {
       setError('Please fill in all required fields');
       return;
     }
@@ -250,6 +266,8 @@ export function CompleteProfile() {
         country,
         city,
         address: address || undefined,
+        phoneCountryCode,
+        phoneNumber,
         nativeLanguage,
         targetLanguage,
         proficiencyLevel,
@@ -464,6 +482,58 @@ export function CompleteProfile() {
                       onChange={(e) => setAddress(e.target.value)}
                       placeholder="Your full address"
                     />
+                  </div>
+
+                  <div className={styles.fieldRow}>
+                    <div className={styles.field} style={{ flex: '0 0 140px' }}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> Code
+                      </label>
+                      <div style={{ position: 'relative' }}>
+                        {phoneCountryCode && getUniquePhoneCodes().find(p => p.code === phoneCountryCode) && (
+                          <img 
+                            src={`https://flagcdn.com/w40/${getUniquePhoneCodes().find(p => p.code === phoneCountryCode)?.isoCode}.png`}
+                            alt="flag"
+                            style={{ 
+                              position: 'absolute', 
+                              left: '10px', 
+                              top: '50%', 
+                              transform: 'translateY(-50%)',
+                              width: '24px',
+                              height: '18px',
+                              borderRadius: '2px',
+                              objectFit: 'cover',
+                              pointerEvents: 'none',
+                              zIndex: 1
+                            }}
+                          />
+                        )}
+                        <Select
+                          value={phoneCountryCode}
+                          onChange={setPhoneCountryCode}
+                          options={getUniquePhoneCodes().map(({ code }) => ({ 
+                            value: code, 
+                            label: code
+                          }))}
+                          placeholder="Code"
+                          error={error && !phoneCountryCode ? 'Required' : undefined}
+                          style={{ paddingLeft: phoneCountryCode ? '42px' : undefined }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className={styles.field} style={{ flex: 1 }}>
+                      <label className={styles.fieldLabel}>
+                        <span className={styles.required}>*</span> Phone Number
+                      </label>
+                      <Input
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                        placeholder="Your phone number"
+                        type="tel"
+                        error={error && !phoneNumber ? 'Required' : undefined}
+                      />
+                    </div>
                   </div>
                 </div>
 

@@ -25,6 +25,8 @@ export interface User {
   country?: string;
   city?: string;
   address?: string;
+  phoneCountryCode?: string;
+  phoneNumber?: string;
   nativeLanguage?: Language;
   targetLanguage?: Language;
   proficiencyLevel?: ProficiencyLevel;
@@ -63,6 +65,8 @@ export interface UserProfileExport {
   country?: string;
   city?: string;
   address?: string;
+  phoneCountryCode?: string;
+  phoneNumber?: string;
   nativeLanguage?: string;
   targetLanguage?: string;
   proficiencyLevel?: string;
@@ -104,6 +108,8 @@ export interface CompleteProfileRequest {
   country: string;
   city: string;
   address?: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
   nativeLanguage: Language;
   targetLanguage: Language;
   proficiencyLevel: ProficiencyLevel;

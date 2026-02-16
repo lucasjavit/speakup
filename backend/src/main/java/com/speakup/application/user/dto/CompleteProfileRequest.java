@@ -20,6 +20,12 @@ public record CompleteProfileRequest(
 
         String address,
 
+        @NotBlank(message = "Phone country code is required")
+        String phoneCountryCode,
+
+        @NotBlank(message = "Phone number is required")
+        String phoneNumber,
+
         @NotNull(message = "Native language is required")
         Language nativeLanguage,
 

@@ -72,6 +72,12 @@ public class User extends BaseEntity {
 
     private String address;
 
+    @Column(name = "phone_country_code")
+    private String phoneCountryCode;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     @Column(name = "openai_api_key")
     private String openaiApiKey;
 
@@ -99,12 +105,15 @@ public class User extends BaseEntity {
      * Mark profile as completed when all required fields are filled.
      */
     public void completeProfile(String idNumber, String country, String city, String address,
+                                String phoneCountryCode, String phoneNumber,
                                 Language nativeLanguage, Language targetLanguage,
                                 ProficiencyLevel level, String timezone) {
         this.idNumber = idNumber;
         this.country = country;
         this.city = city;
         this.address = address;
+        this.phoneCountryCode = phoneCountryCode;
+        this.phoneNumber = phoneNumber;
         this.nativeLanguage = nativeLanguage;
         this.targetLanguage = targetLanguage;
         this.proficiencyLevel = level;
