@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Input } from '@/components/ui';
+import { Button, Input, DataTable } from '@/components/ui';
+import type { Column } from '@/components/ui';
 import { UserLevel } from '@/components/ui/UserLevel';
 import { adminService } from '@/services';
 import { useAuthStore, isSuperAdmin } from '@/stores/authStore';
@@ -71,17 +72,6 @@ export function AdminUsers() {
     setCurrentPage(0);
   };
 
-  const handlePageSizeChange = (newSize: number) => {
-    setPageSize(newSize);
-    setCurrentPage(0);
-  };
-
-  const goToPage = (page: number) => {
-    if (page >= 0 && page < totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
   const handleRoleChange = async (userId: string, role: Role) => {
     try {
       await adminService.updateUserRole(userId, role);
@@ -101,26 +91,6 @@ export function AdminUsers() {
   };
 
   // Email handlers
-  const handleSelectUser = (userId: string) => {
-    setSelectedUserIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(userId)) {
-        next.delete(userId);
-      } else {
-        next.add(userId);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectAll = () => {
-    if (selectedUserIds.size === users.length) {
-      setSelectedUserIds(new Set());
-    } else {
-      setSelectedUserIds(new Set(users.map((u) => u.id)));
-    }
-  };
-
   const handleSendEmail = async (subject: string, body: string, scheduledAt?: string) => {
     const userIds = emailTarget === 'selected' ? Array.from(selectedUserIds) : undefined;
     if (scheduledAt) {
@@ -134,6 +104,85 @@ export function AdminUsers() {
     setSelectedUserIds(new Set());
     setTimeout(() => setEmailSuccess(''), 5000);
   };
+
+  const columns: Column<AdminUser>[] = [
+    {
+      key: 'user',
+      label: 'User',
+      render: (user) => (
+        <div className={styles.userCell}>
+          <div className={styles.avatarWrapper}>
+            <img
+              src={user.avatarUrl || '/default-avatar.png'}
+              alt={user.name}
+              className={styles.avatar}
+            />
+            {onlineUserIds.has(user.id) && (
+              <span className={styles.onlineDot} title="Online" />
+            )}
+          </div>
+          <span>{user.name}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      label: 'Email',
+      render: (user) => user.email,
+    },
+    {
+      key: 'proficiency',
+      label: 'Proficiency Level',
+      render: (user) => <UserLevel user={user} variant="card" />,
+    },
+    {
+      key: 'role',
+      label: 'Role',
+      render: (user) => (
+        isSuperAdmin(currentUser?.role) && user.id !== currentUser?.id ? (
+          <select
+            value={user.role}
+            onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
+            className={styles.roleSelect}
+          >
+            {ROLES.map((role) => (
+              <option key={role} value={role}>
+                {role.replace('_', ' ')}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span className={styles.role}>{user.role.replace('_', ' ')}</span>
+        )
+      ),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (user) => (
+        <span
+          className={`${styles.status} ${user.active ? styles.active : styles.inactive}`}
+        >
+          {user.active ? 'Active' : 'Inactive'}
+        </span>
+      ),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (user) => (
+        user.id !== currentUser?.id ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleStatusToggle(user.id, user.active)}
+          >
+            {user.active ? 'Deactivate' : 'Activate'}
+          </Button>
+        ) : null
+      ),
+    },
+  ];
 
   return (
     <div className={styles.container}>
@@ -177,189 +226,27 @@ export function AdminUsers() {
       {error && <div className={styles.error}>{error}</div>}
       {emailSuccess && <div className={styles.success}>{emailSuccess}</div>}
 
-      {loading ? (
-        <div className={styles.loading}>Loading...</div>
-      ) : users.length === 0 ? (
-        <Card className={styles.empty}>
-          <p>No users found.</p>
-        </Card>
-      ) : (
-        <>
-          <Card className={styles.tableCard}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th className={styles.checkboxCol}>
-                    <input
-                      type="checkbox"
-                      onChange={handleSelectAll}
-                      checked={selectedUserIds.size === users.length && users.length > 0}
-                    />
-                  </th>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Proficiency Level</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id}>
-                    <td className={styles.checkboxCol}>
-                      <input
-                        type="checkbox"
-                        checked={selectedUserIds.has(user.id)}
-                        onChange={() => handleSelectUser(user.id)}
-                      />
-                    </td>
-                    <td>
-                      <div className={styles.userCell}>
-                        <div className={styles.avatarWrapper}>
-                          <img
-                            src={user.avatarUrl || '/default-avatar.png'}
-                            alt={user.name}
-                            className={styles.avatar}
-                          />
-                          {onlineUserIds.has(user.id) && (
-                            <span className={styles.onlineDot} title="Online" />
-                          )}
-                        </div>
-                        <span>{user.name}</span>
-                      </div>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
-                      <UserLevel user={user} variant="card" />
-                    </td>
-                    <td>
-                      {isSuperAdmin(currentUser?.role) && user.id !== currentUser?.id ? (
-                        <select
-                          value={user.role}
-                          onChange={(e) => handleRoleChange(user.id, e.target.value as Role)}
-                          className={styles.roleSelect}
-                        >
-                          {ROLES.map((role) => (
-                            <option key={role} value={role}>
-                              {role.replace('_', ' ')}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span className={styles.role}>{user.role.replace('_', ' ')}</span>
-                      )}
-                    </td>
-                    <td>
-                      <span
-                        className={`${styles.status} ${user.active ? styles.active : styles.inactive}`}
-                      >
-                        {user.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td>
-                      {user.id !== currentUser?.id && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleStatusToggle(user.id, user.active)}
-                        >
-                          {user.active ? 'Deactivate' : 'Activate'}
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
-
-          <div className={styles.paginationContainer}>
-            <div className={styles.paginationInfo}>
-              <span>
-                Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} users
-              </span>
-              <div className={styles.pageSizeSelector}>
-                <label>Rows per page:</label>
-                <select 
-                  value={pageSize} 
-                  onChange={(e) => handlePageSizeChange(Number(e.target.value))}
-                  className={styles.pageSizeSelect}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-              </div>
-            </div>
-            
-            {totalPages > 1 && (
-              <div className={styles.pagination}>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(0)}
-                  disabled={currentPage === 0}
-                  title="First page"
-                >
-                  ««
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(currentPage - 1)}
-                  disabled={currentPage === 0}
-                >
-                  Previous
-                </Button>
-                
-                <div className={styles.pageNumbers}>
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (totalPages <= 5) {
-                      pageNum = i;
-                    } else if (currentPage < 3) {
-                      pageNum = i;
-                    } else if (currentPage >= totalPages - 3) {
-                      pageNum = totalPages - 5 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => goToPage(pageNum)}
-                        className={`${styles.pageButton} ${currentPage === pageNum ? styles.active : ''}`}
-                      >
-                        {pageNum + 1}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(currentPage + 1)}
-                  disabled={currentPage === totalPages - 1}
-                >
-                  Next
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToPage(totalPages - 1)}
-                  disabled={currentPage === totalPages - 1}
-                  title="Last page"
-                >
-                  »»
-                </Button>
-              </div>
-            )}
-          </div>
-        </>
-      )}
+      <DataTable
+        data={users}
+        columns={columns}
+        getRowKey={(user) => user.id}
+        loading={loading}
+        emptyMessage="No users found"
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(0);
+        }}
+        pageSizes={[10, 25, 50, 100]}
+        selectable
+        selectedKeys={selectedUserIds}
+        onSelectionChange={setSelectedUserIds}
+        paginationLabel="users"
+      />
 
       <ScheduledEmailsPanel key={refreshScheduled} />
 
