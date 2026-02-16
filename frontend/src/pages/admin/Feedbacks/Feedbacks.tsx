@@ -11,14 +11,16 @@ export function Feedbacks() {
   const [stats, setStats] = useState<FeedbackStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [statusFilter, setStatusFilter] = useState<FeedbackStatus | ''>('');
   const [typeFilter, setTypeFilter] = useState<FeedbackType | ''>('');
   const [selectedFeedbackId, setSelectedFeedbackId] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
-  }, [page, statusFilter, typeFilter]);
+  }, [page, pageSize, statusFilter, typeFilter]);
 
   const loadData = async () => {
     setLoading(true);
@@ -26,7 +28,7 @@ export function Feedbacks() {
       const [feedbacksData, statsData] = await Promise.all([
         feedbackService.getAllFeedbacks(
           page,
-          20,
+          pageSize,
           statusFilter || undefined,
           typeFilter || undefined
         ),
@@ -35,12 +37,24 @@ export function Feedbacks() {
 
       setFeedbacks(feedbacksData.content);
       setTotalPages(feedbacksData.totalPages);
+      setTotalElements(feedbacksData.totalElements);
       setStats(statsData);
     } catch (error) {
       console.error('Failed to load feedbacks:', error);
       toast.error('Failed to load feedbacks');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setPage(0);
+  };
+
+  const goToPage = (newPage: number) => {
+    if (newPage >= 0 && newPage < totalPages) {
+      setPage(newPage);
     }
   };
 
@@ -234,27 +248,86 @@ export function Feedbacks() {
               </tbody>
             </table>
 
-            {totalPages > 1 && (
-              <div className={styles.pagination}>
-                <button
-                  className={styles.pageButton}
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 0}
-                >
-                  Previous
-                </button>
-                <span className={styles.pageInfo}>
-                  Page {page + 1} of {totalPages}
+            <div className={styles.paginationContainer}>
+              <div className={styles.paginationInfo}>
+                <span>
+                  Showing {page * pageSize + 1} to {Math.min((page + 1) * pageSize, totalElements)} of {totalElements} feedbacks
                 </span>
-                <button
-                  className={styles.pageButton}
-                  onClick={() => setPage(page + 1)}
-                  disabled={page >= totalPages - 1}
-                >
-                  Next
-                </button>
+                <div className={styles.pageSizeSelector}>
+                  <label>Rows per page:</label>
+                  <select 
+                    value={pageSize} 
+                    onChange={(e) => handlePageSizeChange(Number(e.target.value))}
+                    className={styles.pageSizeSelect}
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
               </div>
-            )}
+              
+              {totalPages > 1 && (
+                <div className={styles.pagination}>
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => goToPage(0)}
+                    disabled={page === 0}
+                    title="First page"
+                  >
+                    ««
+                  </button>
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => goToPage(page - 1)}
+                    disabled={page === 0}
+                  >
+                    Previous
+                  </button>
+                  
+                  <div className={styles.pageNumbers}>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum: number;
+                      if (totalPages <= 5) {
+                        pageNum = i;
+                      } else if (page < 3) {
+                        pageNum = i;
+                      } else if (page >= totalPages - 3) {
+                        pageNum = totalPages - 5 + i;
+                      } else {
+                        pageNum = page - 2 + i;
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => goToPage(pageNum)}
+                          className={`${styles.pageButton} ${page === pageNum ? styles.active : ''}`}
+                        >
+                          {pageNum + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => goToPage(page + 1)}
+                    disabled={page === totalPages - 1}
+                  >
+                    Next
+                  </button>
+                  <button
+                    className={styles.pageButton}
+                    onClick={() => goToPage(totalPages - 1)}
+                    disabled={page === totalPages - 1}
+                    title="Last page"
+                  >
+                    »»
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         )}
       </Card>
