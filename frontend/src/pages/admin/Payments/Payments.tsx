@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card } from '@/components/ui';
+import { DataTable } from '@/components/ui';
+import type { Column } from '@/components/ui';
 import { adminService } from '@/services';
 import type { AdminPurchase, PaymentStatus } from '@/types';
 import styles from './Payments.module.css';
@@ -11,25 +12,28 @@ export function AdminPayments() {
   const navigate = useNavigate();
   const [purchases, setPurchases] = useState<AdminPurchase[]>([]);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(20);
   const [selectedStatuses, setSelectedStatuses] = useState<PaymentStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     loadPurchases();
-  }, [currentPage, selectedStatuses]);
+  }, [currentPage, pageSize, selectedStatuses]);
 
   const loadPurchases = async () => {
     try {
       setLoading(true);
       const data = await adminService.getPayments(
         currentPage,
-        20,
+        pageSize,
         selectedStatuses.length > 0 ? selectedStatuses : undefined
       );
       setPurchases(data.content);
       setTotalPages(data.totalPages);
+      setTotalElements(data.totalElements);
     } catch (err) {
       setError('Failed to load payments');
       console.error(err);
@@ -77,6 +81,61 @@ export function AdminPayments() {
     }
   };
 
+  const columns: Column<AdminPurchase>[] = [
+    {
+      key: 'user',
+      label: 'User',
+      render: (purchase) => (
+        <div className={styles.userCell}>
+          <span className={styles.userName}>{purchase.userName}</span>
+          <span className={styles.userEmail}>{purchase.userEmail}</span>
+        </div>
+      ),
+    },
+    {
+      key: 'product',
+      label: 'Product',
+      render: (purchase) => purchase.productName,
+    },
+    {
+      key: 'credits',
+      label: 'Credits',
+      render: (purchase) => (
+        <span className={styles.credits}>
+          {purchase.creditsAmount} {purchase.creditType === 'SESSION' ? 'Sessions' : 'Conversations'}
+        </span>
+      ),
+    },
+    {
+      key: 'price',
+      label: 'Price',
+      render: (purchase) => formatCurrency(purchase.price, purchase.currency),
+    },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (purchase) => (
+        <span className={`${styles.status} ${getStatusClass(purchase.status)}`}>
+          {purchase.status}
+        </span>
+      ),
+    },
+    {
+      key: 'date',
+      label: 'Date',
+      render: (purchase) => (
+        <div className={styles.dateCell}>
+          <span>{formatDate(purchase.createdAt)}</span>
+          {purchase.completedAt && (
+            <span className={styles.completedAt}>
+              Completed: {formatDate(purchase.completedAt)}
+            </span>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className={styles.container}>
       <button className={styles.backButton} onClick={() => navigate('/')}>
@@ -103,88 +162,23 @@ export function AdminPayments() {
 
       {error && <div className={styles.error}>{error}</div>}
 
-      {loading ? (
-        <div className={styles.loading}>Loading...</div>
-      ) : purchases.length === 0 ? (
-        <Card className={styles.empty}>
-          <p>No payments found.</p>
-        </Card>
-      ) : (
-        <>
-          <Card className={styles.tableCard}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Product</th>
-                  <th>Credits</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {purchases.map((purchase) => (
-                  <tr key={purchase.id}>
-                    <td>
-                      <div className={styles.userCell}>
-                        <span className={styles.userName}>{purchase.userName}</span>
-                        <span className={styles.userEmail}>{purchase.userEmail}</span>
-                      </div>
-                    </td>
-                    <td>{purchase.productName}</td>
-                    <td>
-                      <span className={styles.credits}>
-                        {purchase.creditsAmount} {purchase.creditType === 'SESSION' ? 'Sessions' : 'Conversations'}
-                      </span>
-                    </td>
-                    <td>{formatCurrency(purchase.price, purchase.currency)}</td>
-                    <td>
-                      <span className={`${styles.status} ${getStatusClass(purchase.status)}`}>
-                        {purchase.status}
-                      </span>
-                    </td>
-                    <td>
-                      <div className={styles.dateCell}>
-                        <span>{formatDate(purchase.createdAt)}</span>
-                        {purchase.completedAt && (
-                          <span className={styles.completedAt}>
-                            Completed: {formatDate(purchase.completedAt)}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Card>
-
-          {totalPages > 1 && (
-            <div className={styles.pagination}>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
-                disabled={currentPage === 0}
-              >
-                Previous
-              </Button>
-              <span className={styles.pageInfo}>
-                Page {currentPage + 1} of {totalPages}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={currentPage === totalPages - 1}
-              >
-                Next
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+      <DataTable
+        data={purchases}
+        columns={columns}
+        getRowKey={(purchase) => purchase.id}
+        loading={loading}
+        emptyMessage="No payments found"
+        currentPage={currentPage}
+        pageSize={pageSize}
+        totalPages={totalPages}
+        totalElements={totalElements}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(0);
+        }}
+        paginationLabel="payments"
+      />
     </div>
   );
 }
