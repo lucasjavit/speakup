@@ -20,7 +20,7 @@ export function MainLayout({ children }: MainLayoutProps) {
   const [isFreeModeEnabled, setIsFreeModeEnabled] = useState<boolean | null>(null);
   const [isSettingsPageEnabled, setIsSettingsPageEnabled] = useState(false);
   const [isTranscriptFeatureEnabled, setIsTranscriptFeatureEnabled] = useState(true);
-  const [isFeedbackFeatureEnabled, setIsFeedbackFeatureEnabled] = useState(true);
+  const [isFeedbackFeatureEnabled, setIsFeedbackFeatureEnabled] = useState(false);
   
   // Don't show feedback button on admin pages
   const showFeedbackButton = isAuthenticated && isFeedbackFeatureEnabled && !location.pathname.startsWith('/admin');

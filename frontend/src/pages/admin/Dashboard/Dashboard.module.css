@@ -203,6 +203,22 @@
   gap: 0.75rem;
 }
 
+.groupedCards {
+  display: contents;
+}
+
+@media (min-width: 641px) {
+  .groupedCards {
+    display: flex;
+    gap: 0.375rem;
+    grid-column: span 2;
+  }
+  
+  .groupedCards > * {
+    flex: 1;
+  }
+}
+
 /* Responsive for stats grid */
 @media (max-width: 900px) {
   .statsGrid {
@@ -289,6 +305,7 @@
 .notifyCard,
 .settingsPageCard,
 .transcriptFeatureCard,
+.feedbackFeatureCard,
 .transcriptLimitCard {
   background: var(--bg-tertiary, #f1f5f9);
   padding: 1rem;
@@ -309,6 +326,7 @@
 .notifyCard:hover,
 .settingsPageCard:hover,
 .transcriptFeatureCard:hover,
+.feedbackFeatureCard:hover,
 .transcriptLimitCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -470,4 +488,36 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+/* Transcript Label Card */
+.transcriptLabelCard {
+  background: linear-gradient(135deg, var(--color-primary-bg, #eff6ff) 0%, #dbeafe 100%);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-primary, #667eea);
+  width: 100%;
+}
+
+.labelContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.labelIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-primary, #667eea);
+}
+
+.labelText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-primary, #667eea);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }

@@ -315,31 +315,7 @@ export function AdminDashboard() {
             </Card>
           </Tooltip>
 
-          {/* Transcript Feature Toggle Card */}
-          <Tooltip content="Quando ativado, os usuários podem gravar e acessar transcrições de conversas." position="top">
-            <Card className={styles.transcriptFeatureCard}>
-              <div className={styles.settingCardContent}>
-                <div className={styles.settingIconWrapper}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.settingIcon}>
-                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                  </svg>
-                </div>
-                <button
-                  className={`${styles.settingToggle} ${transcriptFeatureEnabled ? styles.enabled : styles.disabled}`}
-                  onClick={handleToggleTranscriptFeature}
-                  disabled={isTogglingTranscriptFeature}
-                  title={isTogglingTranscriptFeature ? 'Atualizando...' : transcriptFeatureEnabled ? 'Ativado' : 'Desativado'}
-                >
-                  <span className={styles.toggleTrack}>
-                    <span className={styles.toggleThumb} />
-                  </span>
-                </button>
-                <h3 className={styles.settingTitle}>Feature de Transcrição</h3>
-              </div>
-            </Card>
-          </Tooltip>
-
-          {/* Feedback Feature Toggle Card */}
+          {/* Feedback Card */}
           <Tooltip content="Quando ativado, os usuários podem reportar bugs e enviar sugestões através do sistema de feedback." position="top">
             <Card className={styles.feedbackFeatureCard}>
               <div className={styles.settingCardContent}>
@@ -363,36 +339,61 @@ export function AdminDashboard() {
             </Card>
           </Tooltip>
 
-          {/* Transcript Daily Limit Card */}
-          <Tooltip content="Define quantas transcrições cada usuário pode solicitar por dia." position="top">
-            <Card className={styles.transcriptLimitCard}>
-              <div className={styles.settingCardContent}>
-                <div className={styles.settingIconWrapper}>
-                  <svg viewBox="0 0 24 24" fill="currentColor" className={styles.settingIcon}>
-                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                  </svg>
-                </div>
-                <div className={styles.limitControls}>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={transcriptLimit}
-                    onChange={(e) => setTranscriptLimit(e.target.value)}
-                    className={styles.limitField}
-                  />
+          {/* Grouped Cards: Transcript Feature + Transcript Limit */}
+          <div className={styles.groupedCards}>
+            <Tooltip content="Quando ativado, os usuários podem gravar e acessar transcrições de conversas." position="top">
+              <Card className={styles.transcriptFeatureCard}>
+                <div className={styles.settingCardContent}>
+                  <div className={styles.settingIconWrapper}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" className={styles.settingIcon}>
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                  </div>
                   <button
-                    onClick={handleUpdateTranscriptLimit}
-                    disabled={isUpdatingLimit}
-                    className={styles.limitButton}
+                    className={`${styles.settingToggle} ${transcriptFeatureEnabled ? styles.enabled : styles.disabled}`}
+                    onClick={handleToggleTranscriptFeature}
+                    disabled={isTogglingTranscriptFeature}
+                    title={isTogglingTranscriptFeature ? 'Atualizando...' : transcriptFeatureEnabled ? 'Ativado' : 'Desativado'}
                   >
-                    {isUpdatingLimit ? 'Salvando...' : 'Salvar'}
+                    <span className={styles.toggleTrack}>
+                      <span className={styles.toggleThumb} />
+                    </span>
                   </button>
+                  <h3 className={styles.settingTitle}>Feature de Transcrição</h3>
                 </div>
-                <h3 className={styles.settingTitle}>Limite Diário de Transcrições</h3>
-              </div>
-            </Card>
-          </Tooltip>
+              </Card>
+            </Tooltip>
+
+            <Tooltip content="Define quantas transcrições cada usuário pode solicitar por dia." position="top">
+              <Card className={styles.transcriptLimitCard}>
+                <div className={styles.settingCardContent}>
+                  <div className={styles.settingIconWrapper}>
+                    <svg viewBox="0 0 24 24" fill="currentColor" className={styles.settingIcon}>
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                  </div>
+                  <div className={styles.limitControls}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={transcriptLimit}
+                      onChange={(e) => setTranscriptLimit(e.target.value)}
+                      className={styles.limitField}
+                    />
+                    <button
+                      onClick={handleUpdateTranscriptLimit}
+                      disabled={isUpdatingLimit}
+                      className={styles.limitButton}
+                    >
+                      {isUpdatingLimit ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </div>
+                  <h3 className={styles.settingTitle}>Limite Diário de Transcrições</h3>
+                </div>
+              </Card>
+            </Tooltip>
+          </div>
         </div>
       </Card>
     </div>
